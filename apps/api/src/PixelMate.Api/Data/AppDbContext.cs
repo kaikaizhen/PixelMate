@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using PixelMate.Api.Items;
 using PixelMate.Api.Pets;
 
 namespace PixelMate.Api.Data;
@@ -13,6 +14,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
     public DbSet<Pet> Pets => Set<Pet>();
     public DbSet<PetSkill> PetSkills => Set<PetSkill>();
+    public DbSet<ItemDefinition> ItemDefinitions => Set<ItemDefinition>();
+    public DbSet<InventoryEntry> InventoryEntries => Set<InventoryEntry>();
+    public DbSet<PetEquipment> PetEquipment => Set<PetEquipment>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -43,12 +47,45 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             e.HasIndex(x => x.OwnerId).IsUnique();                          // MVP: one main pet per owner
             e.HasOne<AppUser>().WithMany().HasForeignKey(x => x.OwnerId).OnDelete(DeleteBehavior.Cascade);
             e.HasMany(x => x.Skills).WithOne().HasForeignKey(x => x.PetId).OnDelete(DeleteBehavior.Cascade);
+            e.HasMany(x => x.Equipment).WithOne().HasForeignKey(x => x.PetId).OnDelete(DeleteBehavior.Cascade);
         });
         b.Entity<PetSkill>(e =>
         {
             e.ToTable("pet_skills", t => t.HasCheckConstraint("ck_pet_skills_points", "points >= 0 AND points <= 5"));
             e.HasKey(x => new { x.PetId, x.SkillKey });
             e.Property(x => x.SkillKey).HasMaxLength(20);
+        });
+
+        b.Entity<ItemDefinition>(e =>
+        {
+            e.ToTable("item_definitions");
+            e.HasKey(x => x.ItemId);
+            e.Property(x => x.ItemId).HasMaxLength(80);
+            e.Property(x => x.AssetKey).HasMaxLength(80).IsRequired();
+            e.Property(x => x.Category).HasMaxLength(20).IsRequired();
+            e.Property(x => x.Rarity).HasMaxLength(20).IsRequired();
+            e.Property(x => x.Slot).HasMaxLength(20);
+            e.Property(x => x.Name).HasMaxLength(80).IsRequired();
+            e.Property(x => x.Batch).HasMaxLength(8);
+            e.Property(x => x.DesignId).HasMaxLength(12);
+            e.HasIndex(x => new { x.Category, x.Rarity });
+        });
+        b.Entity<InventoryEntry>(e =>
+        {
+            e.ToTable("inventory_entries", t => t.HasCheckConstraint("ck_inventory_quantity", "quantity >= 0"));
+            e.HasKey(x => x.InventoryId);
+            e.Property(x => x.ItemId).HasMaxLength(80).IsRequired();
+            e.HasIndex(x => new { x.OwnerId, x.ItemId }).IsUnique();         // one stacked row per owner and item
+            e.HasOne<AppUser>().WithMany().HasForeignKey(x => x.OwnerId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<ItemDefinition>().WithMany().HasForeignKey(x => x.ItemId).OnDelete(DeleteBehavior.Restrict);
+        });
+        b.Entity<PetEquipment>(e =>
+        {
+            e.ToTable("pet_equipment");
+            e.HasKey(x => new { x.PetId, x.Slot });                          // a slot holds at most one item
+            e.Property(x => x.Slot).HasMaxLength(20);
+            e.Property(x => x.ItemId).HasMaxLength(80).IsRequired();
+            e.HasOne<InventoryEntry>().WithMany().HasForeignKey(x => x.InventoryId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

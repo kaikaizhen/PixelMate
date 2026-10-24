@@ -36,6 +36,7 @@ public sealed class AuthFactory(IDictionary<string, string?>? settings = null) :
 {
     private readonly SqliteConnection _db = new("DataSource=:memory:");
     public FakeMailSender Mail { get; } = new();
+    public bool Seed { get; init; } = true;
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -65,7 +66,12 @@ public sealed class AuthFactory(IDictionary<string, string?>? settings = null) :
     {
         using (var scope = Services.CreateScope())
         {
-            scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.EnsureCreated();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            if (db.Database.EnsureCreated() && Seed)            // first call on this factory: build the schema and the item catalogue
+            {
+                using var manifest = File.OpenRead(Path.Combine(AppContext.BaseDirectory, "Seed", "manifest.json"));
+                PixelMate.Api.Items.ItemCatalogSeeder.SeedAsync(db, manifest).GetAwaiter().GetResult();
+            }
         }
         var c = CreateClient();
         c.DefaultRequestHeaders.Add("X-Requested-With", "pixelmate");

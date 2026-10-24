@@ -36,6 +36,9 @@ Use single quotes around values that contain `#` or `$`, e.g. `ConnectionStrings
 | GET | `/api/v1/pets/me` | pet snapshot (docs/API契約 §2); 404 when the player has not adopted yet |
 | POST | `/api/v1/pets/me/skills/allocate` | `{skillKey, pointsToAdd 1-5, expectedRevision}` → `{revision, skills, remainingSkillPoints}`; 422 `INSUFFICIENT_POINTS` (no points / over the 5 cap), 409 `REVISION_CONFLICT` |
 | POST | `/api/v1/pets/me/skills/reset` | `{expectedRevision}` → all skills back to 0 (free in the MVP) |
+| GET | `/api/v1/inventory` | the player's items with catalogue details (`name, category, rarity, slot, assetKey, quantity, equipped`) |
+| POST | `/api/v1/pets/me/equipment` | `{slot, itemId \| null, expectedRevision}` wear / take off; slots `head front back feet hand costume`; costume and hat exclude each other |
+| POST | `/api/v1/dev/inventory/grant` | **Development only**: `{itemId, quantity}` puts items in the bag |
 | POST | `/api/v1/dev/pets/me/level-up` | **Development only** (not mapped elsewhere): +1 level so skill points can be tested |
 | POST | `/api/v1/auth/confirm-email` / `resend-confirmation` | e-mail verification; enforced when `Auth:RequireConfirmedEmail=true` |
 
@@ -56,3 +59,9 @@ dotnet ef migrations add <Name> --project src/PixelMate.Api --output-dir Data/Mi
 ```
 
 Every error is `{ "code", "message", "requestId" }`; codes are defined once in `Infrastructure/ApiError.cs`.
+
+## Item catalogue
+
+`item_definitions` is seeded at start-up from `assets/manifest.json` (copied to `Seed/manifest.json`), so the art, the API and the PWA /
+ESP32 share the same assetKeys (`itemId` = assetKey). Items: wearables, furniture, decor, collectibles and stationery (458 today); weather
+scenes, effects and costume tails are not items. Rarity follows the art batch: B1/B2 common, B3/B4 rare, B5 and costumes precious.
