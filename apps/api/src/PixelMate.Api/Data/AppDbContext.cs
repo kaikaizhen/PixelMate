@@ -39,6 +39,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             e.HasKey(x => x.PetId);
             e.Property(x => x.Name).HasMaxLength(48).IsRequired();          // 12 characters, up to 4 UTF-8 bytes each
             e.Property(x => x.BodyVariant).HasMaxLength(40).IsRequired();
+            e.Property(x => x.Revision).IsConcurrencyToken();                // two writers with the same revision: only one wins
             e.HasIndex(x => x.OwnerId).IsUnique();                          // MVP: one main pet per owner
             e.HasOne<AppUser>().WithMany().HasForeignKey(x => x.OwnerId).OnDelete(DeleteBehavior.Cascade);
             e.HasMany(x => x.Skills).WithOne().HasForeignKey(x => x.PetId).OnDelete(DeleteBehavior.Cascade);

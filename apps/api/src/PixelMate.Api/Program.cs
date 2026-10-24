@@ -143,6 +143,10 @@ var api = app.MapGroup("/api/v1");
 api.MapHealth();
 api.MapAuth();
 api.MapPets();
+if (app.Environment.IsDevelopment())
+{
+    api.MapDev();      // test helpers; never mapped outside Development
+}
 
 app.Run();
 
