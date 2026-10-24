@@ -54,7 +54,7 @@ test.describe('不用捲動', () => {
     await fits(page)
     await page.getByLabel('小夥伴的名字').fill('麻糬')
     await page.getByRole('button', { name: '領養牠！' }).click()
-    await expect(page.getByRole('heading', { name: '麻糬' })).toBeVisible()
+    await expect(page.getByRole('button', { name: '摸摸 麻糬' })).toBeVisible()
     await fits(page)
   })
 })
