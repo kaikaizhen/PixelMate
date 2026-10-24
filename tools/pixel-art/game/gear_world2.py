@@ -455,15 +455,15 @@ def fx_make(kind, mode):
                     _draw_fx(s, kind, x + (1 if (f + k) % 2 else -1), y, k != 2, cols[k % 3])
         elif mode == "bounce":
             y = [38, 28, 18, 28][f]
-            _draw_fx(s, kind, 43, y, True, cols[0])
+            _draw_fx(s, kind, 44, y, True, cols[0])
             if f in (0, 3):
                 s.rect(38, 44, 47, 44, "#e3d9d2")
         else:
             r = 4 + f * 5
-            for k, (dx, dy) in enumerate(((-1, 0.25), (-0.75, -0.6), (0, -1), (0.75, -0.6), (1, 0.25), (-0.35, -0.9))):
+            for k, (dx, dy) in enumerate(((-1, 0), (-0.75, -0.6), (0, -1), (0.75, -0.6), (1, 0), (-0.35, -0.9))):
                 if f == 3 and k % 2:
                     continue
-                x, y = int(24 + dx * (r + 4)), int(15 + dy * r)
+                x, y = int(24 + dx * (r + 4)), int(14 + dy * r)
                 if 2 < y < 21 and 2 < x < 46:
                     _draw_fx(s, kind, x, y, f < 3, cols[k % 3])
         edge(s)
