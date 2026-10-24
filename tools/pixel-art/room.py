@@ -43,13 +43,6 @@ s.rect(WX - 5, WY - 5, WX + WW + 4, WY + WH + 4, FRAME)
 s.rect(WX - 5, WY - 5, WX + WW + 4, WY + WH + 4, LINE, fill=False)
 s.rect(WX - 2, WY + WH + 5, WX + WW + 1, WY + WH + 9, TRIM)              # sill
 s.rect(WX - 2, WY + WH + 5, WX + WW + 1, WY + WH + 9, LINE, fill=False)
-# plant (left)
-s.rect(26, 118, 47, 143, POT); s.rect(26, 118, 47, 143, LINE, fill=False)
-s.rect(28, 132, 45, 135, POT_D)
-for (x0, y0, x1, y1) in [(20, 84, 32, 118), (33, 70, 42, 118), (42, 88, 54, 118), (28, 96, 40, 118)]:
-    s.ellipse(x0, y0, x1, y1, GREEN)
-    s.line((x0 + x1) // 2, y0 + 4, (x0 + x1) // 2, y1, GREEN_D)
-    s.ellipse(x0, y0, x1, y1, LINE, fill=False)
 # shelf with frames
 s.rect(40, 36, 108, 40, WOOD); s.rect(40, 36, 108, 40, LINE, fill=False)
 s.rect(46, 14, 62, 34, FRAME); s.rect(46, 14, 62, 34, LINE, fill=False); s.rect(50, 18, 58, 30, "#f2a9a0")
@@ -61,38 +54,3 @@ s.rect(WX, WY, WX + WW - 1, WY + WH - 1, None)
 s.save_png(OUT + "/room.png")
 s.preview(OUT + "/_preview_room.png", scale=3, bg="#cfe3f0")
 
-def window(name, sky, ground, extra):
-    w = Sprite(WW, WH, palette=PAL + [sky[0], sky[1], ground])
-    for y in range(WH):
-        w.line(0, y, WW - 1, y, sky[0] if y < WH * 0.55 else sky[1])
-    w.rect(0, WH - 14, WW - 1, WH - 1, ground)
-    w.rect(0, WH - 14, WW - 1, WH - 14, GREEN_D)
-    extra(w)
-    w.rect(WW // 2 - 1, 0, WW // 2, WH - 1, FRAME); w.rect(0, WH // 2 - 1, WW - 1, WH // 2, FRAME)
-    w.save_png(OUT + "/window_%s.png" % name)
-
-def sunny(w):
-    w.circle(46, 16, 8, "#ffd86b", fill=True)
-    w.circle(46, 16, 8, "#ffbf4a", fill=False)
-    for cx, cy in [(14, 20), (30, 38)]:
-        w.ellipse(cx - 8, cy, cx + 8, cy + 8, "#ffffff"); w.ellipse(cx - 4, cy - 4, cx + 4, cy + 4, "#ffffff")
-
-def rain(w):
-    rnd = random.Random(7)
-    w.rect(0, 0, WW - 1, 22, "#8a9ab0")
-    for cx in (10, 28, 44, 58):
-        w.ellipse(cx - 9, 8, cx + 9, 24, "#a6b3c6")
-    for _ in range(26):
-        x = rnd.randrange(2, WW - 2); y = rnd.randrange(22, WH - 16)
-        w.line(x, y, x - 1, y + 3, "#d9ecff")
-
-def night(w):
-    rnd = random.Random(3)
-    w.circle(18, 16, 8, "#ffe9a8", fill=True); w.circle(22, 14, 7, "#2b3358", fill=True)
-    for _ in range(14):
-        w.px(rnd.randrange(2, WW - 2), rnd.randrange(2, WH - 24), "#ffffff")
-    w.px(44, 12, "#ffd86b"); w.px(45, 12, "#ffd86b"); w.px(44, 13, "#ffd86b")
-
-window("sunny", ("#9ad8f0", "#d4f0f6"), "#9ad075", sunny)
-window("rain", ("#7f93ad", "#a9b8c9"), "#6f9a73", rain)
-window("night", ("#232a50", "#3a4575"), "#2f4a45", night)
