@@ -11,7 +11,33 @@ STAR = "#ffd86b"; STAR_D = "#f2b84a"; FOOT = "#e9a98e"
 PAL = [LINE, BODY, BODY_D, BODY_L, CHEEK, EYE, WHITE, STAR, STAR_D, FOOT]
 
 
-def sprite(bob=0, sway=0, blink=False, happy=False, look=None, step=0):
+def draw_face(s, y=0, blink=False, happy=False, look=None, sleepy=False):
+    # face (eyes, cheeks, mouth)
+    if sleepy:
+        for ex in (14, 29):
+            s.rect(ex, 27 + y, ex + 3, 28 + y, EYE); s.px(ex, 26 + y, EYE); s.px(ex + 3, 26 + y, EYE)
+    elif blink:
+        s.line(14, 27 + y, 18, 27 + y, EYE); s.line(29, 27 + y, 33, 27 + y, EYE)
+    elif happy:
+        for ex in (14, 29):
+            s.px(ex, 28 + y, EYE); s.px(ex + 1, 27 + y, EYE); s.px(ex + 2, 26 + y, EYE)
+            s.px(ex + 3, 27 + y, EYE); s.px(ex + 4, 28 + y, EYE)
+    elif look == "down":
+        s.rect(14, 26 + y, 17, 29 + y, EYE); s.rect(30, 26 + y, 33, 29 + y, EYE)
+    elif look == "right":
+        s.rect(16, 24 + y, 19, 28 + y, EYE); s.rect(32, 24 + y, 35, 28 + y, EYE)
+        s.px(18, 24 + y, WHITE); s.px(34, 24 + y, WHITE)
+    else:
+        s.rect(14, 24 + y, 17, 28 + y, EYE); s.rect(30, 24 + y, 33, 28 + y, EYE)
+        s.px(14, 24 + y, WHITE); s.px(30, 24 + y, WHITE)
+    s.rect(9, 30 + y, 12, 32 + y, CHEEK); s.rect(35, 30 + y, 38, 32 + y, CHEEK)
+    if happy:
+        s.rect(22, 30 + y, 25, 31 + y, EYE); s.rect(23, 32 + y, 24, 33 + y, EYE)
+    else:
+        s.px(22, 31 + y, EYE); s.px(25, 31 + y, EYE); s.line(23, 32 + y, 24, 32 + y, EYE)
+
+
+def sprite(bob=0, sway=0, blink=False, happy=False, look=None, step=0, face=True):
     s = Sprite(48, 48, palette=PAL)
     y = bob
     # little feet
@@ -33,26 +59,8 @@ def sprite(bob=0, sway=0, blink=False, happy=False, look=None, step=0):
                (sx + 4, 8 + y), (sx, 6 + y), (sx - 4, 8 + y), (sx - 3, 5 + y),
                (sx - 5, 3 + y), (sx - 2, 3 + y)], STAR)
     s.px(sx - 1, 3 + y, WHITE); s.px(sx + 3, 6 + y, STAR_D); s.px(sx - 3, 6 + y, STAR_D)
-    # face
-    if blink:
-        s.line(14, 27 + y, 18, 27 + y, EYE); s.line(29, 27 + y, 33, 27 + y, EYE)
-    elif happy:
-        for ex in (14, 29):
-            s.px(ex, 28 + y, EYE); s.px(ex + 1, 27 + y, EYE); s.px(ex + 2, 26 + y, EYE)
-            s.px(ex + 3, 27 + y, EYE); s.px(ex + 4, 28 + y, EYE)
-    elif look == "down":
-        s.rect(14, 26 + y, 17, 29 + y, EYE); s.rect(30, 26 + y, 33, 29 + y, EYE)
-    elif look == "right":
-        s.rect(16, 24 + y, 19, 28 + y, EYE); s.rect(32, 24 + y, 35, 28 + y, EYE)
-        s.px(18, 24 + y, WHITE); s.px(34, 24 + y, WHITE)
-    else:
-        s.rect(14, 24 + y, 17, 28 + y, EYE); s.rect(30, 24 + y, 33, 28 + y, EYE)
-        s.px(14, 24 + y, WHITE); s.px(30, 24 + y, WHITE)
-    s.rect(9, 30 + y, 12, 32 + y, CHEEK); s.rect(35, 30 + y, 38, 32 + y, CHEEK)
-    if happy:
-        s.rect(22, 30 + y, 25, 31 + y, EYE); s.rect(23, 32 + y, 24, 33 + y, EYE)
-    else:
-        s.px(22, 31 + y, EYE); s.px(25, 31 + y, EYE); s.line(23, 32 + y, 24, 32 + y, EYE)
+    if face:
+        draw_face(s, y, blink, happy, look)
     return s
 
 

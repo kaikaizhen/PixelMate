@@ -1,0 +1,660 @@
+{
+  "version": "1.0.0",
+  "logicalCanvas": {
+    "width": 240,
+    "height": 240
+  },
+  "assets": {
+    "pet.star_01.body.cream.idle": {
+      "type": "spritesheet",
+      "layer": "pet_body",
+      "path": "sprites/pets/star_01/body_cream_idle.png",
+      "frames": 4,
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "fps": 4,
+      "anchor": [
+        24,
+        46
+      ]
+    },
+    "pet.star_01.body.cream.sleep": {
+      "type": "spritesheet",
+      "layer": "pet_body",
+      "path": "sprites/pets/star_01/body_cream_sleep.png",
+      "frames": 2,
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "fps": 4,
+      "anchor": [
+        24,
+        46
+      ]
+    },
+    "pet.star_01.body.cream.walk": {
+      "type": "spritesheet",
+      "layer": "pet_body",
+      "path": "sprites/pets/star_01/body_cream_walk.png",
+      "frames": 4,
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "fps": 4,
+      "anchor": [
+        24,
+        46
+      ]
+    },
+    "pet.star_01.body.mint.idle": {
+      "type": "spritesheet",
+      "layer": "pet_body",
+      "path": "sprites/pets/star_01/body_mint_idle.png",
+      "frames": 4,
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "fps": 4,
+      "anchor": [
+        24,
+        46
+      ]
+    },
+    "pet.star_01.body.mint.sleep": {
+      "type": "spritesheet",
+      "layer": "pet_body",
+      "path": "sprites/pets/star_01/body_mint_sleep.png",
+      "frames": 2,
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "fps": 4,
+      "anchor": [
+        24,
+        46
+      ]
+    },
+    "pet.star_01.body.mint.walk": {
+      "type": "spritesheet",
+      "layer": "pet_body",
+      "path": "sprites/pets/star_01/body_mint_walk.png",
+      "frames": 4,
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "fps": 4,
+      "anchor": [
+        24,
+        46
+      ]
+    },
+    "pet.star_01.face.blink": {
+      "type": "image",
+      "layer": "pet_face",
+      "path": "sprites/pets/star_01/face_blink.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ]
+    },
+    "pet.star_01.face.happy": {
+      "type": "image",
+      "layer": "pet_face",
+      "path": "sprites/pets/star_01/face_happy.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ]
+    },
+    "pet.star_01.face.look_down": {
+      "type": "image",
+      "layer": "pet_face",
+      "path": "sprites/pets/star_01/face_look_down.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ]
+    },
+    "pet.star_01.face.look_right": {
+      "type": "image",
+      "layer": "pet_face",
+      "path": "sprites/pets/star_01/face_look_right.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ]
+    },
+    "pet.star_01.face.normal": {
+      "type": "image",
+      "layer": "pet_face",
+      "path": "sprites/pets/star_01/face_normal.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ]
+    },
+    "pet.star_01.face.sleepy": {
+      "type": "image",
+      "layer": "pet_face",
+      "path": "sprites/pets/star_01/face_sleepy.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ]
+    },
+    "pet.star_01.prop.book": {
+      "type": "spritesheet",
+      "layer": "pet_front_accessory",
+      "path": "sprites/pets/star_01/prop_book.png",
+      "frames": 2,
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "fps": 2,
+      "anchor": [
+        24,
+        46
+      ]
+    }
+  },
+  "animations": {
+    "pet.star_01.anim.blink": {
+      "fps": 8,
+      "loop": false,
+      "frames": [
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "normal",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "blink",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "pet.star_01.anim.idle": {
+      "fps": 4,
+      "loop": true,
+      "frames": [
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "normal",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 1
+          },
+          "face": "normal",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 2
+          },
+          "face": "normal",
+          "attach": [
+            0,
+            1
+          ],
+          "root": [
+            0,
+            0
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 3
+          },
+          "face": "normal",
+          "attach": [
+            0,
+            1
+          ],
+          "root": [
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "pet.star_01.anim.rain_watch": {
+      "fps": 2,
+      "loop": true,
+      "frames": [
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "look_right",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 1
+          },
+          "face": "look_right",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 2
+          },
+          "face": "look_right",
+          "attach": [
+            0,
+            1
+          ],
+          "root": [
+            0,
+            0
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 3
+          },
+          "face": "look_right",
+          "attach": [
+            0,
+            1
+          ],
+          "root": [
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "pet.star_01.anim.react_happy": {
+      "fps": 8,
+      "loop": false,
+      "frames": [
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "happy",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "happy",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            -3
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "happy",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            -6
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "happy",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            -3
+          ]
+        }
+      ]
+    },
+    "pet.star_01.anim.read": {
+      "fps": 3,
+      "loop": true,
+      "frames": [
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "look_down",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ],
+          "props": [
+            {
+              "key": "pet.star_01.prop.book",
+              "index": 0
+            }
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "look_down",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ],
+          "props": [
+            {
+              "key": "pet.star_01.prop.book",
+              "index": 0
+            }
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 1
+          },
+          "face": "look_down",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ],
+          "props": [
+            {
+              "key": "pet.star_01.prop.book",
+              "index": 1
+            }
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "look_down",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ],
+          "props": [
+            {
+              "key": "pet.star_01.prop.book",
+              "index": 0
+            }
+          ]
+        }
+      ]
+    },
+    "pet.star_01.anim.receive_mail": {
+      "fps": 6,
+      "loop": false,
+      "frames": [
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "happy",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "happy",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            -2
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "happy",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            -5
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "happy",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            -2
+          ]
+        }
+      ]
+    },
+    "pet.star_01.anim.sleep": {
+      "fps": 1,
+      "loop": true,
+      "frames": [
+        {
+          "body": {
+            "sheet": "sleep",
+            "index": 0
+          },
+          "face": "sleepy",
+          "attach": [
+            0,
+            2
+          ],
+          "root": [
+            0,
+            0
+          ]
+        },
+        {
+          "body": {
+            "sheet": "sleep",
+            "index": 1
+          },
+          "face": "sleepy",
+          "attach": [
+            0,
+            3
+          ],
+          "root": [
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "pet.star_01.anim.walk": {
+      "fps": 6,
+      "loop": true,
+      "frames": [
+        {
+          "body": {
+            "sheet": "walk",
+            "index": 0
+          },
+          "face": "normal",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ]
+        },
+        {
+          "body": {
+            "sheet": "walk",
+            "index": 1
+          },
+          "face": "normal",
+          "attach": [
+            0,
+            1
+          ],
+          "root": [
+            0,
+            0
+          ]
+        },
+        {
+          "body": {
+            "sheet": "walk",
+            "index": 2
+          },
+          "face": "normal",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ]
+        },
+        {
+          "body": {
+            "sheet": "walk",
+            "index": 3
+          },
+          "face": "normal",
+          "attach": [
+            0,
+            1
+          ],
+          "root": [
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  }
+}
