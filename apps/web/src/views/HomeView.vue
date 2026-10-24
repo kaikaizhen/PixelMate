@@ -5,6 +5,7 @@ import DailySection from '@/components/business/DailySection.vue'
 import MailSection from '@/components/business/MailSection.vue'
 import DressSection from '@/components/business/DressSection.vue'
 import WeatherSection from '@/components/business/WeatherSection.vue'
+import PlatformsSection from '@/components/business/PlatformsSection.vue'
 import ComingSoonSection from '@/components/business/ComingSoonSection.vue'
 
 const TITLE = '小伴星PixelMate｜即將與你見面'
@@ -39,5 +40,6 @@ useHead({
   <MailSection />
   <DressSection />
   <WeatherSection />
+  <PlatformsSection />
   <ComingSoonSection />
 </template>
