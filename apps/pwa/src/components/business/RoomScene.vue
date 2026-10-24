@@ -34,14 +34,14 @@ const night = computed(() => windowWeatherKey(new Date(), props.weather).include
         backgroundImage: weatherUrl ? `url(${weatherUrl})` : undefined,
         backgroundSize: `${u(ROOM_SIZE)} ${u(ROOM_SIZE)}`, backgroundPosition: `${u(-WINDOW_VIEW.x)} ${u(-WINDOW_VIEW.y)}` }" />
     <!-- 2. the house -->
-    <img class="layer pixelated" :src="room" alt="" />
-    <img class="abs pixelated" :src="bars" alt="" :style="{ left: u(WINDOW.x), top: u(WINDOW.y), width: u(WINDOW.w), height: u(WINDOW.h) }" />
+    <img draggable="false" class="layer pixelated" :src="room" alt="" />
+    <img draggable="false" class="abs pixelated" :src="bars" alt="" :style="{ left: u(WINDOW.x), top: u(WINDOW.y), width: u(WINDOW.w), height: u(WINDOW.h) }" />
     <SpriteStrip :src="plant" :frames="4" :width="44" :height="80" :x="15" :y="64" duration="2.4s" />
     <SpriteStrip :src="curtainL" :frames="4" :width="14" :height="84" :x="122" :y="24" duration="3.2s" />
     <SpriteStrip :src="curtainR" :frames="4" :width="14" :height="84" :x="208" :y="24" duration="3.2s" delay="-0.4s" />
     <!-- 3. furniture, by assetKey -->
     <template v-for="f in DEFAULT_FURNITURE" :key="f.key">
-      <img v-if="game.url(f.key)" class="abs pixelated" :src="game.url(f.key)" alt="" :style="{ left: u(f.x), top: u(f.y), width: u(f.w), height: u(f.w) }" />
+      <img draggable="false" v-if="game.url(f.key)" class="abs pixelated" :src="game.url(f.key)" alt="" :style="{ left: u(f.x), top: u(f.y), width: u(f.w), height: u(f.w) }" />
     </template>
     <!-- 4. the pet -->
     <button type="button" class="pet" :class="{ hop: happy }" :style="{ left: u(PET_SPOT.x), top: u(PET_SPOT.y) }" :aria-label="`摸摸 ${name}`" @click="$emit('pat')">

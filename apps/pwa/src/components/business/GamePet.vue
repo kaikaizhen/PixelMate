@@ -12,7 +12,7 @@ const face = computed(() => game.url(`pet.star_01.face.${props.face}`))
 <template>
   <div v-if="body" class="gp">
     <span class="body pixelated" :style="{ backgroundImage: `url(${body})` }" />
-    <img v-if="face" class="face pixelated" :src="face" alt="" />
+    <img draggable="false" v-if="face" class="face pixelated" :src="face" alt="" />
   </div>
 </template>
 

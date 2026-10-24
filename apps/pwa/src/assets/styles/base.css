@@ -26,6 +26,11 @@ a {
   text-underline-offset: 3px;
 }
 
+img {
+  -webkit-user-drag: none; /* pixel art is never lifted out as a picture by drag / long-press */
+  -webkit-touch-callout: none;
+}
+
 .pixelated {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
@@ -53,4 +58,24 @@ a {
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
   }
+}
+
+/* The game screens (room, HUD, cards) behave like an app: no text selection, no image callout / drag.
+   Form fields stay selectable so players can still edit what they type. */
+.game-screen,
+.game-screen * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.game-screen img,
+.game-screen [style*='background-image'] {
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+.game-screen input,
+.game-screen textarea {
+  -webkit-user-select: text;
+  user-select: text;
 }

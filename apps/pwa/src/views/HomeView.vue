@@ -40,7 +40,7 @@ const { loading, submit } = useSubmit(async () => {
 </script>
 
 <template>
-  <main class="home">
+  <main class="home game-screen" @contextmenu.prevent>
     <FullRoom :color="colorOf(pet.bodyVariant)" :happy="happy" :name="pet.name" :weather="pet.world.weather" @pat="pat" />
 
     <!-- HUD: nothing here blocks the room; every function opens in a panel on top of it -->

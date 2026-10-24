@@ -53,7 +53,7 @@ function onSubmit() {
 </script>
 
 <template>
-  <main class="adopt">
+  <main class="adopt game-screen" @contextmenu.prevent>
     <header>
       <PixelPet :color="color" :face="face" :scale="petScale" label="你選的小夥伴預覽" />
       <h1>領養你的第一隻小夥伴</h1>

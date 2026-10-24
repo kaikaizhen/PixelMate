@@ -23,7 +23,7 @@ const face = computed(() => ({ normal: faceNormal, happy: faceHappy, sleepy: fac
 <template>
   <div class="px-pet" :style="{ '--s': scale }" :role="decorative ? undefined : 'img'" :aria-label="decorative ? undefined : label" :aria-hidden="decorative || undefined">
     <div class="body pixelated" :style="{ backgroundImage: `url(${body})` }" />
-    <img class="face pixelated" :src="face" alt="" width="48" height="48" />
+    <img draggable="false" class="face pixelated" :src="face" alt="" width="48" height="48" />
   </div>
 </template>
 
