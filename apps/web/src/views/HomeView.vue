@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useHead } from '@unhead/vue'
 import HeroSection from '@/components/business/HeroSection.vue'
+import DailySection from '@/components/business/DailySection.vue'
 
 const TITLE = '小伴星PixelMate｜即將與你見面'
 const DESCRIPTION =
@@ -30,4 +31,5 @@ useHead({
 
 <template>
   <HeroSection />
+  <DailySection />
 </template>

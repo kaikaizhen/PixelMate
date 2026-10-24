@@ -55,3 +55,4 @@ img {
     transition-duration: 0.001ms !important;
   }
 }
+html { scroll-behavior: smooth; }

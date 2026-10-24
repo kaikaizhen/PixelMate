@@ -13,6 +13,7 @@ import PixelScene from '@/components/business/PixelScene.vue'
         <p class="hero__lead">
           一隻會陪你生活、陪你成長，也會幫你把心意送到遠方的像素小夥伴。
         </p>
+        <a class="hero__more" href="#daily">往下認識牠 ↓</a>
       </div>
       <div class="hero__scene">
         <PixelScene />
@@ -57,6 +58,19 @@ import PixelScene from '@/components/business/PixelScene.vue'
   max-width: 28em;
   font-size: 1.1rem;
   color: var(--c-ink-soft);
+}
+
+.hero__more {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  padding: 0 1.2rem;
+  border: 3px solid var(--c-ink);
+  background: var(--c-pink);
+  color: var(--c-ink);
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 4px 4px 0 var(--c-ink);
 }
 
 .hero__scene {
