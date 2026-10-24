@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useHead } from '@unhead/vue'
 import HeroSection from '@/components/business/HeroSection.vue'
+import fontPixel from '@fontsource/press-start-2p/files/press-start-2p-latin-400-normal.woff2?url'
 import roomImg from '@/assets/pixel/room.png'
 import petIdleImg from '@/assets/pixel/pet_idle.png'
 import DailySection from '@/components/business/DailySection.vue'
@@ -57,6 +58,7 @@ useHead({
     // 首屏必要的像素圖提早載入
     { rel: 'preload', as: 'image', href: roomImg, fetchpriority: 'high' },
     { rel: 'preload', as: 'image', href: petIdleImg },
+    { rel: 'preload', as: 'font', type: 'font/woff2', href: fontPixel, crossorigin: 'anonymous' },
     ...(siteUrl ? [{ rel: 'canonical', href: `${siteUrl}/` }] : []),
   ],
 })
