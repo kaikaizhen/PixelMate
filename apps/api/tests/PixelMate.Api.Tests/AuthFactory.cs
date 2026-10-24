@@ -14,7 +14,7 @@ using PixelMate.Api.Mail;
 
 namespace PixelMate.Api.Tests;
 
-public sealed record SentMail(string To, string Subject, string Text)
+public sealed record SentMail(string To, string Subject, string Text, string Html = "", int ImageCount = 0)
 {
     public string Link => Regex.Match(Text, @"https?://\S+").Value;
     public string Query(string key) => System.Web.HttpUtility.ParseQueryString(new Uri(Link).Query)[key]!;
@@ -24,9 +24,9 @@ public sealed class FakeMailSender : IMailSender
 {
     public ConcurrentQueue<SentMail> Sent { get; } = new();
 
-    public Task SendAsync(string toAddress, string subject, string htmlBody, string textBody, CancellationToken ct = default)
+    public Task SendAsync(string toAddress, MailContent content, CancellationToken ct = default)
     {
-        Sent.Enqueue(new SentMail(toAddress, subject, textBody));
+        Sent.Enqueue(new SentMail(toAddress, content.Subject, content.Text, content.Html, content.Images.Count));
         return Task.CompletedTask;
     }
 }

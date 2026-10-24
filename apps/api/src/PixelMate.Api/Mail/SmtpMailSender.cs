@@ -28,14 +28,20 @@ public sealed class SmtpMailSender(IOptions<MailOptions> options, ILogger<SmtpMa
             or System.Security.Cryptography.X509Certificates.X509ChainStatusFlags.OfflineRevocation);
     }
 
-    public async Task SendAsync(string toAddress, string subject, string htmlBody, string textBody, CancellationToken ct = default)
+    public async Task SendAsync(string toAddress, MailContent content, CancellationToken ct = default)
     {
         var o = options.Value;
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(o.FromName, string.IsNullOrWhiteSpace(o.FromAddress) ? o.Username : o.FromAddress));
         message.To.Add(MailboxAddress.Parse(toAddress));
-        message.Subject = subject;
-        message.Body = new BodyBuilder { HtmlBody = htmlBody, TextBody = textBody }.ToMessageBody();
+        message.Subject = content.Subject;
+        var body = new BodyBuilder { HtmlBody = content.Html, TextBody = content.Text };
+        foreach (var img in content.Images)
+        {
+            var part = body.LinkedResources.Add(img.ContentId + ".png", img.Bytes, ContentType.Parse(img.MediaType));
+            part.ContentId = img.ContentId;
+        }
+        message.Body = body.ToMessageBody();
 
         try
         {
@@ -57,15 +63,15 @@ public sealed class SmtpMailSender(IOptions<MailOptions> options, ILogger<SmtpMa
 /// <summary>Development / not-configured fallback: nothing is sent; the subject is logged so flows can be tested.</summary>
 public sealed class LogMailSender(ILogger<LogMailSender> log, IHostEnvironment env) : IMailSender
 {
-    public Task SendAsync(string toAddress, string subject, string htmlBody, string textBody, CancellationToken ct = default)
+    public Task SendAsync(string toAddress, MailContent content, CancellationToken ct = default)
     {
         if (env.IsDevelopment())
         {
-            log.LogInformation("[dev mail] to={To} subject={Subject}\n{Text}", toAddress, subject, textBody);   // dev only: includes the link
+            log.LogInformation("[dev mail] to={To} subject={Subject}\n{Text}", toAddress, content.Subject, content.Text);   // dev only: includes the link
         }
         else
         {
-            log.LogWarning("Mail is not configured; the message \"{Subject}\" was not sent.", subject);
+            log.LogWarning("Mail is not configured; the message \"{Subject}\" was not sent.", content.Subject);
         }
         return Task.CompletedTask;
     }
