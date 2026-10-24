@@ -5,6 +5,8 @@ import OverlayPanel from '@/components/common/OverlayPanel.vue'
 import PixelButton from '@/components/common/PixelButton.vue'
 import FullRoom from '@/components/business/FullRoom.vue'
 import { SKILLS, colorOf } from '@/constants/petLooks'
+import { ApiError } from '@/api/http'
+import { MAX_SKILL_POINTS, type SkillKey } from '@/types/pet.types'
 import { useSubmit } from '@/composables/useSubmit'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { usePetStore } from '@/stores/usePetStore'
@@ -32,6 +34,30 @@ function pat() {
 }
 onUnmounted(() => window.clearTimeout(timer))
 
+// ---- skill points -----------------------------------------------------------------------------------------------
+const notice = ref('')
+const confirmReset = ref(false)
+const isDev = import.meta.env.DEV
+const canAdd = (key: SkillKey) => pet.value.remainingSkillPoints > 0 && pet.value.skills[key] < MAX_SKILL_POINTS
+
+const skillOp = useSubmit(async (run: () => Promise<void>) => {
+  notice.value = ''
+  try {
+    await run()
+  } catch (e) {
+    if (e instanceof ApiError && e.code === 'REVISION_CONFLICT') notice.value = '資料已在別的地方更新，已幫你重新載入，再試一次吧。'
+    else throw e
+  }
+})
+const add = (key: SkillKey) => skillOp.submit(() => pets.allocate(key))
+const reset = async () => {
+  if (!confirmReset.value) return void (confirmReset.value = true)
+  confirmReset.value = false
+  await skillOp.submit(() => pets.resetSkills())
+}
+const spent = computed(() => Object.values(pet.value.skills).reduce((a, b) => a + b, 0))
+const levelUp = () => skillOp.submit(() => pets.devLevelUp())
+
 const { loading, submit } = useSubmit(async () => {
   panel.value = null
   await auth.logout()
@@ -45,7 +71,7 @@ const { loading, submit } = useSubmit(async () => {
 
     <!-- HUD: nothing here blocks the room; every function opens in a panel on top of it -->
     <button type="button" class="chip" aria-haspopup="dialog" @click="toggle('pet')">
-      <strong>{{ pet.name }}</strong><span>Lv.{{ pet.level }}</span>
+      <strong>{{ pet.name }}</strong><span>Lv.{{ pet.level }}</span><em v-if="pet.remainingSkillPoints" class="badge">+{{ pet.remainingSkillPoints }}</em>
     </button>
     <p v-if="welcome" class="toast" role="status">領養成功！{{ pet.name }} 住進你的小屋了。</p>
 
@@ -56,14 +82,22 @@ const { loading, submit } = useSubmit(async () => {
       <button type="button" class="tool" aria-haspopup="dialog" @click="toggle('account')"><span aria-hidden="true">⚙️</span>帳號</button>
     </nav>
 
-    <OverlayPanel :open="panel === 'pet'" :title="pet.name" @close="panel = null">
-      <p class="meta">Lv.{{ pet.level }}　·　經驗 {{ pet.xp }}</p>
+    <OverlayPanel :open="panel === 'pet'" :title="pet.name" :subtitle="`Lv.${pet.level}　·　經驗 ${pet.xp}　·　可分配 ${pet.remainingSkillPoints} 點`" @close="panel = null">
+      <p v-if="notice" class="notice" role="alert">{{ notice }}</p>
+      <p v-else-if="skillOp.error.value" class="notice" role="alert">{{ skillOp.error.value.message }}</p>
       <ul class="skills" aria-label="技能">
         <li v-for="s in SKILLS" :key="s.key">
-          <strong>{{ s.label }}</strong><span class="pts">{{ pet.skills[s.key] }}</span><small>{{ s.hint }}</small>
+          <span class="name"><strong>{{ s.label }}</strong><small>{{ s.hint }}</small></span>
+          <span class="pips" role="img" :aria-label="`${s.label} ${pet.skills[s.key]} / ${MAX_SKILL_POINTS} 點`">
+            <i v-for="n in MAX_SKILL_POINTS" :key="n" :class="{ on: n <= pet.skills[s.key] }" />
+          </span>
+          <button type="button" class="add" :disabled="!canAdd(s.key) || skillOp.loading.value" :aria-label="`${s.label} 加 1 點`" @click="add(s.key)">＋</button>
         </li>
       </ul>
-      <p class="soon">技能、換裝與寄信很快開放，先陪陪 {{ pet.name }} 吧。</p>
+      <div class="acts">
+        <button type="button" class="ghost" :disabled="spent === 0 || skillOp.loading.value" @click="reset">{{ confirmReset ? '確定重置？再按一次' : '重置技能' }}</button>
+        <button v-if="isDev" type="button" class="ghost dev" @click="levelUp">（測試）升一級</button>
+      </div>
     </OverlayPanel>
 
     <OverlayPanel :open="panel === 'account'" title="帳號" @close="panel = null">
@@ -144,11 +178,22 @@ const { loading, submit } = useSubmit(async () => {
 .tool:disabled { cursor: not-allowed; opacity: 0.7; box-shadow: none; background: var(--c-cream); }
 
 .meta { margin-bottom: 0.5rem; color: var(--c-ink-soft); font-size: 0.95rem; }
-.skills { margin: 0 0 0.75rem; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-.skills li { display: grid; grid-template-columns: 1fr auto; padding: 0.4rem 0.75rem; background: var(--c-cream); border: 2px solid var(--c-line); border-radius: 8px; }
-.skills small { grid-column: 1 / -1; color: var(--c-ink-soft); font-size: 0.78rem; line-height: 1.3; }
-.pts { font-family: var(--font-pixel); font-size: 0.8rem; }
-.soon { color: var(--c-ink-soft); font-size: 0.85rem; }
+.left { font-family: var(--font-pixel); font-size: 0.85rem; }
+.notice { margin: 0 0 0.5rem; padding: 0.5rem 0.75rem; color: var(--c-error); background: var(--c-error-soft); border: 2px solid currentColor; border-radius: 8px; font-size: 0.85rem; }
+.skills { margin: 0 0 0.5rem; padding: 0; list-style: none; display: grid; gap: 0.3rem; }
+.skills li { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 0.6rem; padding: 0.2rem 0.4rem 0.2rem 0.75rem; background: var(--c-cream); border: 2px solid var(--c-line); border-radius: 8px; }
+.name { display: grid; line-height: 1.25; }
+.name small { color: var(--c-ink-soft); font-size: 0.72rem; }
+.pips { display: inline-flex; gap: 3px; }
+.pips i { width: 12px; height: 12px; background: var(--c-paper); border: 2px solid var(--c-ink); }
+.pips i.on { background: var(--c-yellow); }
+.add { min-width: 44px; min-height: 44px; font: inherit; font-size: 1.2rem; font-weight: 700; color: var(--c-ink); background: var(--c-yellow); border: 3px solid var(--c-ink); border-radius: 8px; box-shadow: 2px 2px 0 var(--c-ink); cursor: pointer; }
+.add:disabled { opacity: 0.35; box-shadow: none; cursor: not-allowed; }
+.acts { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.ghost { min-height: 40px; padding: 0 0.9rem; font: inherit; font-size: 0.9rem; color: var(--c-ink); background: var(--c-paper); border: 2px solid var(--c-ink); border-radius: 8px; cursor: pointer; }
+.ghost:disabled { opacity: 0.4; cursor: not-allowed; }
+.ghost.dev { background: var(--c-pink-soft); }
+.badge { font-style: normal; font-family: var(--font-pixel); font-size: 0.6rem; padding: 0.15rem 0.4rem; color: #4a3040; background: var(--c-yellow); border: 2px solid var(--c-ink); border-radius: 6px; }
 .who { display: grid; gap: 0.15rem; margin-bottom: 1rem; }
 .who span { color: var(--c-ink-soft); font-size: 0.9rem; }
 

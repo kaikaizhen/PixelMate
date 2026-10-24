@@ -20,7 +20,7 @@ onUnmounted(() => window.removeEventListener('resize', update))
 const s = computed(() => Math.min(w.value, h.value) / 240)
 const portrait = computed(() => h.value > w.value)
 const left = computed(() => (w.value - 240 * s.value) / 2)
-const top = computed(() => (portrait.value ? (h.value - 240 * s.value) * 0.2 : 0)) // phones: a little wall above, lots of floor below for the tool bar and the panels
+const top = computed(() => (portrait.value ? (h.value - 240 * s.value) * 0.05 : 0)) // phones: a little wall above, lots of floor below for the tool bar and the panels
 const night = computed(() => windowWeatherKey(new Date(), props.weather).includes('starry'))
 const vars = computed(() => ({ '--s': s.value, '--l': `${left.value}px`, '--t': `${top.value}px` }))
 </script>

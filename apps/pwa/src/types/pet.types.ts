@@ -18,3 +18,11 @@ export interface CreatePetInput {
   name: string
   bodyVariant: string
 }
+
+export interface SkillsResult {
+  revision: number
+  skills: Record<SkillKey, number>
+  remainingSkillPoints: number
+}
+
+export const MAX_SKILL_POINTS = 5

@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { petApi } from '@/api/petApi'
-import type { CreatePetInput, Pet } from '@/types/pet.types'
+import { ApiError } from '@/api/http'
+import type { CreatePetInput, Pet, SkillKey, SkillsResult } from '@/types/pet.types'
 
 export const usePetStore = defineStore('pet', () => {
   const pet = ref<Pet | null>(null)
@@ -21,11 +22,38 @@ export const usePetStore = defineStore('pet', () => {
     return pet.value
   }
 
+  function apply(r: SkillsResult) {
+    if (!pet.value) return
+    pet.value = { ...pet.value, skills: r.skills, remainingSkillPoints: r.remainingSkillPoints, revision: r.revision }
+  }
+
+  /** Run a write that carries expectedRevision; on 409 re-read the pet so the screen shows what the server has. */
+  async function guarded<T>(run: (revision: number) => Promise<T>): Promise<T> {
+    try {
+      return await run(pet.value!.revision)
+    } catch (e) {
+      if (e instanceof ApiError && e.code === 'REVISION_CONFLICT') await load(true)
+      throw e
+    }
+  }
+
+  async function allocate(key: SkillKey, points = 1): Promise<void> {
+    apply(await guarded((rev) => petApi.allocate(key, points, rev)))
+  }
+
+  async function resetSkills(): Promise<void> {
+    apply(await guarded((rev) => petApi.resetSkills(rev)))
+  }
+
+  async function devLevelUp(): Promise<void> {
+    pet.value = await petApi.devLevelUp()
+  }
+
   /** Forget everything (sign out / another account). */
   function clear() {
     pet.value = null
     loaded.value = false
   }
 
-  return { pet, loaded, load, adopt, clear }
+  return { pet, loaded, load, adopt, allocate, resetSkills, devLevelUp, clear }
 })

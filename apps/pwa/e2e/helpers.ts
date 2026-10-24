@@ -6,6 +6,8 @@ export const PET = {
   world: { mood: 'happy', scene: 'home', weather: 'sunny' }, updatedAt: '2026-10-25T00:00:00Z',
 }
 
+export const PET_L4 = { ...PET, level: 4, revision: 5, remainingSkillPoints: 3 }
+
 export const USER = { userId: '11111111-1111-1111-1111-111111111111', email: 'a@example.com', displayName: '小栗', emailConfirmed: true }
 
 type Handler = (route: Route, body: any) => Promise<void> | void
@@ -28,6 +30,24 @@ export async function mockApi(page: Page, handlers: Record<string, Handler> = {}
       return json(route, 200, USER)
     }
     if (path === '/pets/me') return state.pet ? json(route, 200, state.pet) : json(route, 404, { code: 'NOT_FOUND', message: '你還沒有小夥伴。', requestId: 'r' })
+    if (path === '/pets/me/skills/allocate' && state.pet) {              // a tiny copy of the server rules
+      const p = state.pet
+      const used = Object.values(p.skills).reduce((a, b) => a + b, 0)
+      if (body.expectedRevision !== p.revision) return json(route, 409, { code: 'REVISION_CONFLICT', message: '小夥伴的資料已經在別的地方更新了。', requestId: 'r' })
+      if (body.pointsToAdd > p.level - 1 - used) return json(route, 422, { code: 'INSUFFICIENT_POINTS', message: '沒有可以分配的技能點數。', requestId: 'r' })
+      p.skills = { ...p.skills, [body.skillKey]: (p.skills as Record<string, number>)[body.skillKey] + body.pointsToAdd }
+      p.revision += 1
+      p.remainingSkillPoints = p.level - 1 - used - body.pointsToAdd
+      return json(route, 200, { revision: p.revision, skills: p.skills, remainingSkillPoints: p.remainingSkillPoints })
+    }
+    if (path === '/pets/me/skills/reset' && state.pet) {
+      const p = state.pet
+      if (body.expectedRevision !== p.revision) return json(route, 409, { code: 'REVISION_CONFLICT', message: 'x', requestId: 'r' })
+      p.skills = { empathy: 0, creativity: 0, exploration: 0, wisdom: 0 }
+      p.revision += 1
+      p.remainingSkillPoints = p.level - 1
+      return json(route, 200, { revision: p.revision, skills: p.skills, remainingSkillPoints: p.remainingSkillPoints })
+    }
     if (path === '/pets' && req.method() === 'POST') {
       state.pet = { ...PET, name: body.name, bodyVariant: body.bodyVariant }
       return json(route, 201, state.pet)
