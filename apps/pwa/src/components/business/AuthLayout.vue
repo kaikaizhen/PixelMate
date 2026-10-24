@@ -8,7 +8,7 @@ const mascotScale = typeof window !== 'undefined' && window.matchMedia?.('(min-w
 </script>
 
 <template>
-  <main class="auth">
+  <main class="auth game-screen">
     <header class="brand">
       <PetMascot :scale="mascotScale" />
       <p class="logo" aria-hidden="true">PixelMate</p>

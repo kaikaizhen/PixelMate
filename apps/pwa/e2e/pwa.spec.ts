@@ -59,6 +59,45 @@ test.describe('不用捲動', () => {
   })
 })
 
+test.describe('長按與拖曳', () => {
+  test('小屋：圖片不能被拖出、長按不會選取或跳出選單', async ({ page }) => {
+    await mockApi(page)
+    await page.goto('login')
+    await page.getByLabel('Email').fill('a@example.com')
+    await page.getByLabel('密碼').fill('Passw0rd-123')
+    await page.getByRole('button', { name: '登入' }).click()
+    await expect(page.getByRole('button', { name: '摸摸 小栗' })).toBeVisible()
+
+    const imgs = await page.locator('main img').evaluateAll((els) => els.map((e) => ({
+      draggable: (e as HTMLImageElement).draggable,
+      callout: getComputedStyle(e).getPropertyValue('-webkit-touch-callout'),
+      userDrag: getComputedStyle(e).getPropertyValue('-webkit-user-drag'),
+      events: getComputedStyle(e).pointerEvents,
+    })))
+    expect(imgs.length).toBeGreaterThan(3)
+    for (const i of imgs) expect(i).toMatchObject({ draggable: false, events: 'none' })
+
+    // the browser context menu (long-press / right-click) is suppressed on the game screen
+    const prevented = await page.evaluate(() => {
+      const ev = new MouseEvent('contextmenu', { bubbles: true, cancelable: true })
+      document.querySelector('main')!.dispatchEvent(ev)
+      return ev.defaultPrevented
+    })
+    expect(prevented).toBe(true)
+
+    // text on the screen cannot be selected (double-click / long-press)
+    await page.getByRole('button', { name: '小夥伴' }).dblclick()
+    expect(await page.evaluate(() => window.getSelection()?.toString() ?? '')).toBe('')
+    expect(await page.evaluate(() => getComputedStyle(document.querySelector('main')!).userSelect)).toBe('none')
+  })
+
+  test('登入頁的輸入框仍然可以選取文字', async ({ page }) => {
+    await mockApi(page)
+    await page.goto('login')
+    expect(await page.getByLabel('Email').evaluate((e) => getComputedStyle(e).userSelect)).toBe('text')
+  })
+})
+
 test.describe('PWA', () => {
   test.use({ serviceWorkers: 'allow' })
 
