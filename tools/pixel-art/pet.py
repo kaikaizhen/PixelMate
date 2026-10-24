@@ -11,11 +11,13 @@ STAR = "#ffd86b"; STAR_D = "#f2b84a"; FOOT = "#e9a98e"
 PAL = [LINE, BODY, BODY_D, BODY_L, CHEEK, EYE, WHITE, STAR, STAR_D, FOOT]
 
 
-def sprite(bob=0, sway=0, blink=False, happy=False, look=None):
+def sprite(bob=0, sway=0, blink=False, happy=False, look=None, step=0):
     s = Sprite(48, 48, palette=PAL)
     y = bob
     # little feet
-    s.ellipse(13, 41, 22, 46, FOOT); s.ellipse(25, 41, 34, 46, FOOT)
+    la = 2 if step == 1 else 0   # left foot forward
+    ra = 2 if step == 3 else 0   # right foot forward
+    s.ellipse(13 + la, 41 - la, 22 + la, 46 - la, FOOT); s.ellipse(25 - ra, 41 - ra, 34 - ra, 46 - ra, FOOT)
     # round body
     s.ellipse(6, 12 + y, 41, 44 + y, BODY)
     s.ellipse(9, 14 + y, 28, 24 + y, BODY_L, only=BODY)       # top-left light
@@ -68,6 +70,7 @@ def main():
     idle = [sprite(0, 0), sprite(0, 1), sprite(1, 2), sprite(1, 1)]
     strip(idle, OUT + "/pet_idle.png")
     strip([sprite(blink=True), sprite(happy=True)], OUT + "/pet_faces.png")
+    strip([sprite(0, 0, step=0), sprite(1, 1, step=1), sprite(0, 2, step=0), sprite(1, 1, step=3)], OUT + "/pet_walk.png")
 
 
 if __name__ == "__main__":

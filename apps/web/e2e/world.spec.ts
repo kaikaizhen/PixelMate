@@ -22,8 +22,8 @@ test.describe('動態世界', () => {
     await expect(page.locator('.win__drop').first()).toBeAttached()
     expect(await animationName(page, '.win__drop')).not.toBe('none')
     await page.getByRole('radio', { name: '夜晚' }).click()
-    await expect(page.locator('.win__moon')).toBeAttached()
-    await expect(page.locator('.win__drop')).toHaveCount(0)
+    await expect(page.locator('#weather .win__moon')).toBeAttached()
+    await expect(page.locator('#weather .win__drop')).toHaveCount(0)
     await expect(page.getByRole('radio', { name: '夜晚' })).toHaveAttribute('aria-checked', 'true')
   })
 
