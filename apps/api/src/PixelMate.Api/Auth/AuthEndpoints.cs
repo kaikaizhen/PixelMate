@@ -50,9 +50,9 @@ public static class AuthEndpoints
     private static async Task SendConfirmation(AppUser user, UserManager<AppUser> users, IMailSender mail, IOptions<AuthOptions> opt, CancellationToken ct)
     {
         var token = Encode(await users.GenerateEmailConfirmationTokenAsync(user));
-        var (subject, html, text) = MailTemplates.ConfirmEmail(user.DisplayName,
+        var content = MailTemplates.ConfirmEmail(user.DisplayName,
             Link(opt.Value, "/confirm-email", ("userId", user.Id.ToString()), ("token", token)));
-        await mail.SendAsync(user.Email!, subject, html, text, ct);
+        await mail.SendAsync(user.Email!, content, ct);
     }
 
     private static async Task<IResult> Register(RegisterRequest req, UserManager<AppUser> users, IMailSender mail,
@@ -140,9 +140,9 @@ public static class AuthEndpoints
         if (user is not null)
         {
             var token = Encode(await users.GeneratePasswordResetTokenAsync(user));
-            var (subject, html, text) = MailTemplates.ResetPassword(user.DisplayName,
+            var content = MailTemplates.ResetPassword(user.DisplayName,
                 Link(opt.Value, "/reset-password", ("email", user.Email!), ("token", token)));
-            await mail.SendAsync(user.Email!, subject, html, text, ct);
+            await mail.SendAsync(user.Email!, content, ct);
         }
         return Results.Accepted();           // never reveals whether the e-mail is registered
     }
