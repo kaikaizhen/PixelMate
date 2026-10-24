@@ -16,3 +16,7 @@ test-results/
 .DS_Store
 .vscode/
 .idea/
+
+# 部署設定（NAS 路徑、埠、網域）屬部署機密文件，不進版本控制
+infra/nas/
+.deploy/
