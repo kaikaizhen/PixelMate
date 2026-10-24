@@ -12,6 +12,7 @@ public static class PetEndpoints
         var g = api.MapGroup("/pets").RequireAuthorization();
         g.MapPost("/", Create).Validate<CreatePetRequest>();
         g.MapGet("/me", GetMine);
+        g.MapGet("/me/events", GetEvents);
         g.MapPost("/me/skills/allocate", Allocate).Validate<AllocateSkillRequest>();
         g.MapPost("/me/skills/reset", Reset).Validate<ResetSkillsRequest>();
         return api;
@@ -37,13 +38,14 @@ public static class PetEndpoints
 
     internal static IQueryable<Pet> WithEquipment(IQueryable<Pet> q) => q.Include(p => p.Skills).Include(p => p.Equipment);
 
-    internal static PetSnapshot ToSnapshot(Pet p)
+    internal static PetSnapshot ToSnapshot(Pet p, DateTime? now = null)
     {
         var skills = SkillKeys.All.ToDictionary(k => k, k => p.Skills.FirstOrDefault(s => s.SkillKey == k)?.Points ?? 0);
         var remaining = Math.Max(0, PetRules.TotalSkillPoints(p.Level) - skills.Values.Sum());
         return new PetSnapshot(p.PetId, p.Name, p.BodyVariant, p.Level, p.Xp, p.Revision, skills, remaining,
             EquipmentOf(p),
-            new PetWorld("happy", "home", "sunny"), p.UpdatedAt);
+            new PetWorld("happy", "home", "sunny"), p.UpdatedAt,
+            Life.LifeScheduler.ActivityNow(p.PetId, skills, now ?? DateTime.UtcNow));
     }
 
     private static async Task<IResult> Create(CreatePetRequest req, ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct)
@@ -71,13 +73,30 @@ public static class PetEndpoints
         return Results.Created("/api/v1/pets/me", ToSnapshot(pet));
     }
 
-    private static async Task<IResult> GetMine(ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct)
+    /// <summary>Reading the pet also makes up any finished slots that the worker has not reached yet (lazy half of the hybrid).</summary>
+    private static async Task<IResult> GetMine(ClaimsPrincipal principal, AppDbContext db, Life.LifeService life, TimeProvider clock, HttpContext ctx, CancellationToken ct)
     {
         var owner = UserId(principal);
+        var now = clock.GetUtcNow().UtcDateTime;
         var pet = await WithEquipment(db.Pets.AsNoTracking()).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
-        return pet is null
-            ? Results.Json(new ApiError(ErrorCodes.NotFound, "你還沒有小夥伴。", ctx.TraceIdentifier), statusCode: 404)
-            : Results.Ok(ToSnapshot(pet));
+        if (pet is null) return NoPet(ctx);
+        await life.CatchUpAsync(db, pet.PetId, owner, pet.CreatedAt, now, ct);
+        return Results.Ok(ToSnapshot(pet, now));
+    }
+
+    /// <summary>The latest things the pet found, newest first.</summary>
+    private static async Task<IResult> GetEvents(ClaimsPrincipal principal, AppDbContext db, int? limit, HttpContext ctx, CancellationToken ct)
+    {
+        var owner = UserId(principal);
+        var take = Math.Clamp(limit ?? 20, 1, 50);
+        var petId = await db.Pets.AsNoTracking().Where(p => p.OwnerId == owner).Select(p => (Guid?)p.PetId).FirstOrDefaultAsync(ct);
+        if (petId is null) return NoPet(ctx);
+        var rows = await (from e in db.PetEvents.AsNoTracking()
+                          join d in db.ItemDefinitions.AsNoTracking() on e.ItemId equals d.ItemId
+                          where e.PetId == petId
+                          orderby e.OccurredAt descending
+                          select new Life.PetEventDto(e.EventId, e.Kind, d.ItemId, d.Name, d.AssetKey, d.Rarity, e.OccurredAt)).Take(take).ToListAsync(ct);
+        return Results.Ok(new { events = rows });
     }
 
     /// <summary>All-or-nothing: points, cap and revision are checked, then skill + revision are written in one transaction.</summary>
@@ -148,6 +167,19 @@ public static class PetEndpoints
             pet.UpdatedAt = DateTime.UtcNow;
             await db.SaveChangesAsync(ct);
             return Results.Ok(ToSnapshot(pet));
+        }).RequireAuthorization();
+        // Moves the life cursor back so the next read makes those hours up again (deterministic: the same walks find the same items).
+        api.MapPost("/dev/pets/me/life/rewind", async (int hours, ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct) =>
+        {
+            var owner = UserId(principal);
+            var petId = await db.Pets.Where(p => p.OwnerId == owner).Select(p => (Guid?)p.PetId).FirstOrDefaultAsync(ct);
+            if (petId is null) return NoPet(ctx);
+            var life = await db.PetLives.FirstOrDefaultAsync(l => l.PetId == petId, ct);
+            if (life is null) return Results.Ok(new { cursorSlot = (long?)null });
+            life.CursorSlot -= Math.Clamp(hours, 1, 24 * 7) * 4;
+            await db.PetEvents.Where(e => e.PetId == petId && e.Slot > life.CursorSlot).ExecuteDeleteAsync(ct);
+            await db.SaveChangesAsync(ct);
+            return Results.Ok(new { cursorSlot = (long?)life.CursorSlot });
         }).RequireAuthorization();
         return api;
     }

@@ -83,6 +83,10 @@ builder.Services.AddScoped<IMailSender>(sp =>
         : ActivatorUtilities.CreateInstance<LogMailSender>(sp));
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddHostedService<ItemSeedHostedService>();
+builder.Services.Configure<PixelMate.Api.Life.LifeOptions>(builder.Configuration.GetSection("Life"));
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddScoped<PixelMate.Api.Life.LifeService>();
+builder.Services.AddHostedService<PixelMate.Api.Life.LifeWorker>();
 
 builder.Services.AddOpenApi();
 

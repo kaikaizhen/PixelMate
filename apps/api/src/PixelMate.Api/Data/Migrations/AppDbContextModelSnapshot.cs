@@ -430,6 +430,70 @@ namespace PixelMate.Api.Data.Migrations
                     b.ToTable("pet_equipment", (string)null);
                 });
 
+            modelBuilder.Entity("PixelMate.Api.Life.PetEvent", b =>
+                {
+                    b.Property<Guid>("EventId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("event_id");
+
+                    b.Property<string>("ItemId")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("item_id");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("kind");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("occurred_at");
+
+                    b.Property<Guid>("PetId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("pet_id");
+
+                    b.Property<long>("Slot")
+                        .HasColumnType("bigint")
+                        .HasColumnName("slot");
+
+                    b.HasKey("EventId")
+                        .HasName("pk_pet_events");
+
+                    b.HasIndex("ItemId")
+                        .HasDatabaseName("ix_pet_events_item_id");
+
+                    b.HasIndex("PetId", "OccurredAt")
+                        .HasDatabaseName("ix_pet_events_pet_id_occurred_at");
+
+                    b.HasIndex("PetId", "Slot")
+                        .IsUnique()
+                        .HasDatabaseName("ix_pet_events_pet_id_slot");
+
+                    b.ToTable("pet_events", (string)null);
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Life.PetLife", b =>
+                {
+                    b.Property<Guid>("PetId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("pet_id");
+
+                    b.Property<long>("CursorSlot")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint")
+                        .HasColumnName("cursor_slot");
+
+                    b.HasKey("PetId")
+                        .HasName("pk_pet_life");
+
+                    b.ToTable("pet_life", (string)null);
+                });
+
             modelBuilder.Entity("PixelMate.Api.Pets.Pet", b =>
                 {
                     b.Property<Guid>("PetId")
@@ -597,6 +661,33 @@ namespace PixelMate.Api.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_pet_equipment_pets_pet_id");
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Life.PetEvent", b =>
+                {
+                    b.HasOne("PixelMate.Api.Items.ItemDefinition", null)
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_pet_events_item_definitions_item_id");
+
+                    b.HasOne("PixelMate.Api.Pets.Pet", null)
+                        .WithMany()
+                        .HasForeignKey("PetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_pet_events_pets_pet_id");
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Life.PetLife", b =>
+                {
+                    b.HasOne("PixelMate.Api.Pets.Pet", null)
+                        .WithOne()
+                        .HasForeignKey("PixelMate.Api.Life.PetLife", "PetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_pet_life_pets_pet_id");
                 });
 
             modelBuilder.Entity("PixelMate.Api.Pets.Pet", b =>
