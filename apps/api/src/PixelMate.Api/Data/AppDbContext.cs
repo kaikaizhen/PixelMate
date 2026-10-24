@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using PixelMate.Api.Pets;
 
 namespace PixelMate.Api.Data;
 
@@ -10,6 +11,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>(options), IDataProtectionKeyContext
 {
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
+    public DbSet<Pet> Pets => Set<Pet>();
+    public DbSet<PetSkill> PetSkills => Set<PetSkill>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -29,5 +32,22 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         b.Entity<IdentityRoleClaim<Guid>>().ToTable("role_claims");
         b.Entity<IdentityUserToken<Guid>>().ToTable("user_tokens");
         b.Entity<DataProtectionKey>().ToTable("data_protection_keys");
+
+        b.Entity<Pet>(e =>
+        {
+            e.ToTable("pets");
+            e.HasKey(x => x.PetId);
+            e.Property(x => x.Name).HasMaxLength(48).IsRequired();          // 12 characters, up to 4 UTF-8 bytes each
+            e.Property(x => x.BodyVariant).HasMaxLength(40).IsRequired();
+            e.HasIndex(x => x.OwnerId).IsUnique();                          // MVP: one main pet per owner
+            e.HasOne<AppUser>().WithMany().HasForeignKey(x => x.OwnerId).OnDelete(DeleteBehavior.Cascade);
+            e.HasMany(x => x.Skills).WithOne().HasForeignKey(x => x.PetId).OnDelete(DeleteBehavior.Cascade);
+        });
+        b.Entity<PetSkill>(e =>
+        {
+            e.ToTable("pet_skills", t => t.HasCheckConstraint("ck_pet_skills_points", "points >= 0 AND points <= 5"));
+            e.HasKey(x => new { x.PetId, x.SkillKey });
+            e.Property(x => x.SkillKey).HasMaxLength(20);
+        });
     }
 }

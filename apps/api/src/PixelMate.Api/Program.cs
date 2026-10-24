@@ -9,6 +9,7 @@ using PixelMate.Api.Data;
 using PixelMate.Api.Endpoints;
 using PixelMate.Api.Infrastructure;
 using PixelMate.Api.Mail;
+using PixelMate.Api.Pets;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -141,6 +142,7 @@ if (app.Environment.IsDevelopment())
 var api = app.MapGroup("/api/v1");
 api.MapHealth();
 api.MapAuth();
+api.MapPets();
 
 app.Run();
 

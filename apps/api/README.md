@@ -32,6 +32,8 @@ Use single quotes around values that contain `#` or `$`, e.g. `ConnectionStrings
 | GET | `/api/v1/auth/me` | current user, 401 when signed out |
 | POST | `/api/v1/auth/forgot-password` | `{email}` → always 202 (never reveals whether the account exists); mails a 1-hour link |
 | POST | `/api/v1/auth/reset-password` | `{email, token, newPassword}` → 204; single use; signs out other sessions |
+| POST | `/api/v1/pets` | `{name, bodyVariant}` (`star_01_cream` / `star_01_mint`) → 201 snapshot; 409 `PET_ALREADY_EXISTS`; name 1–12 characters |
+| GET | `/api/v1/pets/me` | pet snapshot (docs/API契約 §2); 404 when the player has not adopted yet |
 | POST | `/api/v1/auth/confirm-email` / `resend-confirmation` | e-mail verification; enforced when `Auth:RequireConfirmedEmail=true` |
 
 Every **state-changing** request must send `X-Requested-With: pixelmate` (CSRF defence for cookie sessions), otherwise 403 `CSRF_REJECTED`.
