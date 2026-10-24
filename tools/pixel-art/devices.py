@@ -31,13 +31,25 @@ p.rect(30, 119, 41, 120, "#7b6a86")                              # home bar
 p.line(3, 20, 3, 60, "#7b6a86")                                  # sheen
 save(p, "phone_frame.png")
 
-# ---- desktop screen frame 88x96, hole (12,10)-(75,73), little stand ----
+# ---- desktop device: small white cube-like screen with thick bezel (ESP32 touch display) ----
 d = Sprite(88, 96)
-d.rect(4, 2, 83, 81, "#2f2638"); d.rect(4, 2, 83, 81, LINE, fill=False)
-d.rect(6, 4, 81, 79, "#3a3044")
-d.rect(12, 10, 75, 73, None)
-d.rect(40, 82, 47, 88, "#5b4a66"); d.rect(40, 82, 47, 88, LINE, fill=False)
-d.rect(26, 88, 61, 93, "#7b6a86"); d.rect(26, 88, 61, 93, LINE, fill=False)
-d.px(79, 77, "#8fc4e8")                                          # power LED
+WHITE = "#f6f3ee"; SHADE = "#d9d3ca"; DEEP = "#bdb5aa"
+d.ellipse(10, 86, 78, 94, "#e6d3b6")                                # soft shadow on the desk
+d.rect(2, 3, 85, 85, WHITE)                                          # body
+d.rect(2, 79, 85, 85, SHADE)                                         # lower edge shading
+d.rect(80, 3, 85, 85, SHADE)                                         # right edge shading
+d.rect(2, 3, 5, 78, "#ffffff")                                       # left highlight
+for (x, y) in [(2, 3), (85, 3), (2, 85), (85, 85)]:                  # rounded corners
+    d.px(x, y, None)
+d.rect(2, 3, 85, 85, LINE, fill=False)
+for (x, y) in [(2, 3), (85, 3), (2, 85), (85, 85)]:
+    d.px(x, y, None)
+d.rect(12, 11, 75, 74, None)                                         # screen hole (64x64)
+d.rect(11, 10, 76, 75, "#2f2638", fill=False)                        # screen rim
+d.rect(11, 10, 76, 75, LINE, fill=False)
+for k in range(5):                                                   # speaker holes
+    d.px(52 + k * 4, 80, DEEP); d.px(52 + k * 4, 81, DEEP)
+d.rect(86, 30, 87, 40, SHADE); d.rect(86, 30, 87, 40, LINE, fill=False)  # side button
+d.px(14, 80, "#8fc4e8"); d.px(15, 80, "#8fc4e8")                     # status LED
 save(d, "desk_frame.png")
 print("devices ok")
