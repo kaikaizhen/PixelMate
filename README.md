@@ -13,6 +13,8 @@
 ![Playwright](https://img.shields.io/badge/Playwright-80_E2E-2EAD33?style=flat-square&logo=playwright&logoColor=white)
 ![Pixel Art](https://img.shields.io/badge/Pixel_Art-Python_%2B_Pillow-FFD86B?style=flat-square)
 
+<img src="assets/readme/pixelmate-character.gif" alt="星星小精靈：午睡、看書、看雨、喝珍奶、吃雞排、撿禮物與換裝" width="300" />
+
 </div>
 
 ---
@@ -22,6 +24,12 @@
 小伴星 PixelMate 是一款 8-bit 像素風虛擬寵物。這個 repo 目前是它的**預告官網**（M1）：一頁式、可互動的像素小世界，讓第一次進站的人 5 秒內理解「這是一隻會自己生活、也會替你送信的小夥伴」。
 
 > 💡 官網中的互動（點寵物、送信、換裝、切換天氣）皆為**示範預覽**，不代表 PWA 或桌面裝置已上線；CTA 目前顯示「即將開放」。
+
+<div align="center">
+
+<img src="assets/readme/pixelmate-room.gif" alt="會呼吸的像素小房間：草、盆栽、窗簾與雲都在動" width="480" />
+
+</div>
 
 ## ✨ 功能特色
 
@@ -73,6 +81,7 @@ apps/web/                  官網（Vue 3 + vite-ssg）
   e2e/                     Playwright 測試
   nginx/                   容器內靜態站設定範本
 tools/pixel-art/           像素素材產生腳本（pet / room / world / ...）
+assets/readme/             README 用的 GIF（由 tools/pixel-art/readme_gifs.py 產生）
 ```
 
 `docs/`（內部規格）與部署設定不進版本控制。
@@ -97,6 +106,7 @@ A=../../apps/web/src/assets/pixel
 python3 pet.py $A && python3 room.py $A && python3 world.py $A
 python3 activities.py $A && python3 yard.py $A && python3 taiwan.py $A
 python3 accessories.py $A && python3 devices.py $A
+python3 readme_gifs.py $A ../../assets/readme   # README 的角色與房間 GIF
 python3 brand.py $A ../../apps/web/public   # favicon / touch icon / OG 封面
 ```
 
@@ -129,7 +139,3 @@ npx vue-tsc -b            # 型別檢查
 `main` ← `develop` ← `feature/frontend/*`；錯誤修復使用 `bug/*`，完成後合併回 `develop`。
 一個功能一個分支：開發、單元測試、整合測試完成後合併回 `develop`，下一個功能再從 `develop` 開新分支。
 不推送 `.env`、`docs/` 與機密資料。
-
-## 📄 License
-
-尚未指定授權。
