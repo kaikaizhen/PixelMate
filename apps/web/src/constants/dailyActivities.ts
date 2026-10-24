@@ -85,7 +85,7 @@ export const DAILY_ACTIVITIES: readonly DailyActivity[] = [
     sprite: petWatch,
     frames: 4,
     duration: '1.8s',
-    petX: 58,
-    petY: 22,
+    petX: 98,
+    petY: 56,
   },
 ]

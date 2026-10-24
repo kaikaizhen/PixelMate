@@ -14,16 +14,16 @@ defineProps<{ activity: DailyActivity }>()
 
 // 消波塊堆疊位置（由後往前）
 const TETRAPODS = [
-  { x: 40, y: 76 },
-  { x: 76, y: 78 },
-  { x: 58, y: 62 },
+  { x: 86, y: 112 },
+  { x: 122, y: 114 },
+  { x: 104, y: 96 },
 ]
 </script>
 
 <template>
-  <PixelStage v-if="activity.scene === 'beach'" :height="144" :crop-x="30" label="海邊的消波塊上">
-    <img class="beach__bg pixelated" :src="beach" alt="" width="240" height="144" />
-    <SpriteStrip v-for="x in [0, 64, 128, 192]" :key="x" :src="waves" :frames="4" :width="64" :height="10" :x="x" :y="86" duration="2.4s" />
+  <PixelStage v-if="activity.scene === 'beach'" :height="240" :crop-x="56" label="海邊的消波塊上">
+    <img class="beach__bg pixelated" :src="beach" alt="" width="240" height="240" />
+    <SpriteStrip v-for="x in [0, 64, 128, 192]" :key="x" :src="waves" :frames="4" :width="64" :height="10" :x="x" :y="128" duration="2.4s" />
     <img
       v-for="(t, i) in TETRAPODS"
       :key="i"
@@ -82,7 +82,7 @@ const TETRAPODS = [
   left: 0;
   top: 0;
   width: calc(240px * var(--s));
-  height: calc(144px * var(--s));
+  height: calc(240px * var(--s));
 }
 
 .beach__tetra {

@@ -95,23 +95,23 @@ def slippers():
 strip([slippers()] * 4, OUT + "/acc_slippers.png")
 
 # ---------- beach with tetrapods (消波塊) ----------
-W, H = 240, 144
+W, H = 240, 240
 b = Sprite(W, H)
-for y in range(0, 48):
-    t = y / 47
-    b.line(0, y, W - 1, y, "#8fd0ee" if t < 0.5 else "#cdeaf5")
-for y in range(48, 92):
-    t = (y - 48) / 43
-    b.line(0, y, W - 1, y, "#5fb4d8" if t < 0.5 else "#4a9fcb")
-for y in range(92, H):
+for y in range(0, 64):
+    t_ = y / 63
+    b.line(0, y, W - 1, y, "#8fd0ee" if t_ < 0.5 else "#cdeaf5")
+for y in range(64, 132):
+    t_ = (y - 64) / 67
+    b.line(0, y, W - 1, y, "#5fb4d8" if t_ < 0.5 else "#4a9fcb")
+for y in range(132, H):
     b.line(0, y, W - 1, y, "#f2dfae")
 rnd = random.Random(9)
-for _ in range(200):
-    x, y = rnd.randrange(W), rnd.randrange(96, H)
+for _ in range(420):
+    x, y = rnd.randrange(W), rnd.randrange(136, H)
     b.px(x, y, "#e2c98a" if rnd.random() < .6 else "#fff1c9")
 for x in range(0, W):
-    b.px(x, 92 + int(1.5 * math.sin(x / 9.0)), "#ffffff"); b.px(x, 93 + int(1.5 * math.sin(x / 9.0)), "#cfe8f0")
-for (x, y) in [(150, 56), (190, 62), (30, 52), (110, 66)]:
+    b.px(x, 132 + int(1.5 * math.sin(x / 9.0)), "#ffffff"); b.px(x, 133 + int(1.5 * math.sin(x / 9.0)), "#cfe8f0")
+for (x, y) in [(150, 76), (190, 90), (30, 82), (110, 100), (60, 112), (200, 118)]:
     b.line(x, y, x + 10, y, "#8fd0ee")
 save(b, "beach.png")
 
