@@ -34,6 +34,9 @@ Use single quotes around values that contain `#` or `$`, e.g. `ConnectionStrings
 | POST | `/api/v1/auth/reset-password` | `{email, token, newPassword}` → 204; single use; signs out other sessions |
 | POST | `/api/v1/pets` | `{name, bodyVariant}` (`star_01_cream` / `star_01_mint`) → 201 snapshot; 409 `PET_ALREADY_EXISTS`; name 1–12 characters |
 | GET | `/api/v1/pets/me` | pet snapshot (docs/API契約 §2); 404 when the player has not adopted yet |
+| POST | `/api/v1/pets/me/skills/allocate` | `{skillKey, pointsToAdd 1-5, expectedRevision}` → `{revision, skills, remainingSkillPoints}`; 422 `INSUFFICIENT_POINTS` (no points / over the 5 cap), 409 `REVISION_CONFLICT` |
+| POST | `/api/v1/pets/me/skills/reset` | `{expectedRevision}` → all skills back to 0 (free in the MVP) |
+| POST | `/api/v1/dev/pets/me/level-up` | **Development only** (not mapped elsewhere): +1 level so skill points can be tested |
 | POST | `/api/v1/auth/confirm-email` / `resend-confirmation` | e-mail verification; enforced when `Auth:RequireConfirmedEmail=true` |
 
 Every **state-changing** request must send `X-Requested-With: pixelmate` (CSRF defence for cookie sessions), otherwise 403 `CSRF_REJECTED`.

@@ -12,7 +12,21 @@ public static class PetEndpoints
         var g = api.MapGroup("/pets").RequireAuthorization();
         g.MapPost("/", Create).Validate<CreatePetRequest>();
         g.MapGet("/me", GetMine);
+        g.MapPost("/me/skills/allocate", Allocate).Validate<AllocateSkillRequest>();
+        g.MapPost("/me/skills/reset", Reset).Validate<ResetSkillsRequest>();
         return api;
+    }
+
+    private static IResult Conflict(HttpContext ctx) =>
+        Results.Json(new ApiError(ErrorCodes.RevisionConflict, "小夥伴的資料已經在別的地方更新了，請重新整理後再試。", ctx.TraceIdentifier), statusCode: 409);
+
+    private static IResult NoPet(HttpContext ctx) =>
+        Results.Json(new ApiError(ErrorCodes.NotFound, "你還沒有小夥伴。", ctx.TraceIdentifier), statusCode: 404);
+
+    private static SkillsResult ToResult(Pet p)
+    {
+        var snap = ToSnapshot(p);
+        return new SkillsResult(p.Revision, snap.Skills, snap.RemainingSkillPoints);
     }
 
     private static Guid UserId(ClaimsPrincipal p) => Guid.Parse(p.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -58,5 +72,77 @@ public static class PetEndpoints
         return pet is null
             ? Results.Json(new ApiError(ErrorCodes.NotFound, "你還沒有小夥伴。", ctx.TraceIdentifier), statusCode: 404)
             : Results.Ok(ToSnapshot(pet));
+    }
+
+    /// <summary>All-or-nothing: points, cap and revision are checked, then skill + revision are written in one transaction.</summary>
+    private static async Task<IResult> Allocate(AllocateSkillRequest req, ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct)
+    {
+        var owner = UserId(principal);
+        var pet = await db.Pets.Include(p => p.Skills).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
+        if (pet is null) return NoPet(ctx);
+        if (pet.Revision != req.ExpectedRevision) return Conflict(ctx);
+
+        var skill = pet.Skills.First(s => s.SkillKey == req.SkillKey);
+        var remaining = PetRules.TotalSkillPoints(pet.Level) - pet.Skills.Sum(s => s.Points);
+        if (req.PointsToAdd > remaining)
+        {
+            return Results.Json(new ApiError(ErrorCodes.InsufficientPoints, remaining <= 0 ? "沒有可以分配的技能點數。" : $"只剩 {remaining} 點可以分配。", ctx.TraceIdentifier), statusCode: 422);
+        }
+        if (skill.Points + req.PointsToAdd > SkillKeys.MaxPointsPerSkill)
+        {
+            return Results.Json(new ApiError(ErrorCodes.InsufficientPoints, $"每項技能最多 {SkillKeys.MaxPointsPerSkill} 點。", ctx.TraceIdentifier), statusCode: 422);
+        }
+
+        skill.Points += req.PointsToAdd;
+        pet.Revision++;
+        pet.UpdatedAt = DateTime.UtcNow;
+        try
+        {
+            await db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Conflict(ctx);                           // another request moved the revision between our read and write
+        }
+        return Results.Ok(ToResult(pet));
+    }
+
+    /// <summary>Free reset (MVP): every skill back to 0, all points become spendable again.</summary>
+    private static async Task<IResult> Reset(ResetSkillsRequest req, ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct)
+    {
+        var owner = UserId(principal);
+        var pet = await db.Pets.Include(p => p.Skills).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
+        if (pet is null) return NoPet(ctx);
+        if (pet.Revision != req.ExpectedRevision) return Conflict(ctx);
+
+        foreach (var s in pet.Skills) s.Points = 0;
+        pet.Revision++;
+        pet.UpdatedAt = DateTime.UtcNow;
+        try
+        {
+            await db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Conflict(ctx);
+        }
+        return Results.Ok(ToResult(pet));
+    }
+
+    /// <summary>Development only (not mapped in any other environment): gives levels so skill points can be tested before XP exists.</summary>
+    internal static RouteGroupBuilder MapDev(this RouteGroupBuilder api)
+    {
+        api.MapPost("/dev/pets/me/level-up", async (ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct) =>
+        {
+            var owner = UserId(principal);
+            var pet = await db.Pets.Include(p => p.Skills).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
+            if (pet is null) return NoPet(ctx);
+            pet.Level = Math.Min(pet.Level + 1, 30);
+            pet.Revision++;
+            pet.UpdatedAt = DateTime.UtcNow;
+            await db.SaveChangesAsync(ct);
+            return Results.Ok(ToSnapshot(pet));
+        }).RequireAuthorization();
+        return api;
     }
 }

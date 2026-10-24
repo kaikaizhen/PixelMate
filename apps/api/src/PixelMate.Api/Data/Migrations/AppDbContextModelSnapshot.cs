@@ -330,6 +330,7 @@ namespace PixelMate.Api.Data.Migrations
                         .HasColumnName("owner_id");
 
                     b.Property<int>("Revision")
+                        .IsConcurrencyToken()
                         .HasColumnType("int")
                         .HasColumnName("revision");
 
