@@ -107,6 +107,13 @@ test.describe('背包與穿戴', () => {
     await expect(page.locator('[data-fx="note"]')).toHaveCount(1)
     await expect(page.locator('[data-prop="book"]')).toHaveCount(0)
     await expect(page.locator('button.pet img.face')).toHaveAttribute('src', /face_normal/)
+
+    await page.route('**/api/v1/pets/me', (r) =>
+      r.request().method() === 'GET' ? r.fulfill({ json: { ...structuredClone(PET), revision: 10, equipment: { ...EQUIP }, activity: activity('letter') } }) : r.fallback())
+    await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+    await expect(page.getByText('小栗正在寫信')).toBeVisible()
+    await expect(page.locator('[data-prop="letter"]')).toHaveCount(1)                     // writing: paper and a quill
+    await expect(page.locator('[data-prop="book"]')).toHaveCount(0)
   })
 
   test('散步時撿到東西：只對沒看過的事件跳出提示', async ({ page }) => {

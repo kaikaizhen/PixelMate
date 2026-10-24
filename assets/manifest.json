@@ -5946,6 +5946,19 @@
         46
       ]
     },
+    "pet.star_01.prop.letter": {
+      "type": "spritesheet",
+      "layer": "pet_front_accessory",
+      "path": "sprites/pets/star_01/prop_letter.png",
+      "frames": 2,
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "fps": 3,
+      "anchor": [
+        24,
+        46
+      ]
+    },
     "world.decor.bouquet_festival": {
       "type": "image",
       "layer": "furniture_back",
@@ -8548,6 +8561,96 @@
           "root": [
             0,
             0
+          ]
+        }
+      ]
+    },
+    "pet.star_01.anim.write": {
+      "fps": 3,
+      "loop": true,
+      "frames": [
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "look_down",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ],
+          "props": [
+            {
+              "key": "pet.star_01.prop.letter",
+              "index": 0
+            }
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "look_down",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ],
+          "props": [
+            {
+              "key": "pet.star_01.prop.letter",
+              "index": 1
+            }
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 1
+          },
+          "face": "look_down",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ],
+          "props": [
+            {
+              "key": "pet.star_01.prop.letter",
+              "index": 0
+            }
+          ]
+        },
+        {
+          "body": {
+            "sheet": "idle",
+            "index": 0
+          },
+          "face": "look_down",
+          "attach": [
+            0,
+            0
+          ],
+          "root": [
+            0,
+            0
+          ],
+          "props": [
+            {
+              "key": "pet.star_01.prop.letter",
+              "index": 1
+            }
           ]
         }
       ]
