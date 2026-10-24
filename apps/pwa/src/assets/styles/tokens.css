@@ -1,0 +1,40 @@
+:root {
+  --c-cream: #fff8ec;
+  --c-paper: #fffdf8;
+  --c-ink: #4a3040;
+  --c-ink-soft: #7a5f6c;
+  --c-line: #e6d6bf;
+  --c-pink: #f4a6a0;
+  --c-pink-soft: #fde2dd;
+  --c-blue: #8fc4e8;
+  --c-green: #5f9a6a;
+  --c-green-soft: #e3f3dc;
+  --c-yellow: #ffd86b;
+  --c-error: #b8403e;
+  --c-error-soft: #fdeaea;
+
+  --font-body: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
+  --font-pixel: 'Press Start 2P', monospace;
+
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --tap-min: 48px;
+  --radius: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --c-cream: #241c26;
+    --c-paper: #2e2430;
+    --c-ink: #f4e8dc;
+    --c-ink-soft: #c8b4bc;
+    --c-line: #4a3a4c;
+    --c-pink-soft: #4a2e36;
+    --c-green: #8fcf9a;
+    --c-green-soft: #24402c;
+    --c-error: #ff9a96;
+    --c-error-soft: #482426;
+  }
+}
