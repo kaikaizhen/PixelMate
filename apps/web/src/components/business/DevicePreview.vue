@@ -11,7 +11,7 @@ const props = defineProps<{ kind: 'phone' | 'desk' }>()
 
 const SPEC = {
   phone: { w: 72, h: 128, frame: phoneFrame, bg: phoneBg, sx: 8, sy: 12, sw: 56, sh: 104, px: 4, py: 50 },
-  desk: { w: 88, h: 96, frame: deskFrame, bg: deskBg, sx: 12, sy: 10, sw: 64, sh: 64, px: 8, py: 14 },
+  desk: { w: 88, h: 96, frame: deskFrame, bg: deskBg, sx: 12, sy: 11, sw: 64, sh: 64, px: 8, py: 14 },
 } as const
 const spec = SPEC[props.kind]
 </script>
