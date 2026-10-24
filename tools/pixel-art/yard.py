@@ -83,7 +83,7 @@ def postman(bob=0, step=0, hand=False):
     p.rect(6, 23 + y, 9, 24 + y, "#f4a6a0"); p.rect(29, 23 + y, 32, 24 + y, "#f4a6a0")
     p.line(17, 24 + y, 20, 24 + y, EYE)
     # satchel strap + bag
-    p.line(6, 12 + y, 28, 30 + y, BAG)
+    p.line(32, 26 + y, 11, 31 + y, BAG); p.line(32, 27 + y, 11, 32 + y, "#8f6340")
     p.rect(2, 26 + y, 13, 34 + y, BAG); p.rect(2, 26 + y, 13, 34 + y, LINE, fill=False); p.rect(3, 28 + y, 12, 29 + y, "#8f6340")
     return p
 frames = [postman(0, 0), postman(1, 1), postman(0, 2), postman(1, 3)]
