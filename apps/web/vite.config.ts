@@ -8,6 +8,10 @@ export default defineConfig({
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
+  build: {
+    // 像素圖一律輸出為檔案（可長期快取），不內嵌進 HTML
+    assetsInlineLimit: 0,
+  },
   ssgOptions: {
     script: 'async',
     formatting: 'minify',
