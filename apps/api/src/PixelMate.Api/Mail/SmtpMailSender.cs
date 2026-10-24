@@ -8,6 +8,26 @@ namespace PixelMate.Api.Mail;
 /// <summary>Sends through SMTP with STARTTLS (Gmail: smtp.gmail.com:587). Failures are logged without addresses or secrets.</summary>
 public sealed class SmtpMailSender(IOptions<MailOptions> options, ILogger<SmtpMailSender> log) : IMailSender
 {
+    /// <summary>
+    /// Full chain validation, except that an *unreachable revocation list* (OCSP/CRL blocked by a firewall, or macOS
+    /// not answering) does not fail the handshake. Every other certificate problem still rejects the connection.
+    /// </summary>
+    internal static bool ValidateServerCertificate(object sender, System.Security.Cryptography.X509Certificates.X509Certificate? cert,
+        System.Security.Cryptography.X509Certificates.X509Chain? chain, System.Net.Security.SslPolicyErrors errors)
+    {
+        if (errors == System.Net.Security.SslPolicyErrors.None)
+        {
+            return true;
+        }
+        if (errors != System.Net.Security.SslPolicyErrors.RemoteCertificateChainErrors || chain is null)
+        {
+            return false;
+        }
+        return chain.ChainStatus.All(s => s.Status is System.Security.Cryptography.X509Certificates.X509ChainStatusFlags.NoError
+            or System.Security.Cryptography.X509Certificates.X509ChainStatusFlags.RevocationStatusUnknown
+            or System.Security.Cryptography.X509Certificates.X509ChainStatusFlags.OfflineRevocation);
+    }
+
     public async Task SendAsync(string toAddress, string subject, string htmlBody, string textBody, CancellationToken ct = default)
     {
         var o = options.Value;
@@ -19,7 +39,7 @@ public sealed class SmtpMailSender(IOptions<MailOptions> options, ILogger<SmtpMa
 
         try
         {
-            using var smtp = new SmtpClient();
+            using var smtp = new SmtpClient { ServerCertificateValidationCallback = ValidateServerCertificate };
             await smtp.ConnectAsync(o.Host, o.Port, SecureSocketOptions.StartTls, ct);
             await smtp.AuthenticateAsync(o.Username, o.Password, ct);
             await smtp.SendAsync(message, ct);
@@ -27,7 +47,9 @@ public sealed class SmtpMailSender(IOptions<MailOptions> options, ILogger<SmtpMa
         }
         catch (Exception ex)
         {
-            log.LogError("Mail delivery failed ({ExceptionType})", ex.GetType().Name);   // never log the recipient, token or password
+            // never log the recipient, token or password; TLS errors carry no secrets and explain the real cause
+            log.LogError("Mail delivery failed ({ExceptionType}){Reason}", ex.GetType().Name,
+                ex is SslHandshakeException ? ": " + ex.Message : "");
         }
     }
 }

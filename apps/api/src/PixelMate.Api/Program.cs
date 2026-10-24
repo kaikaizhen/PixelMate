@@ -12,6 +12,16 @@ using PixelMate.Api.Mail;
 using Scalar.AspNetCore;
 using Serilog;
 
+// Local settings live in apps/api/.env (and .env.local, which wins). Real environment variables always win over both.
+// Both files are git-ignored; production passes real environment variables and has no .env.
+if (Environment.GetEnvironmentVariable("PIXELMATE_SKIP_DOTENV") != "1")     // tests must not pick up a developer's own files
+{
+    foreach (var file in new[] { ".env.local", ".env" })
+    {
+        DotNetEnv.Env.NoClobber().TraversePath().Load(file);
+    }
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((ctx, cfg) => cfg
