@@ -2,10 +2,10 @@
 import { computed, onMounted, ref } from 'vue'
 import SpriteStrip from '@/components/common/SpriteStrip.vue'
 import GamePet from './GamePet.vue'
-import { DEFAULT_FURNITURE, PET_SPOT, ROOM_SIZE, WINDOW, WINDOW_VIEW } from '@/constants/defaultRoom'
+import { DEFAULT_FURNITURE, OUTDOOR_SPOT, PET_SPOT, ROOM_SIZE, WINDOW, WINDOW_VIEW } from '@/constants/defaultRoom'
 import { useSceneScale } from '@/composables/useSceneScale'
 import { useGameStore } from '@/stores/useGameStore'
-import { windowWeatherKey } from '@/utils/roomWeather'
+import { weatherKey, windowWeatherKey } from '@/utils/roomWeather'
 import room from '@/assets/pixel/room.png'
 import plant from '@/assets/pixel/plant.png'
 import curtainL from '@/assets/pixel/curtain_l.png'
@@ -13,7 +13,7 @@ import curtainR from '@/assets/pixel/curtain_r.png'
 import bars from '@/assets/pixel/window_bars.png'
 
 // The house: the website's room art + the weather outside (game assets by assetKey) + furniture + the pet.
-const props = defineProps<{ color: string; happy: boolean; name: string; weather?: string; bare?: boolean; scale?: number; equipment?: Record<string, string | null>; activity?: string }>()
+const props = defineProps<{ color: string; happy: boolean; name: string; weather?: string; bare?: boolean; scale?: number; equipment?: Record<string, string | null>; activity?: string; scene?: string }>()
 defineEmits<{ pat: [] }>()
 
 const el = ref<HTMLElement | null>(null)
@@ -25,15 +25,21 @@ onMounted(() => void game.load())
 const weatherUrl = computed(() => game.url(windowWeatherKey(new Date(), props.weather)))
 const u = (n: number) => `calc(${n} * var(--s) * 1px)`
 const noteUrl = computed(() => game.url('fx.note_drift'))
+const outdoors = computed(() => (props.scene === 'balcony' || props.scene === 'yard' ? props.scene : null))
+const outdoorUrl = computed(() => (outdoors.value ? game.url(weatherKey(new Date(), props.weather, outdoors.value)) : ''))
+const spot = computed(() => (outdoors.value ? OUTDOOR_SPOT[outdoors.value] : PET_SPOT))
 const night = computed(() => windowWeatherKey(new Date(), props.weather).includes('starry'))
 </script>
 
 <template>
   <div ref="el" class="scene" :class="{ bare }" :style="{ '--s': s, aspectRatio: `${ROOM_SIZE} / ${ROOM_SIZE}` }" role="group" aria-label="你的小屋">
+    <!-- away from home: the balcony or the yard is the whole picture -->
+    <img v-if="outdoors && outdoorUrl" draggable="false" class="layer pixelated" data-scene="outdoor" :data-view="outdoors" :src="outdoorUrl" alt="" />
+    <template v-else>
     <!-- 1. outside the window -->
     <div class="win pixelated" :style="{ left: u(WINDOW.x), top: u(WINDOW.y), width: u(WINDOW.w), height: u(WINDOW.h),
         backgroundImage: weatherUrl ? `url(${weatherUrl})` : undefined,
-        backgroundSize: `${u(ROOM_SIZE)} ${u(ROOM_SIZE)}`, backgroundPosition: `${u(-WINDOW_VIEW.x)} ${u(-WINDOW_VIEW.y)}` }" />
+        backgroundSize: `${u(ROOM_SIZE * WINDOW_VIEW.scale)} ${u(ROOM_SIZE * WINDOW_VIEW.scale)}`, backgroundPosition: `${u(-WINDOW_VIEW.x)} ${u(-WINDOW_VIEW.y)}` }" />
     <!-- 2. the house -->
     <img draggable="false" class="layer pixelated" :src="room" alt="" />
     <img draggable="false" class="abs pixelated" :src="bars" alt="" :style="{ left: u(WINDOW.x), top: u(WINDOW.y), width: u(WINDOW.w), height: u(WINDOW.h) }" />
@@ -44,8 +50,9 @@ const night = computed(() => windowWeatherKey(new Date(), props.weather).include
     <template v-for="f in DEFAULT_FURNITURE" :key="f.key">
       <img draggable="false" v-if="game.url(f.key)" class="abs pixelated" :src="game.url(f.key)" alt="" :style="{ left: u(f.x), top: u(f.y), width: u(f.w), height: u(f.w) }" />
     </template>
+    </template>
     <!-- 4. the pet -->
-    <button type="button" class="pet" :class="[{ hop: happy }, activity && `act-${activity}`]" :style="{ left: u(PET_SPOT.x), top: u(PET_SPOT.y) }" :aria-label="`摸摸 ${name}`" @click="$emit('pat')">
+    <button type="button" class="pet" :class="[{ hop: happy }, activity && `act-${activity}`]" :style="{ left: u(spot.x), top: u(spot.y) }" :aria-label="`摸摸 ${name}`" @click="$emit('pat')">
       <GamePet :color="color" :face="happy ? 'happy' : 'normal'" :equipment="equipment" :activity="activity" />
       <span v-if="activity === 'hum' && noteUrl" class="fx pixelated" data-fx="note" :style="{ backgroundImage: `url(${noteUrl})` }" aria-hidden="true" />
     </button>

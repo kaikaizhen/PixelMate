@@ -132,4 +132,26 @@ test.describe('背包與穿戴', () => {
     await page.evaluate(() => window.dispatchEvent(new Event('focus')))
     await expect(page.getByText('小栗散步時撿到了「郵局草帽」')).toBeVisible()
   })
+
+  test('小夥伴會去陽台和院子：換成全螢幕的戶外場景，天氣用後端說的', async ({ page }) => {
+    const world = (scene: string, weather: string) => ({ ...structuredClone(PET), revision: 20, equipment: { ...EQUIP }, world: { mood: 'happy', scene, weather } })
+    await mockApi(page, {}, { pet: world('home', 'snow') as typeof PET, bag: BAG })
+    await page.goto('login')
+    await page.getByLabel('Email').fill('a@example.com')
+    await page.getByLabel('密碼').fill('Passw0rd-123')
+    await page.getByRole('button', { name: '登入' }).click()
+    await expect(page.getByRole('button', { name: '背包' })).toBeVisible()
+    await expect(page.locator('[data-scene="outdoor"]')).toHaveCount(0)                    // at home: the room with the window
+    await expect(page.locator('.win')).toHaveCSS('background-image', /snow_window/)       // the window shows the server's weather
+
+    for (const [scene, label] of [['balcony', '在陽台'], ['yard', '在院子']] as const) {
+      await page.route('**/api/v1/pets/me', (r) => (r.request().method() === 'GET' ? r.fulfill({ json: { ...world(scene, 'thunder'), activity: { key: 'walk', startedAt: new Date().toISOString(), endsAt: new Date(Date.now() + 600_000).toISOString() } } }) : r.fallback()))
+      await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+      await expect(page.locator('[data-scene="outdoor"]')).toHaveAttribute('src', new RegExp(`thunder_${scene}`))
+      await expect(page.getByText(label)).toBeVisible()
+      await expect(page.locator('button.pet')).toBeVisible()
+    }
+    const overflow = await page.evaluate(() => document.documentElement.scrollHeight > window.innerHeight + 1)
+    expect(overflow).toBe(false)
+  })
 })
