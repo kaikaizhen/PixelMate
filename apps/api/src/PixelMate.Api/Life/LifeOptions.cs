@@ -12,4 +12,6 @@ public sealed class LifeOptions
     public int CatchUpDays { get; set; } = 7;
     /// <summary>Background worker period; 0 turns the worker off (the API still catches up lazily).</summary>
     public int WorkerIntervalSeconds { get; set; } = 300;
+    /// <summary>Local time of the pet world (decides sunrise / day / sunset / night). Taiwan by default.</summary>
+    public int UtcOffsetHours { get; set; } = 8;
 }

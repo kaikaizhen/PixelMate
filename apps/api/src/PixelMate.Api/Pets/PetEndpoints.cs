@@ -38,14 +38,20 @@ public static class PetEndpoints
 
     internal static IQueryable<Pet> WithEquipment(IQueryable<Pet> q) => q.Include(p => p.Skills).Include(p => p.Equipment);
 
-    internal static PetSnapshot ToSnapshot(Pet p, DateTime? now = null)
+    private static Life.LifeOptions LifeOf(HttpContext ctx) => ctx.RequestServices.GetRequiredService<Microsoft.Extensions.Options.IOptions<Life.LifeOptions>>().Value;
+
+    private static PetWorld World(Guid petId, Life.ActivityInfo a, DateTime now, Life.LifeOptions o) =>
+        new("happy", Life.WorldRules.SceneAt(petId, a.Key, Life.LifeScheduler.SlotOf(now)), Life.WorldRules.WeatherAt(now, o.UtcOffsetHours));
+
+    internal static PetSnapshot ToSnapshot(Pet p, DateTime? now = null, Life.LifeOptions? life = null)
     {
         var skills = SkillKeys.All.ToDictionary(k => k, k => p.Skills.FirstOrDefault(s => s.SkillKey == k)?.Points ?? 0);
+        var t = now ?? DateTime.UtcNow;
+        var activity = Life.LifeScheduler.ActivityNow(p.PetId, skills, t);
         var remaining = Math.Max(0, PetRules.TotalSkillPoints(p.Level) - skills.Values.Sum());
         return new PetSnapshot(p.PetId, p.Name, p.BodyVariant, p.Level, p.Xp, p.Revision, skills, remaining,
             EquipmentOf(p),
-            new PetWorld("happy", "home", "sunny"), p.UpdatedAt,
-            Life.LifeScheduler.ActivityNow(p.PetId, skills, now ?? DateTime.UtcNow));
+            World(p.PetId, activity, t, life ?? new Life.LifeOptions()), p.UpdatedAt, activity);
     }
 
     private static async Task<IResult> Create(CreatePetRequest req, ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct)
@@ -70,18 +76,18 @@ public static class PetEndpoints
         {
             return conflict;                                // two tabs raced: the unique index on owner_id decides
         }
-        return Results.Created("/api/v1/pets/me", ToSnapshot(pet));
+        return Results.Created("/api/v1/pets/me", ToSnapshot(pet, null, LifeOf(ctx)));
     }
 
     /// <summary>Reading the pet also makes up any finished slots that the worker has not reached yet (lazy half of the hybrid).</summary>
-    private static async Task<IResult> GetMine(ClaimsPrincipal principal, AppDbContext db, Life.LifeService life, TimeProvider clock, HttpContext ctx, CancellationToken ct)
+    private static async Task<IResult> GetMine(ClaimsPrincipal principal, AppDbContext db, Life.LifeService life, TimeProvider clock, Microsoft.Extensions.Options.IOptions<Life.LifeOptions> lifeOptions, HttpContext ctx, CancellationToken ct)
     {
         var owner = UserId(principal);
         var now = clock.GetUtcNow().UtcDateTime;
         var pet = await WithEquipment(db.Pets.AsNoTracking()).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
         if (pet is null) return NoPet(ctx);
         await life.CatchUpAsync(db, pet.PetId, owner, pet.CreatedAt, now, ct);
-        return Results.Ok(ToSnapshot(pet, now));
+        return Results.Ok(ToSnapshot(pet, now, lifeOptions.Value));
     }
 
     /// <summary>The latest things the pet found, newest first.</summary>
@@ -166,7 +172,7 @@ public static class PetEndpoints
             pet.Revision++;
             pet.UpdatedAt = DateTime.UtcNow;
             await db.SaveChangesAsync(ct);
-            return Results.Ok(ToSnapshot(pet));
+            return Results.Ok(ToSnapshot(pet, null, LifeOf(ctx)));
         }).RequireAuthorization();
         // Moves the life cursor back so the next read makes those hours up again (deterministic: the same walks find the same items).
         api.MapPost("/dev/pets/me/life/rewind", async (int hours, ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct) =>

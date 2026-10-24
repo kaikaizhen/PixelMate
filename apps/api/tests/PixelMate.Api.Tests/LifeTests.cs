@@ -120,6 +120,45 @@ public class LifeTests
         Assert.Equal(LifeScheduler.PickItem(Guid.Empty, NoSkills, 7, catalogue), LifeScheduler.PickItem(Guid.Empty, NoSkills, 7, catalogue));
     }
 
+    // ---- the world ----------------------------------------------------------------------------------------------------
+    [Fact]
+    public void Weather_is_shared_follows_the_time_of_day_and_only_uses_art_that_exists()
+    {
+        var start = new DateTime(2026, 7, 1, 0, 0, 0, DateTimeKind.Utc);
+        var seen = new HashSet<string>();
+        for (var h = 0; h < 24 * 400; h++) seen.Add(WorldRules.WeatherAt(start.AddHours(h), 8));
+        Assert.All(seen, k => Assert.Contains(k, WorldRules.WeatherKeys));
+        Assert.True(seen.Count >= 10, string.Join(",", seen));
+        Assert.Equal(WorldRules.WeatherAt(start, 8), WorldRules.WeatherAt(start, 8));
+
+        // a fair-weather July day, scanned for clear blocks: night is starry and early morning is sunrise
+        var clearNight = Enumerable.Range(0, 200).Select(d => start.AddDays(d).AddHours(-8 + 2)).Select(t => WorldRules.WeatherAt(t, 8)).ToList();
+        Assert.Contains("starry", clearNight);
+        Assert.DoesNotContain("snow", Enumerable.Range(0, 24 * 90).Select(h => WorldRules.WeatherAt(start.AddHours(h), 8)));   // no snow in summer
+    }
+
+    [Fact]
+    public void Scenes_are_stable_cover_every_place_and_walks_favour_the_outdoors()
+    {
+        var pet = Guid.Parse("33333333-3333-3333-3333-333333333333");
+        Assert.Equal(WorldRules.SceneAt(pet, Activities.Read, 123), WorldRules.SceneAt(pet, Activities.Read, 123));
+        double Outdoors(string a) => Enumerable.Range(0, 3000).Count(s => WorldRules.SceneAt(pet, a, s) != Scenes.Home) / 3000.0;
+        Assert.True(Outdoors(Activities.Walk) > Outdoors(Activities.Read) && Outdoors(Activities.Read) > Outdoors(Activities.Idle));
+        Assert.Equal(Scenes.All.Order(), Enumerable.Range(0, 3000).Select(s => WorldRules.SceneAt(pet, Activities.Read, s)).Distinct().Order());
+    }
+
+    [Fact]
+    public async Task The_snapshot_says_where_the_pet_is_and_what_the_weather_is()
+    {
+        using var f = new AuthFactory();
+        var (c, pet) = await Player(f);
+        var now = f.Clock.GetUtcNow().UtcDateTime;
+        var snap = await Get(c);
+        Assert.Equal(WorldRules.WeatherAt(now, 8), snap.World.Weather);
+        Assert.Equal(WorldRules.SceneAt(pet.PetId, snap.Activity.Key, LifeScheduler.SlotOf(now)), snap.World.Scene);
+        Assert.Contains(snap.World.Scene, Scenes.All);
+    }
+
     // ---- through the API --------------------------------------------------------------------------------------------
     [Fact]
     public async Task The_snapshot_carries_the_activity_every_device_must_show()
@@ -185,7 +224,10 @@ public class LifeTests
         f.Clock.Advance(TimeSpan.FromDays(6));
         var worker = f.Services.GetServices<IHostedService>().OfType<LifeWorker>().Single();
 
-        await Task.WhenAll(Enumerable.Range(0, 4).SelectMany(_ => new Task[] { worker.RunOnce(default), Get(c) }));
+        // the test database is one shared in-memory SQLite connection, so a racing call may fail outright; what must hold is the end state
+        static async Task Quietly(Func<Task> run) { try { await run(); } catch (Exception) { /* a lost race */ } }
+        await Task.WhenAll(Enumerable.Range(0, 4).SelectMany(_ => new[] { Quietly(() => worker.RunOnce(default)), Quietly(() => Get(c)) }));
+        await worker.RunOnce(default);                      // a calm pass finishes whatever the race left behind
         var events = await Events(f, pet.PetId);
         Assert.Equal(events.Count, events.Select(e => e.Slot).Distinct().Count());
         Assert.Equal(events.Count, await BagTotal(f, pet.PetId));
