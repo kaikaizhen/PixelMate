@@ -5,10 +5,11 @@ import catalog
 import gear_world
 import gear_world2  # noqa: F401  (registers B2 generators)
 import gear_world3  # noqa: F401  (registers B3 generators)
+import gear_world4  # noqa: F401  (registers B4 generators)
 from common import ANCHOR, FRAME, write_strip
 from gear_base import finish
 
-BATCHES = [b for b in os.environ.get("GEAR_BATCHES", "B1,B2,B3").split(",") if b]
+BATCHES = [b for b in os.environ.get("GEAR_BATCHES", "B1,B2,B3,B4").split(",") if b]
 CATS = {"家具", "布置", "收藏品", "信件", "天氣", "特效"}
 # prefix -> (dir, manifest layer, slot, frame size)
 KIND = {

@@ -153,7 +153,7 @@ def outfit_pajamas(theme):
         s.rect(15, 38, 22, 43, PAPER); s.line(15, 38, 18, 41, PAPER_D); s.line(22, 38, 19, 41, PAPER_D)
     else:                                                                   # picnic: gingham + moon patch
         pattern(s, (2, 33, 45, 45), "check", pal, only=m)
-        s.circle(32, 40, 3, "#fff0a8"); s.circle(33, 39, 3, m)
+        s.circle(32, 40, 3, "#c98a5a"); s.circle(30, 37, 1, "#c98a5a"); s.circle(34, 37, 1, "#c98a5a"); s.px(31, 40, LINE); s.px(33, 40, LINE)   # teddy patch
     s.line(24, 34, 24, 45, d)
     for y in (36, 40, 44):
         s.px(26, y, WHITE)
