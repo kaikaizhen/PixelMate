@@ -8,6 +8,7 @@ using PixelMate.Api.Auth;
 using PixelMate.Api.Data;
 using PixelMate.Api.Endpoints;
 using PixelMate.Api.Infrastructure;
+using PixelMate.Api.Items;
 using PixelMate.Api.Mail;
 using PixelMate.Api.Pets;
 using Scalar.AspNetCore;
@@ -81,6 +82,7 @@ builder.Services.AddScoped<IMailSender>(sp =>
         ? ActivatorUtilities.CreateInstance<SmtpMailSender>(sp)
         : ActivatorUtilities.CreateInstance<LogMailSender>(sp));
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddHostedService<ItemSeedHostedService>();
 
 builder.Services.AddOpenApi();
 
@@ -143,9 +145,11 @@ var api = app.MapGroup("/api/v1");
 api.MapHealth();
 api.MapAuth();
 api.MapPets();
+api.MapItems();
 if (app.Environment.IsDevelopment())
 {
     api.MapDev();      // test helpers; never mapped outside Development
+    api.MapItemDev();
 }
 
 app.Run();

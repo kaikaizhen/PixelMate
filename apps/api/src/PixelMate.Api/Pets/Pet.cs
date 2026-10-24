@@ -14,6 +14,7 @@ public class Pet
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public List<PetSkill> Skills { get; set; } = [];
+    public List<PixelMate.Api.Items.PetEquipment> Equipment { get; set; } = [];
 }
 
 /// <summary><c>pet_skills</c>: points per skill, 0..5 (database check constraint + service rule).</summary>

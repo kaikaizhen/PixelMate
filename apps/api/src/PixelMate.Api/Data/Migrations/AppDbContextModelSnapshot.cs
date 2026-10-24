@@ -298,6 +298,138 @@ namespace PixelMate.Api.Data.Migrations
                     b.ToTable("users", (string)null);
                 });
 
+            modelBuilder.Entity("PixelMate.Api.Items.InventoryEntry", b =>
+                {
+                    b.Property<Guid>("InventoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("inventory_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("ItemId")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("item_id");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("owner_id");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int")
+                        .HasColumnName("quantity");
+
+                    b.HasKey("InventoryId")
+                        .HasName("pk_inventory_entries");
+
+                    b.HasIndex("ItemId")
+                        .HasDatabaseName("ix_inventory_entries_item_id");
+
+                    b.HasIndex("OwnerId", "ItemId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_inventory_entries_owner_id_item_id");
+
+                    b.ToTable("inventory_entries", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_inventory_quantity", "quantity >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Items.ItemDefinition", b =>
+                {
+                    b.Property<string>("ItemId")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("item_id");
+
+                    b.Property<string>("AssetKey")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("asset_key");
+
+                    b.Property<string>("Batch")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("varchar(8)")
+                        .HasColumnName("batch");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("category");
+
+                    b.Property<string>("DesignId")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("varchar(12)")
+                        .HasColumnName("design_id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Rarity")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("rarity");
+
+                    b.Property<string>("Slot")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("slot");
+
+                    b.Property<bool>("Tradable")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("tradable");
+
+                    b.HasKey("ItemId")
+                        .HasName("pk_item_definitions");
+
+                    b.HasIndex("Category", "Rarity")
+                        .HasDatabaseName("ix_item_definitions_category_rarity");
+
+                    b.ToTable("item_definitions", (string)null);
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Items.PetEquipment", b =>
+                {
+                    b.Property<Guid>("PetId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("pet_id");
+
+                    b.Property<string>("Slot")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("slot");
+
+                    b.Property<Guid>("InventoryId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("inventory_id");
+
+                    b.Property<string>("ItemId")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("item_id");
+
+                    b.HasKey("PetId", "Slot")
+                        .HasName("pk_pet_equipment");
+
+                    b.HasIndex("InventoryId")
+                        .HasDatabaseName("ix_pet_equipment_inventory_id");
+
+                    b.ToTable("pet_equipment", (string)null);
+                });
+
             modelBuilder.Entity("PixelMate.Api.Pets.Pet", b =>
                 {
                     b.Property<Guid>("PetId")
@@ -433,6 +565,40 @@ namespace PixelMate.Api.Data.Migrations
                         .HasConstraintName("fk_user_tokens_users_user_id");
                 });
 
+            modelBuilder.Entity("PixelMate.Api.Items.InventoryEntry", b =>
+                {
+                    b.HasOne("PixelMate.Api.Items.ItemDefinition", null)
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_inventory_entries_item_definitions_item_id");
+
+                    b.HasOne("PixelMate.Api.Data.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_inventory_entries_users_owner_id");
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Items.PetEquipment", b =>
+                {
+                    b.HasOne("PixelMate.Api.Items.InventoryEntry", null)
+                        .WithMany()
+                        .HasForeignKey("InventoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_pet_equipment_inventory_entries_inventory_id");
+
+                    b.HasOne("PixelMate.Api.Pets.Pet", null)
+                        .WithMany("Equipment")
+                        .HasForeignKey("PetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_pet_equipment_pets_pet_id");
+                });
+
             modelBuilder.Entity("PixelMate.Api.Pets.Pet", b =>
                 {
                     b.HasOne("PixelMate.Api.Data.AppUser", null)
@@ -455,6 +621,8 @@ namespace PixelMate.Api.Data.Migrations
 
             modelBuilder.Entity("PixelMate.Api.Pets.Pet", b =>
                 {
+                    b.Navigation("Equipment");
+
                     b.Navigation("Skills");
                 });
 #pragma warning restore 612, 618

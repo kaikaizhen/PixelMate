@@ -26,6 +26,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- the game asset manifest is the single source of the item catalogue (read by ItemCatalogSeeder) -->
+    <Content Include="../../../../assets/manifest.json" Link="Seed/manifest.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Mail/Assets/*.png" />
   </ItemGroup>
 

@@ -31,12 +31,18 @@ public static class PetEndpoints
 
     private static Guid UserId(ClaimsPrincipal p) => Guid.Parse(p.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
+    /// <summary>Slot -> itemId. Needs the inventory rows, so callers load p.Equipment with <see cref="WithEquipment"/>.</summary>
+    private static IDictionary<string, string?> EquipmentOf(Pet p) =>
+        Items.Slots.Wearable.ToDictionary(s => s, s => p.Equipment.FirstOrDefault(x => x.Slot == s)?.ItemId);
+
+    internal static IQueryable<Pet> WithEquipment(IQueryable<Pet> q) => q.Include(p => p.Skills).Include(p => p.Equipment);
+
     internal static PetSnapshot ToSnapshot(Pet p)
     {
         var skills = SkillKeys.All.ToDictionary(k => k, k => p.Skills.FirstOrDefault(s => s.SkillKey == k)?.Points ?? 0);
         var remaining = Math.Max(0, PetRules.TotalSkillPoints(p.Level) - skills.Values.Sum());
         return new PetSnapshot(p.PetId, p.Name, p.BodyVariant, p.Level, p.Xp, p.Revision, skills, remaining,
-            new Dictionary<string, string?> { ["hat"] = null, ["outfit"] = null },
+            EquipmentOf(p),
             new PetWorld("happy", "home", "sunny"), p.UpdatedAt);
     }
 
@@ -68,7 +74,7 @@ public static class PetEndpoints
     private static async Task<IResult> GetMine(ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct)
     {
         var owner = UserId(principal);
-        var pet = await db.Pets.AsNoTracking().Include(p => p.Skills).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
+        var pet = await WithEquipment(db.Pets.AsNoTracking()).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
         return pet is null
             ? Results.Json(new ApiError(ErrorCodes.NotFound, "你還沒有小夥伴。", ctx.TraceIdentifier), statusCode: 404)
             : Results.Ok(ToSnapshot(pet));
@@ -78,7 +84,7 @@ public static class PetEndpoints
     private static async Task<IResult> Allocate(AllocateSkillRequest req, ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct)
     {
         var owner = UserId(principal);
-        var pet = await db.Pets.Include(p => p.Skills).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
+        var pet = await WithEquipment(db.Pets).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
         if (pet is null) return NoPet(ctx);
         if (pet.Revision != req.ExpectedRevision) return Conflict(ctx);
 
@@ -111,7 +117,7 @@ public static class PetEndpoints
     private static async Task<IResult> Reset(ResetSkillsRequest req, ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct)
     {
         var owner = UserId(principal);
-        var pet = await db.Pets.Include(p => p.Skills).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
+        var pet = await WithEquipment(db.Pets).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
         if (pet is null) return NoPet(ctx);
         if (pet.Revision != req.ExpectedRevision) return Conflict(ctx);
 
@@ -135,7 +141,7 @@ public static class PetEndpoints
         api.MapPost("/dev/pets/me/level-up", async (ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct) =>
         {
             var owner = UserId(principal);
-            var pet = await db.Pets.Include(p => p.Skills).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
+            var pet = await WithEquipment(db.Pets).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
             if (pet is null) return NoPet(ctx);
             pet.Level = Math.Min(pet.Level + 1, 30);
             pet.Revision++;
