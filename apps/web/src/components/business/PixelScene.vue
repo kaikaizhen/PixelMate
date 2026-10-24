@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import PixelPet from '@/components/business/PixelPet.vue'
 import { usePetReaction } from '@/composables/usePetReaction'
 import { useWeatherStore } from '@/stores/useWeatherStore'
 import room from '@/assets/pixel/room.png'
-import windowSunny from '@/assets/pixel/window_sunny.png'
-import windowRain from '@/assets/pixel/window_rain.png'
-import windowNight from '@/assets/pixel/window_night.png'
+import SpriteStrip from '@/components/common/SpriteStrip.vue'
+import PixelWindow from '@/components/business/PixelWindow.vue'
+import plant from '@/assets/pixel/plant.png'
+import curtainL from '@/assets/pixel/curtain_l.png'
+import curtainR from '@/assets/pixel/curtain_r.png'
 
 const PHRASES = [
   '今天的陽光好舒服。',
@@ -19,8 +20,6 @@ const PHRASES = [
 const weather = useWeatherStore()
 const { mood, message, touch } = usePetReaction(PHRASES)
 
-const windows = { sunny: windowSunny, rain: windowRain, night: windowNight } as const
-const windowSrc = computed(() => windows[weather.scene])
 const sceneLabel = { sunny: '晴天', rain: '雨天', night: '夜晚' } as const
 </script>
 
@@ -28,8 +27,11 @@ const sceneLabel = { sunny: '晴天', rain: '雨天', night: '夜晚' } as const
   <div class="scene" :class="`scene--${weather.scene}`" role="group" :aria-label="`小房間，窗外是${sceneLabel[weather.scene]}`">
     <div class="scene__viewport">
       <div class="scene__room">
-        <img class="scene__window pixelated" :src="windowSrc" alt="" width="64" height="72" />
+        <div class="scene__window"><PixelWindow :weather="weather.scene" /></div>
         <img class="scene__layer scene__room-img pixelated" :src="room" alt="" width="240" height="240" />
+        <SpriteStrip :src="plant" :frames="4" :width="44" :height="80" :x="15" :y="64" duration="calc(var(--wind) * 2)" />
+        <SpriteStrip :src="curtainL" :frames="4" :width="14" :height="84" :x="122" :y="24" duration="calc(var(--wind) * 2)" />
+        <SpriteStrip :src="curtainR" :frames="4" :width="14" :height="84" :x="208" :y="24" duration="calc(var(--wind) * 2)" delay="-0.4s" />
         <div class="scene__pet">
           <PixelPet :mood="mood" @touch="touch" />
           <p v-if="message" class="scene__bubble" role="status">{{ message }}</p>
@@ -45,6 +47,7 @@ const sceneLabel = { sunny: '晴天', rain: '雨天', night: '夜晚' } as const
   --s: 2;
   --crop-x: 56;
   --view-w: 160;
+  --wind: 1.6s;
   position: relative;
   width: fit-content;
   margin-inline: auto;
@@ -88,7 +91,16 @@ const sceneLabel = { sunny: '晴天', rain: '雨天', night: '夜晚' } as const
   height: calc(72px * var(--s));
 }
 
-.scene--night .scene__room-img {
+.scene--rain {
+  --wind: 0.8s;
+}
+
+.scene--night {
+  --wind: 2.6s;
+}
+
+.scene--night .scene__room-img,
+.scene--night .sprite {
   filter: brightness(0.62) saturate(0.9) hue-rotate(-12deg);
 }
 
