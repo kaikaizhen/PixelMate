@@ -1,16 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/useAuthStore'
+import { usePetStore } from '@/stores/usePetStore'
 
 declare module 'vue-router' {
   interface RouteMeta {
     requiresAuth?: boolean
+    needsPet?: boolean // signed in AND adopted
+    noPetOnly?: boolean // the adoption page: only for players without a pet
     guestOnly?: boolean
     title?: string
   }
 }
 
 export const routes = [
-  { path: '/', name: 'home', component: () => import('@/views/HomeView.vue'), meta: { requiresAuth: true, title: '我的小屋' } },
+  { path: '/', name: 'home', component: () => import('@/views/HomeView.vue'), meta: { requiresAuth: true, needsPet: true, title: '我的小屋' } },
+  { path: '/adopt', name: 'adopt', component: () => import('@/views/AdoptView.vue'), meta: { requiresAuth: true, noPetOnly: true, title: '領養小夥伴' } },
   { path: '/login', name: 'login', component: () => import('@/views/LoginView.vue'), meta: { guestOnly: true, title: '登入' } },
   { path: '/register', name: 'register', component: () => import('@/views/RegisterView.vue'), meta: { guestOnly: true, title: '註冊' } },
   { path: '/forgot-password', name: 'forgot-password', component: () => import('@/views/ForgotPasswordView.vue'), meta: { guestOnly: true, title: '忘記密碼' } },
@@ -30,6 +34,11 @@ export function createAppRouter(history = createWebHistory(import.meta.env.BASE_
     }
     if (to.meta.guestOnly && auth.user) {
       return { name: 'home' }
+    }
+    if (auth.user && (to.meta.needsPet || to.meta.noPetOnly)) {
+      const pet = await usePetStore().load()
+      if (to.meta.needsPet && !pet) return { name: 'adopt' }
+      if (to.meta.noPetOnly && pet) return { name: 'home' }
     }
     return true
   })

@@ -41,3 +41,12 @@ export function validateDisplayName(value: string): string {
 export function safeRedirect(target: unknown): string {
   return typeof target === 'string' && /^\/(?!\/)[^\\]*$/.test(target) ? target : '/'
 }
+
+/** Mirrors the API pet-name rule: 1-12 characters, letters / digits / spaces / - _ · ・ only (no markup, no emoji). */
+export function validatePetName(value: string): string {
+  const v = value.trim()
+  if (!v) return '請幫小夥伴取個名字。'
+  if ([...v].length > 12) return '名字最多 12 個字。'
+  if (![...v].every((c) => /[\p{L}\p{N}]/u.test(c) || ' -_·・'.includes(c))) return '名字只能用文字、數字、空格和 - _ ・。'
+  return ''
+}

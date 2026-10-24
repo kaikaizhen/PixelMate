@@ -17,7 +17,51 @@ test.describe('RWD', () => {
   }
 })
 
+test.describe('不用捲動', () => {
+  // The design target: every page fits one screen on an iPhone 16 (393x852 project) and on a 1440x900 desktop.
+  const fits = async (page: import('@playwright/test').Page) => {
+    const m = await page.evaluate(() => ({ sh: document.documentElement.scrollHeight, ih: window.innerHeight }))
+    expect(m.sh, `content ${m.sh}px vs viewport ${m.ih}px`).toBeLessThanOrEqual(m.ih)
+  }
+
+  for (const path of ['login', 'register', 'forgot-password', 'reset-password?email=a%40b.co&token=t', 'confirm-email']) {
+    test(`/${path.split('?')[0]} 一個畫面放得下`, async ({ page }) => {
+      await mockApi(page)
+      await page.goto(path)
+      await fits(page)
+    })
+  }
+
+  test('註冊頁每個欄位都顯示錯誤時仍放得下', async ({ page }) => {
+    await mockApi(page)
+    await page.goto('register')
+    await page.getByLabel('密碼', { exact: true }).fill('abc')
+    await page.getByRole('button', { name: '註冊' }).click()
+    await expect(page.getByText('請輸入暱稱。')).toBeVisible()
+    await fits(page)
+  })
+
+  test('領養頁與小屋放得下', async ({ page }) => {
+    await mockApi(page, {}, { pet: null })
+    await page.goto('login')
+    await page.getByLabel('Email').fill('a@example.com')
+    await page.getByLabel('密碼').fill('Passw0rd-123')
+    await page.getByRole('button', { name: '登入' }).click()
+    await expect(page.getByRole('heading', { name: '領養你的第一隻小夥伴' })).toBeVisible()
+    await fits(page)
+    await page.getByRole('button', { name: '領養牠！' }).click()                 // empty name: error shown
+    await expect(page.getByText('請幫小夥伴取個名字。')).toBeVisible()
+    await fits(page)
+    await page.getByLabel('小夥伴的名字').fill('麻糬')
+    await page.getByRole('button', { name: '領養牠！' }).click()
+    await expect(page.getByRole('heading', { name: '麻糬' })).toBeVisible()
+    await fits(page)
+  })
+})
+
 test.describe('PWA', () => {
+  test.use({ serviceWorkers: 'allow' })
+
   test('manifest 完整且 icon 可載入', async ({ page, request }) => {
     await mockApi(page)
     await page.goto('login')

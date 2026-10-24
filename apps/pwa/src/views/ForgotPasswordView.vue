@@ -44,5 +44,5 @@ function onSubmit() {
 </template>
 
 <style scoped>
-form { display: grid; gap: var(--space-2); }
+form { display: grid; gap: 0.75rem; }
 </style>
