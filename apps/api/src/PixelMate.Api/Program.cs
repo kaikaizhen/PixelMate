@@ -1,18 +1,75 @@
 using System.Threading.RateLimiting;
+using FluentValidation;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using PixelMate.Api.Auth;
 using PixelMate.Api.Data;
 using PixelMate.Api.Endpoints;
 using PixelMate.Api.Infrastructure;
+using PixelMate.Api.Mail;
+using Scalar.AspNetCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((ctx, cfg) => cfg
+    .ReadFrom.Configuration(ctx.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}"));
 
 // ---- configuration: secrets come from user-secrets (dev) or environment variables (prod); never from the repo.
 var connectionString = builder.Configuration.GetConnectionString("Default") ?? "Server=localhost;Database=pixelmate;Uid=unset;Pwd=unset";
 
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseMySql(connectionString, new MariaDbServerVersion(new Version(10, 11, 8)),
-        my => my.EnableRetryOnFailure(3).CommandTimeout(15)));
+            my => my.EnableRetryOnFailure(3).CommandTimeout(15))
+        .UseSnakeCaseNamingConvention());
+
+// ---- identity (cookie sessions) -------------------------------------------------------------------------------
+builder.Services.AddIdentity<AppUser, IdentityRole<Guid>>(o =>
+    {
+        o.User.RequireUniqueEmail = true;
+        o.Password.RequiredLength = 10;
+        o.Password.RequireDigit = true;
+        o.Password.RequireLowercase = false;
+        o.Password.RequireUppercase = false;
+        o.Password.RequireNonAlphanumeric = false;
+        o.Lockout.MaxFailedAccessAttempts = 5;
+        o.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+        o.Lockout.AllowedForNewUsers = true;
+        o.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
+    })
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+// A password reset rotates the security stamp; other sessions are dropped at the next check (default every 60 s).
+builder.Services.Configure<SecurityStampValidatorOptions>(o =>
+    o.ValidationInterval = TimeSpan.FromSeconds(builder.Configuration.GetValue("Auth:SecurityStampValidationSeconds", 60)));
+builder.Services.Configure<DataProtectionTokenProviderOptions>(o => o.TokenLifespan = TimeSpan.FromHours(1));
+builder.Services.AddDataProtection().SetApplicationName("PixelMate").PersistKeysToDbContext<AppDbContext>();   // keys survive restarts
+
+builder.Services.ConfigureApplicationCookie(o =>
+{
+    o.Cookie.Name = ".pixelmate.auth";
+    o.Cookie.HttpOnly = true;
+    o.Cookie.SameSite = SameSiteMode.Lax;
+    o.Cookie.SecurePolicy = builder.Configuration.GetValue("Auth:SecureCookie", true) ? CookieSecurePolicy.Always : CookieSecurePolicy.SameAsRequest;
+    o.ExpireTimeSpan = TimeSpan.FromDays(14);
+    o.SlidingExpiration = true;
+    o.Events.OnRedirectToLogin = ctx => ErrorHandling.WriteAsync(ctx.HttpContext, 401, ErrorCodes.AuthRequired, "請先登入。");
+    o.Events.OnRedirectToAccessDenied = ctx => ErrorHandling.WriteAsync(ctx.HttpContext, 403, ErrorCodes.NotOwner, "沒有權限執行這個操作。");
+});
+builder.Services.AddAuthorization();
+
+builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection("Auth"));
+builder.Services.Configure<MailOptions>(builder.Configuration.GetSection("Mail"));
+builder.Services.AddScoped<IMailSender>(sp =>
+    sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<MailOptions>>().Value.IsConfigured
+        ? ActivatorUtilities.CreateInstance<SmtpMailSender>(sp)
+        : ActivatorUtilities.CreateInstance<LogMailSender>(sp));
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.AddOpenApi();
 
@@ -25,13 +82,18 @@ builder.Services.AddCors(o => o.AddPolicy("web", p =>
     }
 }));
 
+static string ClientIp(HttpContext ctx) => ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
 builder.Services.AddRateLimiter(o =>
 {
     var permit = builder.Configuration.GetValue("RateLimit:PermitPerMinute", 120);
+    var authPermit = builder.Configuration.GetValue("RateLimit:AuthPerMinute", 10);
     o.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
     o.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
-        RateLimitPartition.GetFixedWindowLimiter(ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        RateLimitPartition.GetFixedWindowLimiter(ClientIp(ctx),
             _ => new FixedWindowRateLimiterOptions { PermitLimit = permit, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+    o.AddPolicy("auth", ctx => RateLimitPartition.GetFixedWindowLimiter("auth:" + ClientIp(ctx),
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = authPermit, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     o.OnRejected = (rc, _) => new ValueTask(ErrorHandling.WriteAsync(rc.HttpContext, StatusCodes.Status429TooManyRequests,
         ErrorCodes.RateLimited, "請求太頻繁，請稍後再試。"));
 });
@@ -47,6 +109,7 @@ var app = builder.Build();
 
 app.UseForwardedHeaders();
 app.UseMiddleware<RequestIdMiddleware>();
+app.UseSerilogRequestLogging();                // logs method + path + status only (no bodies, no query strings with tokens)
 app.UseExceptionHandler(errorApp => errorApp.Run(ctx =>
 {
     var ex = ctx.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
@@ -55,13 +118,19 @@ app.UseExceptionHandler(errorApp => errorApp.Run(ctx =>
 app.UseStatusCodePages(ErrorHandling.StatusPageAsync);
 app.UseRateLimiter();
 app.UseCors("web");
+app.UseMiddleware<CsrfMiddleware>();
+app.UseAuthentication();
+app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
-app.MapGroup("/api/v1").MapHealth();
+var api = app.MapGroup("/api/v1");
+api.MapHealth();
+api.MapAuth();
 
 app.Run();
 

@@ -16,10 +16,16 @@ public static class ErrorCodes
     public const string ValidationFailed = "VALIDATION_FAILED";
     public const string ServiceUnavailable = "SERVICE_UNAVAILABLE";
     public const string Internal = "INTERNAL_ERROR";
+    public const string EmailTaken = "EMAIL_ALREADY_REGISTERED";
+    public const string EmailNotConfirmed = "EMAIL_NOT_CONFIRMED";
+    public const string InvalidToken = "INVALID_TOKEN";
+    public const string CsrfRejected = "CSRF_REJECTED";
 }
 
 /// <summary>Error body returned by every failing request: <c>{ code, message, requestId }</c>.</summary>
-public sealed record ApiError(string Code, string Message, string RequestId);
+public sealed record ApiError(string Code, string Message, string RequestId,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    IDictionary<string, string[]>? Errors = null);
 
 /// <summary>Thrown by application services; the middleware turns it into <see cref="ApiError"/> + HTTP status.</summary>
 public sealed class ApiException(int statusCode, string code, string message) : Exception(message)
