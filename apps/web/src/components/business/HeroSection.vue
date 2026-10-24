@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import StatusBadge from '@/components/common/StatusBadge.vue'
-import WeatherSwitch from '@/components/business/WeatherSwitch.vue'
 import PixelScene from '@/components/business/PixelScene.vue'
 </script>
 
@@ -17,7 +16,6 @@ import PixelScene from '@/components/business/PixelScene.vue'
       </div>
       <div class="hero__scene">
         <PixelScene />
-        <div class="hero__switch"><WeatherSwitch /></div>
       </div>
     </div>
   </section>
@@ -75,12 +73,6 @@ import PixelScene from '@/components/business/PixelScene.vue'
 
 .hero__scene {
   padding-bottom: 1rem;
-}
-
-.hero__switch {
-  display: flex;
-  justify-content: center;
-  margin-top: 3rem;
 }
 
 @media (min-width: 960px) {
