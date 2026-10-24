@@ -56,3 +56,13 @@ img {
   }
 }
 html { scroll-behavior: smooth; }
+
+/* 首屏以下的區塊：進入視窗才渲染，減少離螢幕動畫與繪製成本 */
+#daily,
+#mail,
+#dress,
+#weather,
+#platforms {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 720px;
+}
