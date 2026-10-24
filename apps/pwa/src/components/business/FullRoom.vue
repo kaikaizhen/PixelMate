@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import RoomScene from './RoomScene.vue'
-import { windowWeatherKey } from '@/utils/roomWeather'
+import { weatherKey, windowWeatherKey } from '@/utils/roomWeather'
+import { useEdgeColors } from '@/composables/useEdgeColors'
+import { useGameStore } from '@/stores/useGameStore'
 import wall from '@/assets/pixel/room_wall_tile.png'
 import base from '@/assets/pixel/room_base_tile.png'
 import floor from '@/assets/pixel/room_floor_tile.png'
 
 // The house at full screen: the 240x240 room is scaled to the short side of the screen and its wall, baseboard and
 // floor are continued with seamless tiles cut from the same art, so the screen is one room edge to edge.
-const props = defineProps<{ color: string; happy: boolean; name: string; weather?: string; equipment?: Record<string, string | null>; activity?: string }>()
+const props = defineProps<{ color: string; happy: boolean; name: string; weather?: string; equipment?: Record<string, string | null>; activity?: string; scene?: string }>()
 defineEmits<{ pat: [] }>()
 
 const w = ref(typeof window === 'undefined' ? 393 : window.innerWidth)
@@ -21,17 +23,28 @@ const s = computed(() => Math.min(w.value, h.value) / 240)
 const portrait = computed(() => h.value > w.value)
 const left = computed(() => (w.value - 240 * s.value) / 2)
 const top = computed(() => (portrait.value ? (h.value - 240 * s.value) * 0.05 : 0)) // phones: a little wall above, lots of floor below for the tool bar and the panels
+const game = useGameStore()
+const outdoors = computed(() => (props.scene === 'balcony' || props.scene === 'yard' ? props.scene : null))
+const outdoorUrl = computed(() => (outdoors.value ? game.url(weatherKey(new Date(), props.weather, outdoors.value)) : ''))
+const edge = useEdgeColors(outdoorUrl)
 const night = computed(() => windowWeatherKey(new Date(), props.weather).includes('starry'))
 const vars = computed(() => ({ '--s': s.value, '--l': `${left.value}px`, '--t': `${top.value}px` }))
 </script>
 
 <template>
   <div class="full" :style="vars">
-    <div class="wall pixelated" :style="{ backgroundImage: `url(${wall})` }" />
-    <div class="base pixelated" :style="{ backgroundImage: `url(${base})` }" />
-    <div class="floor pixelated" :style="{ backgroundImage: `url(${floor})` }" />
-    <RoomScene class="scene-box" bare :scale="s" :color="color" :happy="happy" :name="name" :weather="weather" :equipment="equipment" :activity="activity" @pat="$emit('pat')" />
-    <span v-if="night" class="dim" aria-hidden="true" />
+    <!-- the house and the outdoors cross-fade when the pet moves between them -->
+    <Transition name="scene" mode="out-in">
+      <div :key="outdoors ?? 'home'" class="stage" :style="outdoors ? { background: `linear-gradient(${edge.top.value || '#cfe3f5'} 0 50%, ${edge.bottom.value || '#9fcf8f'} 50% 100%)` } : undefined">
+        <template v-if="!outdoors">
+          <div class="wall pixelated" :style="{ backgroundImage: `url(${wall})` }" />
+          <div class="base pixelated" :style="{ backgroundImage: `url(${base})` }" />
+          <div class="floor pixelated" :style="{ backgroundImage: `url(${floor})` }" />
+        </template>
+        <RoomScene class="scene-box" bare :scale="s" :color="color" :happy="happy" :name="name" :weather="weather" :equipment="equipment" :activity="activity" :scene="scene" @pat="$emit('pat')" />
+        <span v-if="night && !outdoors" class="dim" aria-hidden="true" />
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -46,6 +59,10 @@ const vars = computed(() => ({ '--s': s.value, '--l': `${left.value}px`, '--t': 
   background-size: calc(40 * var(--s) * 1px) calc(24 * var(--s) * 1px);
   background-position: var(--l) calc(8 * var(--s) * 1px);
 }
+.stage { position: absolute; inset: 0; }
+.scene-enter-active, .scene-leave-active { transition: opacity 0.35s; }
+.scene-enter-from, .scene-leave-to { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .scene-enter-active, .scene-leave-active { transition: none; } }
 .dim { position: absolute; inset: 0; background: rgba(36, 44, 100, 0.22); pointer-events: none; }
 .scene-box { position: absolute; left: var(--l); top: var(--t); width: calc(240 * var(--s) * 1px); }
 </style>

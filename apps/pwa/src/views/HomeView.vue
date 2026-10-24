@@ -79,6 +79,7 @@ onUnmounted(() => {
   window.removeEventListener('focus', refreshLife)
 })
 const doing = computed(() => ACTIVITIES[pet.value.activity?.key ?? ''])
+const place = computed(() => ({ balcony: '在陽台', yard: '在院子' } as Record<string, string>)[pet.value.world.scene])
 
 // ---- backpack ---------------------------------------------------------------------------------------------------
 const TABS = [
@@ -170,13 +171,13 @@ const { loading, submit } = useSubmit(async () => {
 
 <template>
   <main class="home game-screen" @contextmenu.prevent>
-    <FullRoom :color="colorOf(pet.bodyVariant)" :happy="happy" :name="pet.name" :weather="pet.world.weather" :equipment="pet.equipment" :activity="pet.activity?.key" @pat="pat" />
+    <FullRoom :color="colorOf(pet.bodyVariant)" :happy="happy" :name="pet.name" :weather="pet.world.weather" :equipment="pet.equipment" :activity="pet.activity?.key" :scene="pet.world.scene" @pat="pat" />
 
     <!-- HUD: nothing here blocks the room; every function opens in a panel on top of it -->
     <button type="button" class="chip" aria-haspopup="dialog" @click="toggle('pet')">
       <strong>{{ pet.name }}</strong><span>Lv.{{ pet.level }}</span><em v-if="pet.remainingSkillPoints" class="badge">+{{ pet.remainingSkillPoints }}</em>
     </button>
-    <p v-if="doing" class="doing" role="status" :data-activity="pet.activity?.key">{{ doing.emoji }} {{ pet.name }}正在{{ doing.label }}</p>
+    <p v-if="doing" class="doing" role="status" :data-activity="pet.activity?.key">{{ doing.emoji }} {{ pet.name }}正在{{ doing.label }}<template v-if="place">・{{ place }}</template></p>
     <p v-if="found && !welcome" class="toast" role="status">🎁 {{ found }}</p>
     <p v-if="welcome" class="toast" role="status">領養成功！{{ pet.name }} 住進你的小屋了。</p>
 
