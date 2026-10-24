@@ -70,7 +70,7 @@ def main():
     for dp, _, fs in os.walk(ASSETS):
         for fn in fs:
             rel = os.path.relpath(os.path.join(dp, fn), ASSETS).replace(os.sep, "/")
-            if rel in ("manifest.json", "LICENSES.md") or rel.startswith(("preview/", "readme/")) or fn.startswith("."):
+            if rel in ("manifest.json", "LICENSES.md", "README.md") or rel.startswith(("preview/", "readme/")) or fn.startswith("."):
                 continue
             if rel not in used_paths:
                 err(f"orphan file not in manifest: {rel}")
