@@ -7,7 +7,7 @@ public sealed record CreatePetRequest(string Name, string BodyVariant);
 public sealed record PetSnapshot(
     Guid PetId, string Name, string BodyVariant, int Level, int Xp, int Revision,
     IDictionary<string, int> Skills, int RemainingSkillPoints,
-    IDictionary<string, string?> Equipment, PetWorld World, DateTime UpdatedAt);
+    IDictionary<string, string?> Equipment, PetWorld World, DateTime UpdatedAt, PixelMate.Api.Life.ActivityInfo Activity);
 
 public sealed record PetWorld(string Mood, string Scene, string Weather);
 

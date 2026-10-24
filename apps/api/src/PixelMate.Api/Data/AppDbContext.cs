@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PixelMate.Api.Items;
+using PixelMate.Api.Life;
 using PixelMate.Api.Pets;
 
 namespace PixelMate.Api.Data;
@@ -17,6 +18,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<ItemDefinition> ItemDefinitions => Set<ItemDefinition>();
     public DbSet<InventoryEntry> InventoryEntries => Set<InventoryEntry>();
     public DbSet<PetEquipment> PetEquipment => Set<PetEquipment>();
+    public DbSet<PetLife> PetLives => Set<PetLife>();
+    public DbSet<PetEvent> PetEvents => Set<PetEvent>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -86,6 +89,24 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             e.Property(x => x.Slot).HasMaxLength(20);
             e.Property(x => x.ItemId).HasMaxLength(80).IsRequired();
             e.HasOne<InventoryEntry>().WithMany().HasForeignKey(x => x.InventoryId).OnDelete(DeleteBehavior.Cascade);
+        });
+        b.Entity<PetLife>(e =>
+        {
+            e.ToTable("pet_life");
+            e.HasKey(x => x.PetId);
+            e.Property(x => x.CursorSlot).IsConcurrencyToken();
+            e.HasOne<Pet>().WithOne().HasForeignKey<PetLife>(x => x.PetId).OnDelete(DeleteBehavior.Cascade);
+        });
+        b.Entity<PetEvent>(e =>
+        {
+            e.ToTable("pet_events");
+            e.HasKey(x => x.EventId);
+            e.Property(x => x.Kind).HasMaxLength(20).IsRequired();
+            e.Property(x => x.ItemId).HasMaxLength(80).IsRequired();
+            e.HasIndex(x => new { x.PetId, x.Slot }).IsUnique();             // one event per pet and slot, however often it is triggered
+            e.HasIndex(x => new { x.PetId, x.OccurredAt });
+            e.HasOne<Pet>().WithMany().HasForeignKey(x => x.PetId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<ItemDefinition>().WithMany().HasForeignKey(x => x.ItemId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

@@ -65,3 +65,12 @@ Every error is `{ "code", "message", "requestId" }`; codes are defined once in `
 `item_definitions` is seeded at start-up from `assets/manifest.json` (copied to `Seed/manifest.json`), so the art, the API and the PWA /
 ESP32 share the same assetKeys (`itemId` = assetKey). Items: wearables, furniture, decor, collectibles and stationery (458 today); weather
 scenes, effects and costume tails are not items. Rarity follows the art batch: B1/B2 common, B3/B4 rare, B5 and costumes precious.
+
+## Life (autonomous behaviour)
+
+- `Life/LifeScheduler.cs` – pure rules: the activity of each 15-minute slot (idle/walk/read/hum/letter, weighted by skill points) and whether a
+  finished walking slot ends with a find. Same answer on every device and process.
+- `Life/LifeService.cs` – makes up finished slots (max `Life:CatchUpDays`, default 7): `pet_events` (unique per pet+slot) + the items go into the bag in one
+  transaction; `pet_life.cursor_slot` is a concurrency token so the API and the worker can run at once. Max `Life:MaxFindsPerDay` (3) a UTC day.
+- `Life/LifeWorker.cs` – `BackgroundService` every `Life:WorkerIntervalSeconds` (300; 0 = off). `GET /pets/me` also catches up lazily.
+- `GET /pets/me` has `activity {key, startedAt, endsAt}`; `GET /pets/me/events` lists recent finds. Development: `POST /dev/pets/me/life/rewind?hours=N`.
