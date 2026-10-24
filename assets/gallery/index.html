@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>小伴星 素材圖鑑</title>
+<style>
+:root{--bg:#fff8ec;--card:#fffdf8;--ink:#4a3040;--mute:#8a7080;--line:#e6d6bf;--accent:#e9a98e;--ok:#5f9a6a}
+@media (prefers-color-scheme:dark){:root{--bg:#241c26;--card:#2e2430;--ink:#f4e8dc;--mute:#b8a4b0;--line:#4a3a4c;--accent:#e9a98e}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,"Noto Sans TC",sans-serif}
+header{padding:16px;border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:20px}header p{margin:4px 0 0;color:var(--mute);font-size:13px}
+main{display:grid;grid-template-columns:minmax(0,520px) 1fr;gap:16px;padding:16px;max-width:1280px;margin:auto}
+@media(max-width:860px){main{grid-template-columns:1fr}}
+.stage{position:sticky;top:8px;align-self:start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+canvas{display:block;width:100%;height:auto;image-rendering:pixelated;background:#fff4e0;border-radius:8px}
+.row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+button,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer}
+button[aria-pressed=true],button.on{background:var(--accent);color:#3a2433;border-color:var(--accent)}
+button:focus-visible,select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.item{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center;font-size:12px;cursor:pointer}
+.item[aria-pressed=true]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.item img{width:96px;height:96px;object-fit:contain;image-rendering:pixelated;display:block;margin:0 auto 4px}
+.item small{color:var(--mute);display:block}
+.hint{color:var(--mute);font-size:13px;margin:0 0 10px}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header><h1>小伴星 素材圖鑑</h1><p>依 manifest 的 assetKey 載入；只載入目前分頁的縮圖。點穿戴類可在左邊的 pet.star_01 試穿；家具、布置、收藏品、信件、特效會放進左邊場景（再點一次取消，每類各一個）。</p></header>
+<main>
+  <section class="stage" aria-label="試穿預覽">
+    <canvas id="c" width="240" height="240" role="img" aria-label="寵物試穿畫面"></canvas>
+    <div class="row" id="faces" role="group" aria-label="表情"></div>
+    <div class="row">
+      <button id="play" aria-pressed="true">待機動畫</button>
+      <button id="clear">脫掉全部</button>
+      <select id="weather" aria-label="窗外天氣"><option value="">（無天氣背景）</option></select>
+    </div>
+    <p class="hint" id="worn">穿著：無</p>
+  </section>
+  <section>
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <div class="tabs" id="batches" role="group" aria-label="批次篩選"></div>
+    <div class="grid" id="grid"></div>
+  </section>
+</main>
+<script>
+const TABS=[["head","帽子"],["costume","布偶裝"],["front","配件"],["back","背飾"],["feet","鞋履"],["hand","手持物"],
+ ["furn","家具"],["decor","布置"],["item","收藏品"],["mail","信件"],["fx","特效"]];
+const FACES=["normal","happy","sleepy","blink"];
+let M,A,imgs={},batch="all",tab="head",worn={},scene={},face="normal",playing=true,weatherKey="",t0=0;
+const $=id=>document.getElementById(id),ctx=$("c").getContext("2d");ctx.imageSmoothingEnabled=false;
+const img=k=>{if(!imgs[k]){const i=new Image();i.src="../"+A[k].path;i.onload=()=>draw();imgs[k]=i}return imgs[k]};
+function slotOf(k){const a=A[k];if(a.slot)return a.slot;return null}
+function keysFor(t){return Object.keys(A).filter(k=>{const a=A[k];if(batch!=="all"&&a.batch!==batch)return false;
+  if(["head","body","costume","front","back","feet","hand"].includes(t))return a.slot===t&&!k.endsWith(".tail");
+  if(t==="furn")return k.startsWith("world.furniture");if(t==="decor")return k.startsWith("world.decor");
+  if(t==="item")return k.startsWith("item.collectible");if(t==="mail")return k.startsWith("item.stationery");
+  if(t==="fx")return k.startsWith("fx.");return false}).sort()}
+function renderBatches(){const el=$("batches");el.innerHTML="";
+  const names=["all",...[...new Set(Object.values(A).map(a=>a.batch).filter(Boolean))].sort()];
+  names.forEach(b=>{const n=b==="all"?Object.values(A).filter(a=>a.batch).length:Object.values(A).filter(a=>a.batch===b).length;
+    const x=document.createElement("button");x.textContent=(b==="all"?"全部批次":b==="X1"?"追加 X1":b)+" "+n;
+    x.setAttribute("aria-pressed",b===batch);x.onclick=()=>{batch=b;renderBatches();renderTabs();renderGrid()};el.appendChild(x)})}
+function renderTabs(){const el=$("tabs");el.innerHTML="";TABS.forEach(([id,label])=>{const b=document.createElement("button");
+  b.textContent=`${label} ${keysFor(id).length}`;b.setAttribute("role","tab");b.setAttribute("aria-pressed",id===tab);
+  b.onclick=()=>{tab=id;renderTabs();renderGrid()};el.appendChild(b)})}
+function renderGrid(){const g=$("grid");g.innerHTML="";const wearable=["head","body","costume","front","back","feet","hand"].includes(tab);
+  keysFor(tab).forEach(k=>{const a=A[k],d=document.createElement("div");d.className="item";d.tabIndex=0;d.setAttribute("role","button");
+    d.setAttribute("aria-pressed",wearable?worn[a.slot]===k:scene[tab]===k);
+    const im=document.createElement("img");im.loading="lazy";im.alt=a.name||k;im.src="../"+a.path;
+    if(a.frames>1){im.style.objectPosition="0 0";im.style.width="96px";im.style.height="96px"}
+    d.append(im,Object.assign(document.createElement("div"),{textContent:a.name||k}),
+      Object.assign(document.createElement("small"),{textContent:(a.batch?a.batch+" · ":"")+k.split(".").slice(1).join(".")}));
+    const act=()=>{if(wearable)toggle(k);else toggleScene(k)};
+    d.onclick=act;d.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();act()}};g.appendChild(d)})}
+function toggle(k){const a=A[k],s=a.slot;if(worn[s]===k){delete worn[s]}else{worn[s]=k;
+  if(s==="costume"){delete worn.body;delete worn.head}else if(s==="body"||s==="head"){delete worn.costume}}
+  renderGrid();draw();$("worn").textContent="穿著："+(Object.values(worn).map(k=>A[k].name).join("、")||"無")}
+function toggleScene(k){const t=tab;if(scene[t]===k)delete scene[t];else{scene[t]=k;img(k)}
+  renderGrid();draw();$("worn").textContent="穿著："+(Object.values(worn).map(k=>A[k].name).join("、")||"無")+
+  (Object.keys(scene).length?"　場景："+Object.values(scene).map(k=>A[k].name).join("、"):"")}
+function frameInfo(now){const an=M.animations["pet.star_01.anim.idle"],n=an.frames.length,i=playing?Math.floor(now/1000*an.fps)%n:0;return an.frames[i]}
+function draw(now=performance.now()){ctx.clearRect(0,0,240,240);
+  if(weatherKey&&imgs[weatherKey]&&imgs[weatherKey].complete)ctx.drawImage(imgs[weatherKey],0,0);
+  const f=frameInfo(now),[ax,ay]=f.attach,ox=scene.furn?30:96,oy=96;
+  const sc=(k,x,y,z=1)=>{const i=img(k);if(i.complete)ctx.drawImage(i,x,y,i.width*z,i.height*z)};
+  if(scene.decor){const k=scene.decor;if(k.includes("floor_tile")){for(let x=0;x<240;x+=48)sc(k,x,192)}else sc(k,96,20)}
+  if(scene.furn)sc(scene.furn,124,116);
+  const place=(k,dx=0,dy=0)=>{const i=img(k);if(i.complete)ctx.drawImage(i,ox+dx,oy+dy)};
+  Object.values(worn).forEach(k=>{if(A[k].backKey)place(A[k].backKey,ax,ay);if(A[k].layer==="pet_back_accessory")place(k,ax,ay)});
+  const body=img("pet.star_01.body.cream.idle");if(body.complete)ctx.drawImage(body,f.body.index*48,0,48,48,ox,oy,48,48);
+  place("pet.star_01.face."+face);
+  Object.values(worn).filter(k=>A[k].layer!=="pet_back_accessory").sort((a,b)=>A[a].z-A[b].z).forEach(k=>place(k,ax,ay));
+  if(scene.item)sc(scene.item,ox+56,oy+40,2);
+  if(scene.mail){const w=A[scene.mail].frameWidth;sc(scene.mail,ox+56,oy-20,w===24?2:1)}
+  if(scene.fx){const a=A[scene.fx],i=img(scene.fx),n=a.frames||1,fi=playing?Math.floor(now/1000*(a.fps||6))%n:0;
+    if(i.complete)ctx.drawImage(i,fi*48,0,48,48,ox,oy-6,48,48)}}
+function loop(t){draw(t);if(playing)requestAnimationFrame(loop)}
+fetch("../manifest.json").then(r=>r.json()).then(m=>{M=m;A=m.assets;
+  Object.keys(A).filter(k=>k.startsWith("world.weather")).sort().forEach(k=>{const o=document.createElement("option");o.value=k;o.textContent=A[k].name;$("weather").appendChild(o)});
+  $("weather").onchange=e=>{weatherKey=e.target.value;if(weatherKey)img(weatherKey);draw()};
+  FACES.forEach(f=>{const b=document.createElement("button");b.textContent=f;b.setAttribute("aria-pressed",f===face);b.onclick=()=>{face=f;[...$("faces").children].forEach(c=>c.setAttribute("aria-pressed",c===b));draw()};$("faces").appendChild(b)});
+  $("play").onclick=e=>{playing=!playing;e.target.setAttribute("aria-pressed",playing);if(playing)requestAnimationFrame(loop);else draw()};
+  $("clear").onclick=()=>{worn={};scene={};$("worn").textContent="穿著：無";renderGrid();draw()};
+  renderBatches();renderTabs();renderGrid();requestAnimationFrame(loop)});
+</script>
+</body>
+</html>

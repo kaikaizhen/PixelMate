@@ -20,3 +20,12 @@ test-results/
 # 部署設定（NAS 路徑、埠、網域）屬部署機密文件，不進版本控制
 infra/nas/
 .deploy/
+
+# asset catalog / approvals are specs, not shipped
+assets/catalog/
+# generated review sheets
+assets/preview/b1_*
+assets/preview/b2_*
+assets/preview/esp32_*
+assets/preview/stats.md
+assets/preview/similarity_report.txt
