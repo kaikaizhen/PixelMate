@@ -10,11 +10,13 @@ const game = useGameStore()
 // Activities use the manifest animations: walk = the walk sheet, read = look_down face + the book prop opening and closing.
 const walking = computed(() => props.activity === 'walk' && props.face === 'normal')
 const reading = computed(() => props.activity === 'read' && props.face === 'normal')
+const writing = computed(() => props.activity === 'letter' && props.face === 'normal')
 const body = computed(() =>
   (walking.value && (game.url(`pet.star_01.body.${props.color}.walk`) || game.url('pet.star_01.body.cream.walk'))) ||
   game.url(`pet.star_01.body.${props.color}.idle`) || game.url('pet.star_01.body.cream.idle'))
-const face = computed(() => game.url(`pet.star_01.face.${reading.value ? 'look_down' : props.face}`))
+const face = computed(() => game.url(`pet.star_01.face.${reading.value || writing.value ? 'look_down' : props.face}`))
 const book = computed(() => (reading.value ? game.url('pet.star_01.prop.book') : ''))
+const letter = computed(() => (writing.value ? game.url('pet.star_01.prop.letter') : ''))
 
 const worn = computed(() =>
   Object.values(props.equipment ?? {})
@@ -31,11 +33,12 @@ const src = (path: string) => `${import.meta.env.BASE_URL}game/${path}`
 </script>
 
 <template>
-  <div v-if="body" class="gp" :class="{ walking, reading }">
+  <div v-if="body" class="gp" :class="{ walking, reading, writing }">
     <img v-for="p in behind" :key="p" draggable="false" class="layer bob pixelated" :src="src(p)" alt="" />
     <span class="body pixelated" :style="{ backgroundImage: `url(${body})` }" />
     <img v-if="face" draggable="false" class="layer bob face pixelated" :src="face" alt="" />
     <img v-for="w in front" :key="w.key" draggable="false" class="layer bob pixelated" :src="src(w.asset.path)" alt="" :data-item="w.key" />
+ <span v-if="letter" class="layer letter pixelated" data-prop="letter" :style="{ backgroundImage: `url(${letter})` }" />
     <span v-if="book" class="layer book pixelated" data-prop="book" :style="{ backgroundImage: `url(${book})` }" />
   </div>
 </template>
@@ -50,8 +53,10 @@ const src = (path: string) => `${import.meta.env.BASE_URL}game/${path}`
 .walking .body { animation: walk 0.667s steps(1) infinite; }
 .walking .bob { animation: bobwalk 0.667s steps(1) infinite; }
 .reading .body { animation: readbody 1.333s steps(1) infinite; }
-.reading .bob { animation: none; }
+.reading .bob, .writing .bob { animation: none; }
+.writing .body { animation: readbody 1.333s steps(1) infinite; }
 .book { background-size: calc(96px * var(--s)) 100%; background-repeat: no-repeat; animation: readbook 1.333s steps(1) infinite; }
+.letter { background-size: calc(96px * var(--s)) 100%; background-repeat: no-repeat; animation: writeletter 0.667s steps(1) infinite; }
 .bob { animation: bob 1s steps(1) infinite; }
 @keyframes idle {
   0% { background-position: 0 0; }
@@ -67,7 +72,8 @@ const src = (path: string) => `${import.meta.env.BASE_URL}game/${path}`
 }
 @keyframes bobwalk { 0%, 24% { transform: translateY(0); } 25%, 49% { transform: translateY(calc(1px * var(--s))); } 50%, 74% { transform: translateY(0); } 75%, 100% { transform: translateY(calc(1px * var(--s))); } }
 @keyframes readbody { 0%, 49% { background-position: 0 0; } 50%, 74% { background-position: calc(-48px * var(--s)) 0; } 75%, 100% { background-position: 0 0; } }
+@keyframes writeletter { 0%, 49% { background-position: 0 0; } 50%, 100% { background-position: calc(-48px * var(--s)) 0; } }
 @keyframes readbook { 0%, 49% { background-position: 0 0; } 50%, 74% { background-position: calc(-48px * var(--s)) 0; } 75%, 100% { background-position: 0 0; } }
-@media (prefers-reduced-motion: reduce) { .walking .body, .walking .bob, .reading .body, .book { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .walking .body, .walking .bob, .reading .body, .writing .body, .book, .letter { animation: none; } }
 @keyframes bob { 0%, 49% { transform: translateY(0); } 50%, 100% { transform: translateY(calc(1px * var(--s))); } }
 </style>
