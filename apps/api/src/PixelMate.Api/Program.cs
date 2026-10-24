@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using PixelMate.Api.Social;
 using FluentValidation;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -87,6 +88,7 @@ builder.Services.Configure<PixelMate.Api.Life.LifeOptions>(builder.Configuration
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<PixelMate.Api.Life.LifeService>();
 builder.Services.AddHostedService<PixelMate.Api.Life.LifeWorker>();
+builder.Services.Configure<PixelMate.Api.Social.LetterOptions>(builder.Configuration.GetSection("Letters"));
 
 builder.Services.AddOpenApi();
 
@@ -111,6 +113,9 @@ builder.Services.AddRateLimiter(o =>
             _ => new FixedWindowRateLimiterOptions { PermitLimit = permit, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     o.AddPolicy("auth", ctx => RateLimitPartition.GetFixedWindowLimiter("auth:" + ClientIp(ctx),
         _ => new FixedWindowRateLimiterOptions { PermitLimit = authPermit, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+    var pairingPermit = builder.Configuration.GetValue("RateLimit:PairingPerMinute", 10);   // guessing codes / sending letters
+    o.AddPolicy("pairing", ctx => RateLimitPartition.GetFixedWindowLimiter("pairing:" + ClientIp(ctx),
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = pairingPermit, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     o.OnRejected = (rc, _) => new ValueTask(ErrorHandling.WriteAsync(rc.HttpContext, StatusCodes.Status429TooManyRequests,
         ErrorCodes.RateLimited, "請求太頻繁，請稍後再試。"));
 });
@@ -150,6 +155,8 @@ api.MapHealth();
 api.MapAuth();
 api.MapPets();
 api.MapItems();
+api.MapPairing();
+api.MapMail();
 if (app.Environment.IsDevelopment())
 {
     api.MapDev();      // test helpers; never mapped outside Development

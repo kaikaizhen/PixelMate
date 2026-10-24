@@ -572,6 +572,182 @@ namespace PixelMate.Api.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PixelMate.Api.Social.Letter", b =>
+                {
+                    b.Property<Guid>("LetterId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("letter_id");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(2400)
+                        .HasColumnType("varchar(2400)")
+                        .HasColumnName("body");
+
+                    b.Property<DateTime>("DeliverAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("deliver_at");
+
+                    b.Property<string>("GiftItemId")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("gift_item_id");
+
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("idempotency_key");
+
+                    b.Property<string>("PaperItemId")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("paper_item_id");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("read_at");
+
+                    b.Property<bool>("RecipientDeleted")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("recipient_deleted");
+
+                    b.Property<Guid>("RecipientId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("recipient_id");
+
+                    b.Property<bool>("SenderDeleted")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("sender_deleted");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("sender_id");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("sent_at");
+
+                    b.HasKey("LetterId")
+                        .HasName("pk_letters");
+
+                    b.HasIndex("GiftItemId")
+                        .HasDatabaseName("ix_letters_gift_item_id");
+
+                    b.HasIndex("PaperItemId")
+                        .HasDatabaseName("ix_letters_paper_item_id");
+
+                    b.HasIndex("RecipientId", "DeliverAt")
+                        .HasDatabaseName("ix_letters_recipient_id_deliver_at");
+
+                    b.HasIndex("SenderId", "IdempotencyKey")
+                        .IsUnique()
+                        .HasDatabaseName("ix_letters_sender_id_idempotency_key");
+
+                    b.HasIndex("SenderId", "SentAt")
+                        .HasDatabaseName("ix_letters_sender_id_sent_at");
+
+                    b.ToTable("letters", (string)null);
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Social.PairingInvite", b =>
+                {
+                    b.Property<Guid>("InviteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("invite_id");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("code_hash");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("expires_at");
+
+                    b.Property<Guid>("InviterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("inviter_id");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("varchar(12)")
+                        .HasColumnName("kind");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("used_at");
+
+                    b.Property<Guid?>("UsedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("used_by");
+
+                    b.HasKey("InviteId")
+                        .HasName("pk_pairing_invites");
+
+                    b.HasIndex("CodeHash")
+                        .IsUnique()
+                        .HasDatabaseName("ix_pairing_invites_code_hash");
+
+                    b.HasIndex("InviterId")
+                        .HasDatabaseName("ix_pairing_invites_inviter_id");
+
+                    b.ToTable("pairing_invites", (string)null);
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Social.Relationship", b =>
+                {
+                    b.Property<Guid>("RelationshipId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("relationship_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime?>("EndedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("ended_at");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("varchar(12)")
+                        .HasColumnName("kind");
+
+                    b.Property<Guid>("UserHighId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("user_high_id");
+
+                    b.Property<Guid>("UserLowId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("user_low_id");
+
+                    b.HasKey("RelationshipId")
+                        .HasName("pk_relationships");
+
+                    b.HasIndex("UserHighId")
+                        .HasDatabaseName("ix_relationships_user_high_id");
+
+                    b.HasIndex("UserLowId", "UserHighId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_relationships_user_low_id_user_high_id");
+
+                    b.ToTable("relationships", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_relationships_order", "user_low_id < user_high_id");
+                        });
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -708,6 +884,62 @@ namespace PixelMate.Api.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_pet_skills_pets_pet_id");
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Social.Letter", b =>
+                {
+                    b.HasOne("PixelMate.Api.Items.ItemDefinition", null)
+                        .WithMany()
+                        .HasForeignKey("GiftItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_letters_item_definitions_gift_item_id");
+
+                    b.HasOne("PixelMate.Api.Items.ItemDefinition", null)
+                        .WithMany()
+                        .HasForeignKey("PaperItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_letters_item_definitions_paper_item_id");
+
+                    b.HasOne("PixelMate.Api.Data.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_letters_users_recipient_id");
+
+                    b.HasOne("PixelMate.Api.Data.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_letters_users_sender_id");
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Social.PairingInvite", b =>
+                {
+                    b.HasOne("PixelMate.Api.Data.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("InviterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_pairing_invites_users_inviter_id");
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Social.Relationship", b =>
+                {
+                    b.HasOne("PixelMate.Api.Data.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserHighId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_relationships_users_user_high_id");
+
+                    b.HasOne("PixelMate.Api.Data.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserLowId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_relationships_users_user_low_id");
                 });
 
             modelBuilder.Entity("PixelMate.Api.Pets.Pet", b =>

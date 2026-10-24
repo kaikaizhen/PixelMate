@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using PixelMate.Api.Items;
 using PixelMate.Api.Life;
 using PixelMate.Api.Pets;
+using PixelMate.Api.Social;
 
 namespace PixelMate.Api.Data;
 
@@ -20,6 +21,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<PetEquipment> PetEquipment => Set<PetEquipment>();
     public DbSet<PetLife> PetLives => Set<PetLife>();
     public DbSet<PetEvent> PetEvents => Set<PetEvent>();
+    public DbSet<PairingInvite> PairingInvites => Set<PairingInvite>();
+    public DbSet<Relationship> Relationships => Set<Relationship>();
+    public DbSet<Letter> Letters => Set<Letter>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -107,6 +111,42 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             e.HasIndex(x => new { x.PetId, x.OccurredAt });
             e.HasOne<Pet>().WithMany().HasForeignKey(x => x.PetId).OnDelete(DeleteBehavior.Cascade);
             e.HasOne<ItemDefinition>().WithMany().HasForeignKey(x => x.ItemId).OnDelete(DeleteBehavior.Restrict);
+        });
+        b.Entity<PairingInvite>(e =>
+        {
+            e.ToTable("pairing_invites");
+            e.HasKey(x => x.InviteId);
+            e.Property(x => x.CodeHash).HasMaxLength(64).IsRequired();
+            e.Property(x => x.Kind).HasMaxLength(12).IsRequired();
+            e.HasIndex(x => x.CodeHash).IsUnique();
+            e.HasIndex(x => x.InviterId);
+            e.HasOne<AppUser>().WithMany().HasForeignKey(x => x.InviterId).OnDelete(DeleteBehavior.Cascade);
+        });
+        b.Entity<Relationship>(e =>
+        {
+            e.ToTable("relationships", t => t.HasCheckConstraint("ck_relationships_order", "user_low_id < user_high_id"));
+            e.HasKey(x => x.RelationshipId);
+            e.Property(x => x.Kind).HasMaxLength(12).IsRequired();
+            e.HasIndex(x => new { x.UserLowId, x.UserHighId }).IsUnique();   // a pair of players exists once (ending keeps the row)
+            e.HasIndex(x => x.UserHighId);
+            e.HasOne<AppUser>().WithMany().HasForeignKey(x => x.UserLowId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<AppUser>().WithMany().HasForeignKey(x => x.UserHighId).OnDelete(DeleteBehavior.Cascade);
+        });
+        b.Entity<Letter>(e =>
+        {
+            e.ToTable("letters");
+            e.HasKey(x => x.LetterId);
+            e.Property(x => x.Body).HasMaxLength(2400).IsRequired();          // 500 characters, some of them emoji
+            e.Property(x => x.PaperItemId).HasMaxLength(80);
+            e.Property(x => x.GiftItemId).HasMaxLength(80);
+            e.Property(x => x.IdempotencyKey).HasMaxLength(64).IsRequired();
+            e.HasIndex(x => new { x.SenderId, x.IdempotencyKey }).IsUnique();  // a retried send is the same letter
+            e.HasIndex(x => new { x.RecipientId, x.DeliverAt });
+            e.HasIndex(x => new { x.SenderId, x.SentAt });
+            e.HasOne<AppUser>().WithMany().HasForeignKey(x => x.SenderId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<AppUser>().WithMany().HasForeignKey(x => x.RecipientId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<ItemDefinition>().WithMany().HasForeignKey(x => x.GiftItemId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne<ItemDefinition>().WithMany().HasForeignKey(x => x.PaperItemId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 }
