@@ -36,6 +36,7 @@ const vars = computed(() => ({ '--s': s.value, '--l': `${left.value}px`, '--t': 
     <!-- the house and the outdoors cross-fade when the pet moves between them -->
     <Transition name="scene" mode="out-in">
       <div :key="outdoors ?? 'home'" class="stage" :style="outdoors ? { background: `linear-gradient(${edge.top.value || '#cfe3f5'} 0 50%, ${edge.bottom.value || '#9fcf8f'} 50% 100%)` } : undefined">
+        <div v-if="outdoors && edge.strip.value" class="extend pixelated" data-extend :style="{ backgroundImage: `url(${edge.strip.value})` }" />
         <template v-if="!outdoors">
           <div class="wall pixelated" :style="{ backgroundImage: `url(${wall})` }" />
           <div class="base pixelated" :style="{ backgroundImage: `url(${base})` }" />
@@ -60,6 +61,8 @@ const vars = computed(() => ({ '--s': s.value, '--l': `${left.value}px`, '--t': 
   background-position: var(--l) calc(8 * var(--s) * 1px);
 }
 .stage { position: absolute; inset: 0; }
+/* outdoors on a wide or tall screen: the scenery's own row colours carry on to the edges of the screen */
+.extend { position: absolute; left: 0; right: 0; top: var(--t); height: calc(240 * var(--s) * 1px); background-size: 100% 100%; }
 .scene-enter-active, .scene-leave-active { transition: opacity 0.35s; }
 .scene-enter-from, .scene-leave-to { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .scene-enter-active, .scene-leave-active { transition: none; } }
