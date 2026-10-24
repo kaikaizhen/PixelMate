@@ -49,7 +49,6 @@ const STARS = [
   --s: 3;
   position: relative;
   overflow: hidden;
-  margin-top: var(--space-5);
   padding-block: var(--space-5) calc(16px * 3 + var(--space-3));
   background: linear-gradient(#232a50, #3a4575);
   color: #fff8ec;
