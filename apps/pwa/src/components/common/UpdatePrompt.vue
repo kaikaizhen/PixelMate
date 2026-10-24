@@ -1,8 +1,14 @@
 <script setup lang="ts">
+import { watch } from 'vue'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 
 // registerType "prompt": a new version waits until the player taps "更新", so a form is never wiped mid-typing.
 const { needRefresh, offlineReady, updateServiceWorker } = useRegisterSW()
+
+// The "ready offline" note is only a courtesy: let it go after a few seconds so it never covers a button for long.
+watch(offlineReady, (v) => {
+  if (v) window.setTimeout(() => (offlineReady.value = false), 4000)
+})
 </script>
 
 <template>

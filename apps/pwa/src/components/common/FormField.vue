@@ -48,7 +48,7 @@ const describedBy = computed(() => [props.error && `${id}-err`, props.hint && `$
 </template>
 
 <style scoped>
-.field { display: grid; gap: 0.35rem; }
+.field { display: grid; gap: 0.25rem; }
 label { font-weight: 700; font-size: 0.95rem; }
 .control { position: relative; display: flex; }
 input {

@@ -51,7 +51,7 @@ function onSubmit() {
 
     <form v-else novalidate @submit.prevent="onSubmit">
       <AlertBox v-if="error && !Object.keys(fieldErrors).length" tone="error">{{ error.message }}</AlertBox>
-      <FormField v-model="displayName" label="暱稱" autocomplete="nickname" :maxlength="20" :error="errors.displayName" hint="最多 20 個字，之後可以幫小夥伴取名。" />
+      <FormField v-model="displayName" label="暱稱" autocomplete="nickname" :maxlength="20" :error="errors.displayName" />
       <FormField v-model="email" label="Email" type="email" inputmode="email" autocomplete="username" :error="errors.email" />
       <PasswordField v-model="password" label="密碼" autocomplete="new-password" :error="errors.password">
         <PasswordChecklist :password="password" />
@@ -67,7 +67,7 @@ function onSubmit() {
 </template>
 
 <style scoped>
-form { display: grid; gap: var(--space-2); }
+form { display: grid; gap: 0.75rem; }
 .cta {
   display: grid;
   place-items: center;

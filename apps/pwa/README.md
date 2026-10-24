@@ -1,7 +1,11 @@
 # PixelMate PWA
 
 Vue 3 + TypeScript + Vite installable web app (served under `/web/`, API on the same origin under `/api/`).
-This stage: register, login, logout, forgot / reset password, e-mail confirmation, offline banner, install + update prompts.
+This stage: register, login, logout, forgot / reset password, e-mail confirmation, adopt a pet (pick a look + name), the pet's home
+(level, skills, tap to pet), offline banner, install + update prompts.
+
+Design target: **no page scrolls** on an iPhone 16 (393×852) or a 1440×900 desktop (checked by `e2e/pwa.spec.ts`); wide screens
+use two columns, phones drop the subtitle and shrink the pet.
 
 ## Run
 

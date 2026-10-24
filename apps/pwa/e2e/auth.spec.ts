@@ -9,11 +9,11 @@ test.describe('登入', () => {
     await page.getByLabel('Email').fill('a@example.com')
     await page.getByLabel('密碼').fill('Passw0rd-123')
     await page.getByRole('button', { name: '登入' }).click()
-    await expect(page.getByRole('heading', { name: /嗨，小栗/ })).toBeVisible()
+    await expect(page.getByRole('heading', { name: '小栗' })).toBeVisible()
     expect(api.calls.find((c) => c.path === '/auth/login')?.csrf).toBe('pixelmate')
 
     await page.reload()                                              // the session cookie keeps the player signed in
-    await expect(page.getByRole('heading', { name: /嗨，小栗/ })).toBeVisible()
+    await expect(page.getByRole('heading', { name: '小栗' })).toBeVisible()
     await page.getByRole('button', { name: '登出' }).click()
     await expect(page).toHaveURL(/\/web\/login/)
   })

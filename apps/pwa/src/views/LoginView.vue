@@ -64,7 +64,7 @@ const notice = route.query.reset ? '密碼已經更新，請用新密碼登入�
 </template>
 
 <style scoped>
-form { display: grid; gap: var(--space-2); }
+form { display: grid; gap: 0.75rem; }
 .forgot { text-align: right; font-size: 0.9rem; margin-top: -0.5rem; }
 .linkish { margin-left: 0.5rem; font: inherit; color: inherit; background: none; border: 0; text-decoration: underline; cursor: pointer; }
 </style>
