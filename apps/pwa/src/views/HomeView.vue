@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import OverlayPanel from '@/components/common/OverlayPanel.vue'
 import PixelButton from '@/components/common/PixelButton.vue'
@@ -30,6 +30,21 @@ const toggle = (id: Exclude<PanelId, null>) => {
   if (panel.value === 'bag') void loadBag()
 }
 
+// Another device may have changed the pet (worn items, skills): re-read when this screen comes back and every minute.
+const resync = () => {
+  if (document.visibilityState === 'visible') void Promise.all([pets.load(true), panel.value === 'bag' ? bag.load(true) : null]).catch(() => {})
+}
+const resyncTimer = window.setInterval(resync, 60_000)
+onMounted(() => {
+  document.addEventListener('visibilitychange', resync)
+  window.addEventListener('focus', resync)
+})
+onUnmounted(() => {
+  window.clearInterval(resyncTimer)
+  document.removeEventListener('visibilitychange', resync)
+  window.removeEventListener('focus', resync)
+})
+
 // ---- backpack ---------------------------------------------------------------------------------------------------
 const TABS = [
   { id: 'all', label: '全部', match: () => true },
@@ -46,7 +61,7 @@ const thumb = (i: InventoryItem) => game.url(i.assetKey)
 async function loadBag() {
   bagError.value = ''
   try {
-    await Promise.all([bag.load(true), game.load()])
+    await Promise.all([bag.load(true), pets.load(true), game.load()])
   } catch (e) {
     bagError.value = e instanceof ApiError ? e.message : '背包暫時打不開，請稍後再試。'
   }

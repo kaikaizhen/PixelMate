@@ -75,4 +75,15 @@ test.describe('背包與穿戴', () => {
     await page.reload()
     await expect(page.locator('button.pet img[data-item="equip.costume.dog"]')).toHaveCount(1)
   })
+
+  test('別的裝置換了裝備：回到這個畫面時小夥伴也跟著換', async ({ page }) => {
+    await openBag(page)
+    await expect(worn(page)).toHaveCount(0)
+    await page.route('**/api/v1/pets/me', (r) =>
+      r.request().method() === 'GET'
+        ? r.fulfill({ json: { ...structuredClone(PET), revision: 9, equipment: { ...EQUIP, head: 'equip.hat.straw_post' } } })
+        : r.fallback())
+    await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+    await expect(worn(page)).toHaveCount(1)
+  })
 })
