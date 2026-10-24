@@ -15,6 +15,8 @@ export default defineConfig({
   ssgOptions: {
     script: 'async',
     formatting: 'minify',
+    // CSS 很小：整份內嵌進 HTML，避免擋住首次渲染（不使用 onload 載入法，CSP 禁止行內事件）
+    beastiesOptions: { preload: 'body', inlineThreshold: 60000, minimumExternalSize: 0 },
   },
   test: {
     environment: 'jsdom',
