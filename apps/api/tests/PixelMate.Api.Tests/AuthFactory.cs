@@ -1,0 +1,83 @@
+using System.Collections.Concurrent;
+using System.Net.Http.Json;
+using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using PixelMate.Api.Data;
+using PixelMate.Api.Mail;
+
+namespace PixelMate.Api.Tests;
+
+public sealed record SentMail(string To, string Subject, string Text)
+{
+    public string Link => Regex.Match(Text, @"https?://\S+").Value;
+    public string Query(string key) => System.Web.HttpUtility.ParseQueryString(new Uri(Link).Query)[key]!;
+}
+
+public sealed class FakeMailSender : IMailSender
+{
+    public ConcurrentQueue<SentMail> Sent { get; } = new();
+
+    public Task SendAsync(string toAddress, string subject, string htmlBody, string textBody, CancellationToken ct = default)
+    {
+        Sent.Enqueue(new SentMail(toAddress, subject, textBody));
+        return Task.CompletedTask;
+    }
+}
+
+/// <summary>Real pipeline + real Identity, but an in-memory SQLite database and a mail sender that records messages.</summary>
+public sealed class AuthFactory(IDictionary<string, string?>? settings = null) : WebApplicationFactory<Program>
+{
+    private readonly SqliteConnection _db = new("DataSource=:memory:");
+    public FakeMailSender Mail { get; } = new();
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        _db.Open();
+        builder.UseEnvironment("Production");
+        builder.ConfigureAppConfiguration((_, cfg) =>
+        {
+            var s = new Dictionary<string, string?> { ["Auth:SecureCookie"] = "false", ["Auth:SecurityStampValidationSeconds"] = "0", ["RateLimit:AuthPerMinute"] = "1000" };
+            foreach (var kv in settings ?? new Dictionary<string, string?>())
+            {
+                s[kv.Key] = kv.Value;
+            }
+            cfg.AddInMemoryCollection(s);
+        });
+        builder.ConfigureServices(services =>
+        {
+            services.RemoveAll<DbContextOptions<AppDbContext>>();
+            services.RemoveAll<DbContextOptions>();
+            services.RemoveAll<IDbContextOptionsConfiguration<AppDbContext>>();   // the MySQL options action registered by Program
+            services.AddDbContext<AppDbContext>(o => o.UseSqlite(_db).UseSnakeCaseNamingConvention());
+            services.RemoveAll<IMailSender>();
+            services.AddSingleton<IMailSender>(Mail);
+        });
+    }
+
+    public HttpClient NewClient()
+    {
+        using (var scope = Services.CreateScope())
+        {
+            scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.EnsureCreated();
+        }
+        var c = CreateClient();
+        c.DefaultRequestHeaders.Add("X-Requested-With", "pixelmate");
+        return c;
+    }
+
+    public static Task<HttpResponseMessage> Register(HttpClient c, string email = "a@example.com", string password = "Passw0rd-123", string name = "小栗") =>
+        c.PostAsJsonAsync("/api/v1/auth/register", new { email, password, displayName = name });
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        _db.Dispose();
+    }
+}
