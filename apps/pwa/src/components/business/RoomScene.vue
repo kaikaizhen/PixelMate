@@ -46,7 +46,7 @@ const night = computed(() => windowWeatherKey(new Date(), props.weather).include
     </template>
     <!-- 4. the pet -->
     <button type="button" class="pet" :class="[{ hop: happy }, activity && `act-${activity}`]" :style="{ left: u(PET_SPOT.x), top: u(PET_SPOT.y) }" :aria-label="`摸摸 ${name}`" @click="$emit('pat')">
-      <GamePet :color="color" :face="happy ? 'happy' : 'normal'" :equipment="equipment" />
+      <GamePet :color="color" :face="happy ? 'happy' : 'normal'" :equipment="equipment" :activity="activity" />
       <span v-if="activity === 'hum' && noteUrl" class="fx pixelated" data-fx="note" :style="{ backgroundImage: `url(${noteUrl})` }" aria-hidden="true" />
     </button>
     <span v-if="night && !bare" class="dim" aria-hidden="true" />

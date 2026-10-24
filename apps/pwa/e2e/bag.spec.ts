@@ -97,12 +97,16 @@ test.describe('背包與穿戴', () => {
     await page.getByRole('button', { name: '登入' }).click()
     await expect(page.getByText('小栗正在看書')).toBeVisible()
     await expect(page.locator('[data-fx="note"]')).toHaveCount(0)
+    await expect(page.locator('[data-prop="book"]')).toHaveCount(1)                       // reading: the book opens in its hands
+    await expect(page.locator('button.pet img.face')).toHaveAttribute('src', /face_look_down/)
 
     await page.route('**/api/v1/pets/me', (r) =>
       r.request().method() === 'GET' ? r.fulfill({ json: { ...structuredClone(PET), revision: 9, equipment: { ...EQUIP }, activity: activity('hum') } }) : r.fallback())
     await page.evaluate(() => window.dispatchEvent(new Event('focus')))
     await expect(page.getByText('小栗正在哼歌')).toBeVisible()
     await expect(page.locator('[data-fx="note"]')).toHaveCount(1)
+    await expect(page.locator('[data-prop="book"]')).toHaveCount(0)
+    await expect(page.locator('button.pet img.face')).toHaveAttribute('src', /face_normal/)
   })
 
   test('散步時撿到東西：只對沒看過的事件跳出提示', async ({ page }) => {
