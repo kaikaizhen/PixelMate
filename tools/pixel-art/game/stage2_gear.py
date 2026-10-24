@@ -9,15 +9,16 @@ import gear_wear
 import gear_wear2  # noqa: F401  (registers B2 generators)
 import gear_wear3  # noqa: F401  (registers B3 generators)
 import gear_wear4  # noqa: F401  (registers B4 generators)
+import gear_wear5  # noqa: F401  (registers B5 generators)
 from common import ANCHOR, FRAME, write_strip
 from gear_base import finish
 
-BATCHES = [b for b in os.environ.get("GEAR_BATCHES", "B1,B2,B3,B4").split(",") if b]
+BATCHES = [b for b in os.environ.get("GEAR_BATCHES", "B1,B2,B3,B4,B5").split(",") if b]
 CATS = {"帽子", "服飾", "配件", "鞋履", "手持物"}
-LAYER = {"head": "pet_front_accessory", "body": "pet_outfit", "front": "pet_front_accessory",
+LAYER = {"head": "pet_front_accessory", "body": "pet_outfit", "front": "pet_front_accessory", "back": "pet_back_accessory",
          "feet": "pet_outfit", "hand": "pet_front_accessory"}
-Z = {"feet": 1, "body": 2, "front": 3, "hand": 4, "head": 5}     # draw order inside the pet stack
-DIR = {"head": "hats", "body": "outfits", "front": "accessories", "feet": "feet", "hand": "handheld"}
+Z = {"back": 0, "feet": 1, "body": 2, "front": 3, "hand": 4, "head": 5}     # draw order inside the pet stack
+DIR = {"head": "hats", "body": "outfits", "front": "accessories", "back": "accessories", "feet": "feet", "hand": "handheld"}
 
 
 def split(key):
