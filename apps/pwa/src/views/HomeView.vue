@@ -2,11 +2,14 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import OverlayPanel from '@/components/common/OverlayPanel.vue'
+import MailPanel from '@/components/business/MailPanel.vue'
+import { useSocialStore } from '@/stores/useSocialStore'
 import PixelButton from '@/components/common/PixelButton.vue'
 import FullRoom from '@/components/business/FullRoom.vue'
 import { SKILLS, colorOf } from '@/constants/petLooks'
 import { ACTIVITIES } from '@/constants/activities'
 import { petApi } from '@/api/petApi'
+import { utc } from '@/utils/time'
 import { ApiError } from '@/api/http'
 import { MAX_SKILL_POINTS, type SkillKey } from '@/types/pet.types'
 import { useSubmit } from '@/composables/useSubmit'
@@ -16,11 +19,12 @@ import { useInventoryStore } from '@/stores/useInventoryStore'
 import { usePetStore } from '@/stores/usePetStore'
 import type { InventoryItem } from '@/types/pet.types'
 
-type PanelId = 'pet' | 'bag' | 'account' | null
+type PanelId = 'pet' | 'bag' | 'mail' | 'account' | null
 
 const auth = useAuthStore()
 const pets = usePetStore()
 const bag = useInventoryStore()
+const social = useSocialStore()
 const game = useGameStore()
 const route = useRoute()
 const router = useRouter()
@@ -36,7 +40,6 @@ const toggle = (id: Exclude<PanelId, null>) => {
 // (that also makes the server catch up on anything it found meanwhile). Other devices' changes show up the same way.
 const found = ref('')
 let foundTimer: number | undefined
-const utc = (t: string) => Date.parse(/Z|[+-]\d\d:\d\d$/.test(t) ? t : `${t}Z`)
 
 async function checkFinds() {
   const key = `pm.seen.${pet.value.petId}`
@@ -53,11 +56,22 @@ async function checkFinds() {
   if (bag.loaded) void bag.load(true).catch(() => {})
 }
 
+// A letter arrives when the postman gets there: the badge rises, the pet perks up and a note pops up.
+async function checkMail() {
+  if (await social.refreshUnread()) {
+    found.value = `郵差送來一封信！`
+    window.clearTimeout(foundTimer)
+    foundTimer = window.setTimeout(() => (found.value = ''), 6000)
+    pat()
+  }
+}
+
 async function refreshLife() {
   if (document.visibilityState !== 'visible') return
   try {
     await Promise.all([pets.load(true), panel.value === 'bag' ? bag.load(true) : null])
     await checkFinds()
+    await checkMail()
   } catch { /* offline: the next tick tries again */ }
 }
 const resyncTimer = window.setInterval(refreshLife, 60_000)
@@ -70,6 +84,7 @@ onMounted(() => {
   document.addEventListener('visibilitychange', refreshLife)
   window.addEventListener('focus', refreshLife)
   void checkFinds().catch(() => {})
+  void social.refreshUnread().catch(() => {})
 })
 onUnmounted(() => {
   window.clearInterval(resyncTimer)
@@ -184,7 +199,7 @@ const { loading, submit } = useSubmit(async () => {
     <nav class="bar" aria-label="功能">
       <button type="button" class="tool" aria-haspopup="dialog" @click="toggle('pet')"><span aria-hidden="true">🐾</span>小夥伴</button>
       <button type="button" class="tool" aria-haspopup="dialog" @click="toggle('bag')"><span aria-hidden="true">🎒</span>背包</button>
-      <button type="button" class="tool" disabled aria-label="信箱，即將推出"><span aria-hidden="true">✉️</span>信箱<small>即將推出</small></button>
+      <button type="button" class="tool" aria-haspopup="dialog" :aria-label="social.unread ? `信箱，${social.unread} 封未讀` : '信箱'" @click="toggle('mail')"><span aria-hidden="true">✉️</span>信箱<b v-if="social.unread" class="mark">{{ social.unread }}</b></button>
       <button type="button" class="tool" aria-haspopup="dialog" @click="toggle('account')"><span aria-hidden="true">⚙️</span>帳號</button>
     </nav>
 
@@ -224,6 +239,10 @@ const { loading, submit } = useSubmit(async () => {
         </li>
       </ul>
       <div v-if="isDev" class="acts"><button type="button" class="ghost dev" @click="grant">（測試）領一些道具</button></div>
+    </OverlayPanel>
+
+    <OverlayPanel :open="panel === 'mail'" tall title="信箱" subtitle="寫信給好友，郵差會送過去" @close="panel = null">
+      <MailPanel />
     </OverlayPanel>
 
     <OverlayPanel :open="panel === 'account'" title="帳號" @close="panel = null">
@@ -268,6 +287,7 @@ const { loading, submit } = useSubmit(async () => {
   border: 3px solid var(--c-ink);
   border-radius: var(--radius);
 }
+.mark { position: absolute; top: -8px; right: -6px; min-width: 20px; padding: 0 0.3rem; font-family: var(--font-pixel); font-size: 0.6rem; line-height: 20px; color: #fff; background: var(--c-error); border: 2px solid var(--c-ink); border-radius: 10px; text-align: center; }
 .toast {
   position: absolute;
   top: calc(0.75rem + env(safe-area-inset-top));
@@ -294,6 +314,7 @@ const { loading, submit } = useSubmit(async () => {
   gap: 0.5rem;
 }
 .tool {
+  position: relative;
   display: grid;
   justify-items: center;
   align-content: center;

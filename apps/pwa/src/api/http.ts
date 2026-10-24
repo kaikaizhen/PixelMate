@@ -35,7 +35,7 @@ const BASE = '/api/v1'
  * Thin fetch wrapper: same-origin cookies, JSON in/out, the CSRF header on every unsafe call,
  * and every failure normalised into an ApiError (so views never parse responses themselves).
  */
-export async function request<T = void>(method: string, path: string, body?: unknown): Promise<T> {
+export async function request<T = void>(method: string, path: string, body?: unknown, extraHeaders: Record<string, string> = {}): Promise<T> {
   let res: Response
   try {
     res = await fetch(BASE + path, {
@@ -45,6 +45,7 @@ export async function request<T = void>(method: string, path: string, body?: unk
         Accept: 'application/json',
         ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
         ...(method !== 'GET' ? { 'X-Requested-With': 'pixelmate' } : {}),
+        ...extraHeaders,
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,
     })

@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { authApi } from '@/api/authApi'
 import { ApiError } from '@/api/http'
 import type { LoginInput, RegisterInput, User } from '@/types/auth.types'
+import { useSocialStore } from './useSocialStore'
 import { useInventoryStore } from './useInventoryStore'
 import { usePetStore } from './usePetStore'
 
@@ -26,6 +27,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(input: LoginInput): Promise<User> {
     usePetStore().clear() // never show the previous player's pet or bag
     useInventoryStore().clear()
+    useSocialStore().clear()
     user.value = await authApi.login(input)
     return user.value
   }
@@ -39,6 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = null // even if the request failed the local view must not stay "signed in"
       usePetStore().clear()
       useInventoryStore().clear()
+      useSocialStore().clear()
     }
   }
 
