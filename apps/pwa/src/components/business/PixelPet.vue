@@ -21,14 +21,14 @@ const face = computed(() => ({ normal: faceNormal, happy: faceHappy, sleepy: fac
 </script>
 
 <template>
-  <div class="pet" :style="{ '--s': scale }" :role="decorative ? undefined : 'img'" :aria-label="decorative ? undefined : label" :aria-hidden="decorative || undefined">
+  <div class="px-pet" :style="{ '--s': scale }" :role="decorative ? undefined : 'img'" :aria-label="decorative ? undefined : label" :aria-hidden="decorative || undefined">
     <div class="body pixelated" :style="{ backgroundImage: `url(${body})` }" />
     <img class="face pixelated" :src="face" alt="" width="48" height="48" />
   </div>
 </template>
 
 <style scoped>
-.pet {
+.px-pet {
   position: relative;
   width: calc(48px * var(--s));
   height: calc(48px * var(--s));

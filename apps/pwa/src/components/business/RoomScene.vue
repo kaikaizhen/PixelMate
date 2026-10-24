@@ -13,11 +13,12 @@ import curtainR from '@/assets/pixel/curtain_r.png'
 import bars from '@/assets/pixel/window_bars.png'
 
 // The house: the website's room art + the weather outside (game assets by assetKey) + furniture + the pet.
-const props = defineProps<{ color: string; happy: boolean; name: string; weather?: string }>()
+const props = defineProps<{ color: string; happy: boolean; name: string; weather?: string; bare?: boolean; scale?: number }>()
 defineEmits<{ pat: [] }>()
 
 const el = ref<HTMLElement | null>(null)
-const s = useSceneScale(el)
+const measured = useSceneScale(el)
+const s = computed(() => props.scale ?? measured.value)   // fullscreen passes its own scale
 const game = useGameStore()
 onMounted(() => void game.load())
 
@@ -27,7 +28,7 @@ const night = computed(() => windowWeatherKey(new Date(), props.weather).include
 </script>
 
 <template>
-  <div ref="el" class="scene" :style="{ '--s': s, aspectRatio: `${ROOM_SIZE} / ${ROOM_SIZE}` }" role="group" aria-label="你的小屋">
+  <div ref="el" class="scene" :class="{ bare }" :style="{ '--s': s, aspectRatio: `${ROOM_SIZE} / ${ROOM_SIZE}` }" role="group" aria-label="你的小屋">
     <!-- 1. outside the window -->
     <div class="win pixelated" :style="{ left: u(WINDOW.x), top: u(WINDOW.y), width: u(WINDOW.w), height: u(WINDOW.h),
         backgroundImage: weatherUrl ? `url(${weatherUrl})` : undefined,
@@ -46,12 +47,13 @@ const night = computed(() => windowWeatherKey(new Date(), props.weather).include
     <button type="button" class="pet" :class="{ hop: happy }" :style="{ left: u(PET_SPOT.x), top: u(PET_SPOT.y) }" :aria-label="`摸摸 ${name}`" @click="$emit('pat')">
       <GamePet :color="color" :face="happy ? 'happy' : 'normal'" />
     </button>
-    <span v-if="night" class="dim" aria-hidden="true" />
+    <span v-if="night && !bare" class="dim" aria-hidden="true" />
   </div>
 </template>
 
 <style scoped>
 .scene { position: relative; width: 100%; overflow: hidden; border: 3px solid var(--c-ink); border-radius: 14px; background: var(--c-pink-soft); }
+.scene.bare { border: 0; border-radius: 0; background: transparent; overflow: visible; }
 .layer, .abs, .win { position: absolute; }
 .layer { inset: 0; width: 100%; height: 100%; }
 .win { background-repeat: no-repeat; background-color: var(--c-blue); }

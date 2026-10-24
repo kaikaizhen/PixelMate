@@ -20,7 +20,6 @@ test.describe('領養小夥伴', () => {
     await page.getByRole('button', { name: '領養牠！' }).click()
 
     await expect(page).toHaveURL(/\/web\/\?welcome=1/)
-    await expect(page.getByRole('heading', { name: '麻糬' })).toBeVisible()
     await expect(page.getByText('領養成功！麻糬 住進你的小屋了。')).toBeVisible()
     expect(api.calls.find((c) => c.path === '/pets')?.body).toEqual({ name: '麻糬', bodyVariant: 'star_01_mint' })
   })
@@ -41,9 +40,9 @@ test.describe('領養小夥伴', () => {
   test('已經有小夥伴的人直接進小屋，開領養頁會被導回', async ({ page }) => {
     await mockApi(page)
     await signIn(page)
-    await expect(page.getByRole('heading', { name: '小栗' })).toBeVisible()
+    await expect(page.getByRole('button', { name: '摸摸 小栗' })).toBeVisible()
     await page.goto('adopt')
-    await expect(page.getByRole('heading', { name: '小栗' })).toBeVisible()
+    await expect(page.getByRole('button', { name: '摸摸 小栗' })).toBeVisible()
     await expect(page).not.toHaveURL(/adopt/)
   })
 
@@ -57,16 +56,58 @@ test.describe('領養小夥伴', () => {
     await signIn(page)
     await page.getByLabel('小夥伴的名字').fill('麻糬')
     await page.getByRole('button', { name: '領養牠！' }).click()
-    await expect(page.getByRole('heading', { name: '小栗' })).toBeVisible()
+    await expect(page.getByRole('button', { name: '摸摸 小栗' })).toBeVisible()
   })
 
-  test('小屋：顯示等級與技能，點小夥伴會變開心，登出回到登入頁', async ({ page }) => {
+  test('小屋是全螢幕的房間；功能用浮動面板顯示：小夥伴、帳號，背包與信箱還沒開放', async ({ page }) => {
     await mockApi(page)
     await signIn(page)
-    await expect(page.getByText('Lv.1')).toBeVisible()
-    for (const s of ['共感', '創作', '探索', '智慧']) await expect(page.getByText(s, { exact: true })).toBeVisible()
+    const vp = page.viewportSize()!
+    const full = await page.locator('.full').boundingBox()
+    expect(full).toMatchObject({ x: 0, y: 0, width: vp.width, height: vp.height })      // the room is the whole screen
+
+    await expect(page.getByRole('dialog')).toHaveCount(0)                               // nothing covers the room until asked
     await page.getByRole('button', { name: '摸摸 小栗' }).click()
-    await expect(page.locator('.pet img.face')).toHaveAttribute('src', /face_happy/)
+    await expect(page.locator('button.pet img.face')).toHaveAttribute('src', /face_happy/)
+
+    await page.getByRole('button', { name: '小夥伴' }).click()
+    const dlg = page.getByRole('dialog', { name: '小栗' })
+    await expect(dlg).toBeVisible()
+    await expect(dlg.getByText('Lv.1')).toBeVisible()
+    for (const s of ['共感', '創作', '探索', '智慧']) await expect(dlg.getByText(s, { exact: true })).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+
+    await page.getByRole('button', { name: '小夥伴' }).click()
+    await page.getByRole('button', { name: '關閉' }).click()                           // the close button
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+
+    await expect(page.getByRole('button', { name: '背包，即將推出' })).toBeDisabled()
+    await expect(page.getByRole('button', { name: '信箱，即將推出' })).toBeDisabled()
+  })
+
+  test('面板沒有遮罩：開著面板時房間仍看得到、小夥伴仍可以點；同一個按鈕再按會收起', async ({ page }) => {
+    await mockApi(page)
+    await signIn(page)
+    await page.getByRole('button', { name: '小夥伴' }).click()
+    const dlg = page.getByRole('dialog', { name: '小栗' })
+    await expect(dlg).toBeVisible()
+    await expect(dlg).toHaveAttribute('aria-modal', 'false')
+    expect(await page.evaluate(() => document.querySelectorAll('dialog').length)).toBe(0)       // no modal <dialog>, no ::backdrop
+
+    // the whole room is still reachable behind the card
+    await page.getByRole('button', { name: '摸摸 小栗' }).click()   // not covered by the card
+    await expect(page.locator('button.pet img.face')).toHaveAttribute('src', /face_happy/)
+
+    await page.getByRole('button', { name: '小夥伴' }).click()                              // toggle
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+  })
+
+  test('帳號面板可以登出', async ({ page }) => {
+    await mockApi(page)
+    await signIn(page)
+    await page.getByRole('button', { name: '帳號' }).click()
+    await expect(page.getByRole('dialog', { name: '帳號' })).toContainText('a@example.com')
     await page.getByRole('button', { name: '登出' }).click()
     await expect(page).toHaveURL(/\/web\/login/)
   })
@@ -108,7 +149,7 @@ test.describe('領養小夥伴', () => {
     }
     await page.getByLabel('小夥伴的名字').fill('麻糬')
     await page.getByRole('button', { name: '領養牠！' }).click()
-    await expect(page.getByRole('heading', { name: '麻糬' })).toBeVisible()
+    await expect(page.getByRole('button', { name: '摸摸 麻糬' })).toBeVisible()
     const w = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }))
     expect(w.sw).toBeLessThanOrEqual(w.cw)
   })

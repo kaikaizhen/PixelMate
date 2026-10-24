@@ -4,6 +4,10 @@ Vue 3 + TypeScript + Vite installable web app (served under `/web/`, API on the 
 This stage: register, login, logout, forgot / reset password, e-mail confirmation, adopt a pet (pick a look + name), the pet's home
 (level, skills, tap to pet), offline banner, install + update prompts.
 
+The home page is **full screen**: the house art is scaled to the short side of the screen and its wall, baseboard and floor are
+continued with seamless tiles (`python tools/pixel-art/room_extend.py`), so the room runs edge to edge. Functions (pet, account;
+backpack and mail are marked "coming soon") open as floating cards on top of the room — no dim mask, the room stays tappable.
+
 Design target: **no page scrolls** on an iPhone 16 (393×852) or a 1440×900 desktop (checked by `e2e/pwa.spec.ts`); wide screens
 use two columns, phones drop the subtitle and shrink the pet.
 
