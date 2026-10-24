@@ -12,7 +12,13 @@ dotnet run --project src/PixelMate.Api          # http://localhost:5200
 dotnet test
 ```
 
-Secrets live in user-secrets (dev) or environment variables (`ConnectionStrings__Default`), never in the repo. See `.env.example`.
+Settings are read from, in order of priority: real environment variables, `apps/api/.env.local`, `apps/api/.env`, user-secrets,
+`appsettings*.json`. `.env` and `.env.local` are git-ignored (copy `.env.example`). Typical split:
+
+- `.env` — the values for the real site (database, Gmail, `Auth__WebBaseUrl=https://…`).
+- `.env.local` — overrides for your own machine (`Auth__WebBaseUrl=http://localhost:5173/web`, `Auth__SecureCookie=false`, `Health__ExposeDb=true`).
+
+Use single quotes around values that contain `#` or `$`, e.g. `ConnectionStrings__Default='Server=…;Pwd=a#b$c'`.
 
 ## Endpoints
 
