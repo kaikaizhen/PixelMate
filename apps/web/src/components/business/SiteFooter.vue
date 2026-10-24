@@ -12,7 +12,6 @@
 
 <style scoped>
 .site-footer {
-  margin-top: var(--space-5);
   padding-block: var(--space-4);
   border-top: 4px dashed var(--c-ink);
   background: var(--c-paper);
