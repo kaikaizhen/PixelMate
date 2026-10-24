@@ -34,3 +34,6 @@ assets/preview/similarity_report.txt
 bin/
 obj/
 *.user
+
+# game art copied from /assets at dev/build time
+apps/pwa/public/game/

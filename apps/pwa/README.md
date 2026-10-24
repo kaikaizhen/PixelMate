@@ -19,6 +19,13 @@ cd apps/pwa && npm install && npm run dev                      # http://localhos
 `/api` is proxied to the API in dev and preview, so the session cookie is first-party. In development the API prints the
 confirmation / reset e-mail (with its link) to its console until Gmail is configured.
 
+## Game art
+
+The home page is **your house** (the website's room art) filled with the game assets: the window shows the weather scene for the
+time of day (`world.weather.*`), the furniture and the pet come from `assets/manifest.json` **by assetKey** (no hard-coded paths).
+`npm run dev` / `build` first run `scripts/sync-game-assets.mjs`, which copies the repo-root `assets/` (manifest, sprites, backgrounds)
+into `public/game/` (git-ignored). Edit the starter room in `src/constants/defaultRoom.ts`.
+
 ## Scripts
 
 | Command | What it does |

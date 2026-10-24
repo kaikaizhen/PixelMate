@@ -3,7 +3,7 @@ import { computed, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AlertBox from '@/components/common/AlertBox.vue'
 import PixelButton from '@/components/common/PixelButton.vue'
-import PixelPet from '@/components/business/PixelPet.vue'
+import RoomScene from '@/components/business/RoomScene.vue'
 import { SKILLS, colorOf } from '@/constants/petLooks'
 import { useSubmit } from '@/composables/useSubmit'
 import { useAuthStore } from '@/stores/useAuthStore'
@@ -15,8 +15,6 @@ const route = useRoute()
 const router = useRouter()
 
 const pet = computed(() => pets.pet!)
-const wide = typeof window !== 'undefined' && window.matchMedia?.('(min-width: 860px)').matches
-const petScale = wide ? 7 : 4
 const welcome = route.query.welcome === '1'
 
 // Tap the pet: it smiles and hops for a moment (reduced-motion users only get the smile).
@@ -39,12 +37,7 @@ const { loading, submit } = useSubmit(async () => {
   <main class="home">
     <AlertBox v-if="welcome" tone="success">領養成功！{{ pet.name }} 住進你的小屋了。</AlertBox>
 
-    <section class="room" aria-label="你的小屋">
-      <button type="button" class="pet" :class="{ hop: happy }" :aria-label="`摸摸 ${pet.name}`" @click="pat">
-        <PixelPet :color="colorOf(pet.bodyVariant)" :face="happy ? 'happy' : 'normal'" :scale="petScale" :label="pet.name" />
-      </button>
-      <div class="floor" aria-hidden="true" />
-    </section>
+    <RoomScene class="room" :color="colorOf(pet.bodyVariant)" :happy="happy" :name="pet.name" :weather="pet.world.weather" @pat="pat" />
 
     <section class="card" aria-labelledby="pet-name">
       <h1 id="pet-name">{{ pet.name }}</h1>
@@ -74,29 +67,9 @@ const { loading, submit } = useSubmit(async () => {
   padding: 1rem;
 }
 .home > * { width: min(100%, 28rem); }
-.room {
-  position: relative;
-  display: grid;
-  justify-items: center;
-  padding-top: 1rem;
-  background: linear-gradient(var(--c-pink-soft) 0 68%, transparent 68%);
-  border: 3px solid var(--c-ink);
-  border-radius: 14px;
-  overflow: hidden;
-}
-.floor { position: absolute; inset: auto 0 0 0; height: 32%; background: #e6c9a0; border-top: 3px solid var(--c-ink); z-index: 0; }
-.pet {
-  position: relative;
-  z-index: 1;
-  margin-bottom: 0.7rem;
-  padding: 0;
-  background: none;
-  border: 0;
-  cursor: pointer;
-  border-radius: var(--radius);
-}
-.hop { animation: hop 0.5s steps(4) 1; }
-@keyframes hop { 40% { transform: translateY(-18px); } }
+/* phones: leave room for the card and sign-out under the square scene */
+.room { max-width: min(100%, 22rem); }
+.room { width: 100%; align-self: center; }
 .card {
   display: grid;
   gap: 0.4rem;
@@ -118,11 +91,10 @@ h1 { font-size: 1.4rem; }
 .who span { font-size: 0.8rem; }
 .actions { width: min(100%, 12rem); margin-inline: auto; }
 @media (min-width: 860px) {
-  .home { grid-template-columns: minmax(0, 24rem) minmax(0, 26rem); grid-template-areas: 'room card' 'room who'; column-gap: 2.5rem; justify-content: center; align-content: center; }
+  .home { grid-template-columns: minmax(0, 30rem) minmax(0, 26rem); grid-template-areas: 'room card' 'room who'; column-gap: 2.5rem; justify-content: center; align-content: center; }
   .home > * { width: auto; }
-  .room { grid-area: room; align-self: center; padding-top: 2rem; }
+  .home > .room { grid-area: room; align-self: center; width: 100%; max-width: 30rem; }
   .card { grid-area: card; }
   .who { grid-area: who; }
 }
-@media (prefers-reduced-motion: reduce) { .hop { animation: none; } }
 </style>
