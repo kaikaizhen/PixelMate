@@ -1,0 +1,18 @@
+# secrets / env
+.env
+.env.*
+!.env.example
+
+# internal docs (never pushed)
+docs/
+
+# deps / build
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+*.log
+.DS_Store
+.vscode/
+.idea/
