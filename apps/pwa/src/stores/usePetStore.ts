@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { petApi } from '@/api/petApi'
 import { ApiError } from '@/api/http'
-import type { CreatePetInput, Pet, SkillKey, SkillsResult } from '@/types/pet.types'
+import type { CreatePetInput, EquipResult, Pet, SkillKey, SkillsResult } from '@/types/pet.types'
 
 export const usePetStore = defineStore('pet', () => {
   const pet = ref<Pet | null>(null)
@@ -45,6 +45,12 @@ export const usePetStore = defineStore('pet', () => {
     apply(await guarded((rev) => petApi.resetSkills(rev)))
   }
 
+  async function equip(slot: string, itemId: string | null): Promise<EquipResult> {
+    const r = await guarded((rev) => petApi.equip(slot, itemId, rev))
+    if (pet.value) pet.value = { ...pet.value, equipment: r.equipment, revision: r.revision }
+    return r
+  }
+
   async function devLevelUp(): Promise<void> {
     pet.value = await petApi.devLevelUp()
   }
@@ -55,5 +61,5 @@ export const usePetStore = defineStore('pet', () => {
     loaded.value = false
   }
 
-  return { pet, loaded, load, adopt, allocate, resetSkills, devLevelUp, clear }
+  return { pet, loaded, load, adopt, allocate, resetSkills, equip, devLevelUp, clear }
 })

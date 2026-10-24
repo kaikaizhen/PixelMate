@@ -8,6 +8,13 @@ export const PET = {
 
 export const PET_L4 = { ...PET, level: 4, revision: 5, remainingSkillPoints: 3 }
 
+export const BAG = [
+  { inventoryId: 'i1', itemId: 'equip.hat.straw_post', name: '郵局草帽', category: 'hat', rarity: 'common', slot: 'head', assetKey: 'equip.hat.straw_post', quantity: 1, equipped: false },
+  { inventoryId: 'i2', itemId: 'equip.costume.dog', name: '小狗布偶裝', category: 'costume', rarity: 'precious', slot: 'costume', assetKey: 'equip.costume.dog', quantity: 1, equipped: false },
+  { inventoryId: 'i3', itemId: 'equip.feet.sneaker_picnic', name: '野餐帆布鞋', category: 'shoes', rarity: 'rare', slot: 'feet', assetKey: 'equip.feet.sneaker_picnic', quantity: 2, equipped: false },
+  { inventoryId: 'i4', itemId: 'world.furniture.bed_garden', name: '花園單人床', category: 'furniture', rarity: 'rare', slot: null, assetKey: 'world.furniture.bed_garden', quantity: 1, equipped: false },
+]
+
 export const USER = { userId: '11111111-1111-1111-1111-111111111111', email: 'a@example.com', displayName: '小栗', emailConfirmed: true }
 
 type Handler = (route: Route, body: any) => Promise<void> | void
@@ -15,8 +22,8 @@ export const json = (route: Route, status: number, body?: unknown) =>
   route.fulfill({ status, contentType: 'application/json', body: body === undefined ? '' : JSON.stringify(body) })
 
 /** Mock the API. `session` flips to the user after a successful login so /me behaves like the real cookie session. */
-export async function mockApi(page: Page, handlers: Record<string, Handler> = {}, opts: { pet?: typeof PET | null } = {}) {
-  const state = { signedIn: false, pet: opts.pet === undefined ? (PET as typeof PET | null) : opts.pet, calls: [] as { path: string; body: any; csrf: string | undefined }[] }
+export async function mockApi(page: Page, handlers: Record<string, Handler> = {}, opts: { pet?: typeof PET | null; bag?: typeof BAG } = {}) {
+  const state = { signedIn: false, bag: structuredClone(opts.bag ?? []), pet: opts.pet === undefined ? (PET as typeof PET | null) : opts.pet, calls: [] as { path: string; body: any; csrf: string | undefined }[] }
   await page.route('**/api/v1/**', async (route) => {
     const req = route.request()
     const path = new URL(req.url()).pathname.replace('/api/v1', '')
@@ -30,6 +37,22 @@ export async function mockApi(page: Page, handlers: Record<string, Handler> = {}
       return json(route, 200, USER)
     }
     if (path === '/pets/me') return state.pet ? json(route, 200, state.pet) : json(route, 404, { code: 'NOT_FOUND', message: '你還沒有小夥伴。', requestId: 'r' })
+    if (path === '/inventory') return json(route, 200, { items: state.bag })
+    if (path === '/pets/me/equipment' && state.pet) {                       // a small copy of the server rules
+      const p = state.pet as typeof PET & { equipment: Record<string, string | null> }
+      if (body.expectedRevision !== p.revision) return json(route, 409, { code: 'REVISION_CONFLICT', message: 'x', requestId: 'r' })
+      if (body.itemId) {
+        const item = state.bag.find((i) => i.itemId === body.itemId)
+        if (!item) return json(route, 404, { code: 'NOT_FOUND', message: '背包裡沒有這個道具。', requestId: 'r' })
+        if (item.slot !== body.slot) return json(route, 422, { code: 'INVALID_STATE', message: '這個道具不能穿在這個位置。', requestId: 'r' })
+        if (body.slot === 'costume') p.equipment.head = null
+        if (body.slot === 'head') p.equipment.costume = null
+      }
+      p.equipment = { ...p.equipment, [body.slot]: body.itemId }
+      p.revision += 1
+      state.bag.forEach((i) => (i.equipped = Object.values(p.equipment).includes(i.itemId)))
+      return json(route, 200, { revision: p.revision, equipment: p.equipment })
+    }
     if (path === '/pets/me/skills/allocate' && state.pet) {              // a tiny copy of the server rules
       const p = state.pet
       const used = Object.values(p.skills).reduce((a, b) => a + b, 0)

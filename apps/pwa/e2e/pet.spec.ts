@@ -59,7 +59,7 @@ test.describe('領養小夥伴', () => {
     await expect(page.getByRole('button', { name: '摸摸 小栗' })).toBeVisible()
   })
 
-  test('小屋是全螢幕的房間；功能用浮動面板顯示：小夥伴、帳號，背包與信箱還沒開放', async ({ page }) => {
+  test('小屋是全螢幕的房間；功能用浮動面板顯示：小夥伴、背包、帳號，信箱還沒開放', async ({ page }) => {
     await mockApi(page)
     await signIn(page)
     const vp = page.viewportSize()!
@@ -82,7 +82,7 @@ test.describe('領養小夥伴', () => {
     await page.getByRole('button', { name: '關閉' }).click()                           // the close button
     await expect(page.getByRole('dialog')).toHaveCount(0)
 
-    await expect(page.getByRole('button', { name: '背包，即將推出' })).toBeDisabled()
+    await expect(page.getByRole('button', { name: '背包' })).toBeEnabled()
     await expect(page.getByRole('button', { name: '信箱，即將推出' })).toBeDisabled()
   })
 
