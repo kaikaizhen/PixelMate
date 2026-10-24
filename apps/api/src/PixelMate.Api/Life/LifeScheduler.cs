@@ -24,7 +24,7 @@ public static class LifeScheduler
     public static long DayOf(long slot) => slot / SlotsPerDay;
 
     /// <summary>Uniform [0,1) from (pet, slot, purpose): stable across processes and machines (SHA-256, not string.GetHashCode).</summary>
-    internal static double Roll(Guid petId, long slot, string purpose)
+    public static double Roll(Guid petId, long slot, string purpose)
     {
         Span<byte> input = stackalloc byte[16 + 8 + 16];
         petId.TryWriteBytes(input);
