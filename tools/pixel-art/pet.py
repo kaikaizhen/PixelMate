@@ -5,14 +5,13 @@ sys.path.insert(0, "/Volumes/Backup_ACASIS M001 Media/Dev/skills/pixel-art-studi
 from pixelstudio import Sprite
 from PIL import Image
 
-OUT = sys.argv[1]
 LINE = "#4a3040"; BODY = "#fbe3c8"; BODY_D = "#efc3a4"; BODY_L = "#fff4e4"
 CHEEK = "#f4a6a0"; EYE = "#3a2433"; WHITE = "#ffffff"
 STAR = "#ffd86b"; STAR_D = "#f2b84a"; FOOT = "#e9a98e"
 PAL = [LINE, BODY, BODY_D, BODY_L, CHEEK, EYE, WHITE, STAR, STAR_D, FOOT]
 
 
-def sprite(bob=0, sway=0, blink=False, happy=False):
+def sprite(bob=0, sway=0, blink=False, happy=False, look=None):
     s = Sprite(48, 48, palette=PAL)
     y = bob
     # little feet
@@ -39,6 +38,11 @@ def sprite(bob=0, sway=0, blink=False, happy=False):
         for ex in (14, 29):
             s.px(ex, 28 + y, EYE); s.px(ex + 1, 27 + y, EYE); s.px(ex + 2, 26 + y, EYE)
             s.px(ex + 3, 27 + y, EYE); s.px(ex + 4, 28 + y, EYE)
+    elif look == "down":
+        s.rect(14, 26 + y, 17, 29 + y, EYE); s.rect(30, 26 + y, 33, 29 + y, EYE)
+    elif look == "right":
+        s.rect(16, 24 + y, 19, 28 + y, EYE); s.rect(32, 24 + y, 35, 28 + y, EYE)
+        s.px(18, 24 + y, WHITE); s.px(34, 24 + y, WHITE)
     else:
         s.rect(14, 24 + y, 17, 28 + y, EYE); s.rect(30, 24 + y, 33, 28 + y, EYE)
         s.px(14, 24 + y, WHITE); s.px(30, 24 + y, WHITE)
@@ -59,9 +63,12 @@ def strip(sprites, path):
     im.save(path)
 
 
-idle = [sprite(0, 0), sprite(0, 1), sprite(1, 2), sprite(1, 1)]
-strip(idle, OUT + "/pet_idle.png")
-strip([sprite(blink=True), sprite(happy=True)], OUT + "/pet_faces.png")
-Image.open(OUT + "/pet_idle.png").save(OUT + "/../../../../../_p.png") if False else None
-idle[0].preview(sys.argv[2] if len(sys.argv) > 2 else "/tmp/_p.png", scale=10, bg="#cfe3f0")
-idle[0].stats()
+def main():
+    OUT = sys.argv[1]
+    idle = [sprite(0, 0), sprite(0, 1), sprite(1, 2), sprite(1, 1)]
+    strip(idle, OUT + "/pet_idle.png")
+    strip([sprite(blink=True), sprite(happy=True)], OUT + "/pet_faces.png")
+
+
+if __name__ == "__main__":
+    main()

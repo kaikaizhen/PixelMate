@@ -17,7 +17,7 @@ test.describe('Hero 首屏', () => {
 
   test('預覽標示與頁尾透明說明存在', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByText('互動預覽')).toBeVisible()
+    await expect(page.getByText('互動預覽').first()).toBeVisible()
     await expect(page.getByText('各項功能仍在準備中')).toBeVisible()
   })
 
