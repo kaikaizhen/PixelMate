@@ -1,0 +1,9 @@
+node_modules
+dist
+.vite-ssg-temp
+e2e
+test-results
+playwright-report
+.env
+.env.*
+!.env.example

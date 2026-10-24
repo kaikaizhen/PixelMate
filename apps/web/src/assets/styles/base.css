@@ -1,0 +1,68 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--c-cream);
+  color: var(--c-ink);
+  font-family: var(--font-body);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: none;
+  display: block;
+}
+
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.page-width {
+  width: min(100% - var(--page-gutter) * 2, var(--page-max));
+  margin-inline: auto;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 3px solid var(--c-ink);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
+html { scroll-behavior: smooth; }
+
+/* 首屏以下的區塊：進入視窗才渲染，減少離螢幕動畫與繪製成本 */
+#daily,
+#mail,
+#dress,
+#weather,
+#platforms {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 720px;
+}
