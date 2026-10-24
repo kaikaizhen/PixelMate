@@ -37,6 +37,7 @@ export async function mockApi(page: Page, handlers: Record<string, Handler> = {}
       return json(route, 200, USER)
     }
     if (path === '/pets/me') return state.pet ? json(route, 200, state.pet) : json(route, 404, { code: 'NOT_FOUND', message: '你還沒有小夥伴。', requestId: 'r' })
+    if (path === '/pets/me/events') return json(route, 200, { events: [] })
     if (path === '/inventory') return json(route, 200, { items: state.bag })
     if (path === '/pets/me/equipment' && state.pet) {                       // a small copy of the server rules
       const p = state.pet as typeof PET & { equipment: Record<string, string | null> }
