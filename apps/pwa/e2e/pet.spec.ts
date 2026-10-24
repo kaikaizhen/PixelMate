@@ -71,6 +71,33 @@ test.describe('領養小夥伴', () => {
     await expect(page).toHaveURL(/\/web\/login/)
   })
 
+  test('小屋用我的房子與素材：窗外天氣、家具與小夥伴都來自 manifest', async ({ page }) => {
+    await page.clock.install({ time: new Date('2026-10-25T07:30:00') })       // morning -> sunrise outside the window
+    await mockApi(page)
+    const assets: string[] = []
+    page.on('response', (r) => r.url().includes('/web/game/') && assets.push(new URL(r.url()).pathname))
+    await signIn(page)
+    await expect(page.getByRole('group', { name: '你的小屋' })).toBeVisible()
+    await expect.poll(() => assets.length).toBeGreaterThan(3)
+    expect(assets.some((a) => a.endsWith('/game/manifest.json'))).toBe(true)
+    expect(assets).toContain('/web/game/backgrounds/sunrise_window.png')
+    expect(assets).toContain('/web/game/sprites/furniture/table_garden.png')
+    expect(assets).toContain('/web/game/sprites/pets/star_01/body_cream_idle.png')
+    for (const path of assets) {
+      const res = await page.request.get(path)
+      expect(res.status(), path).toBe(200)
+    }
+  })
+
+  test('夜裡窗外是星空', async ({ page }) => {
+    await page.clock.install({ time: new Date('2026-10-25T23:00:00') })
+    await mockApi(page)
+    const assets: string[] = []
+    page.on('response', (r) => r.url().includes('/web/game/') && assets.push(new URL(r.url()).pathname))
+    await signIn(page)
+    await expect.poll(() => assets.some((a) => a.endsWith('starry_window.png'))).toBe(true)
+  })
+
   test('領養頁與小屋在手機和桌機都沒有橫向捲動', async ({ page }) => {
     await mockApi(page, {}, { pet: null })
     await signIn(page)

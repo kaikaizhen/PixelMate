@@ -32,10 +32,12 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,woff2,svg,webmanifest}'],
+        globIgnores: ['game/**'],                   // 600+ game files: fetched when needed, not precached
         navigateFallback: '/web/index.html',
         navigateFallbackDenylist: [/^\/api\//],     // never answer API calls from the cache
         cleanupOutdatedCaches: true,
-        runtimeCaching: [],                         // only static assets are cached; API responses are never stored
+        // static game art is cached after first use; API responses are never stored
+        runtimeCaching: [{ urlPattern: ({ url }) => url.pathname.startsWith('/web/game/'), handler: 'CacheFirst', options: { cacheName: 'game-assets', expiration: { maxEntries: 400, maxAgeSeconds: 60 * 60 * 24 * 30 } } }],
       },
       devOptions: { enabled: false },
     }),
