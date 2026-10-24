@@ -1,2 +1,15 @@
 User-agent: *
 Allow: /
+
+# AI 搜尋與助理爬蟲：允許讀取公開預告頁
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /

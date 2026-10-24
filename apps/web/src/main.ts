@@ -2,7 +2,7 @@ import { ViteSSG } from 'vite-ssg'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 import { routes } from './router/routes'
-import '@fontsource/press-start-2p'
+import '@fontsource/press-start-2p/latin-400.css'
 import './assets/styles/tokens.css'
 import './assets/styles/base.css'
 
