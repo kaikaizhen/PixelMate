@@ -30,7 +30,7 @@ def halo(ms, r=2):
 
 
 def main():
-    gear = [k for k, a in A.items() if a.get("slot") in ("head", "body", "front", "feet", "hand", "costume", "costume_back")]
+    gear = [k for k, a in A.items() if a.get("slot") in ("head", "body", "front", "feet", "hand", "costume", "costume_back", "back")]
     bad, checked = [], 0
     for an, anim in ANIMS.items():
         for i, f in enumerate(anim["frames"]):

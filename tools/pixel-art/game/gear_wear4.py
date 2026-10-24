@@ -131,7 +131,7 @@ def outfit_sweater(theme):
         for y in range(34, 46):
             if s.get(x, y) in (m, l, d) and (y // 2 + x // 3) % 2 == 0:
                 s.px(x, y, l if s.get(x, y) != l else m)
-    neck = {"post": "turtle", "picnic": "crew", "rainy": "turtle", "starlight": "v"}[theme]
+    neck = {"post": "turtle", "picnic": "crew", "rainy": "turtle", "starlight": "v", "forest": "v", "winter": "turtle"}[theme]
     if neck == "turtle":
         s.rect(15, 32, 32, 35, d); s.line(15, 35, 32, 35, l)
     elif neck == "crew":
@@ -139,13 +139,20 @@ def outfit_sweater(theme):
     else:
         s.polygon([(17, 32), (30, 32), (24, 39)], BODY); s.line(17, 32, 24, 39, d); s.line(30, 32, 24, 39, d)
     s.rect(2, 44, 45, 45, d, only=m) if False else None
-    pattern(s, (3, 37, 44, 43), {"post": "stripe_h", "picnic": "dots", "rainy": "stripe_v", "starlight": "stars"}[theme], pal, only=m)
+    pattern(s, (3, 37, 44, 43), {"post": "stripe_h", "picnic": "dots", "rainy": "stripe_v", "starlight": "stars", "forest": "chevron", "winter": "check"}[theme], pal, only=m)
     if theme == "post":                                                    # envelope patch on the chest
         s.rect(14, 38, 21, 43, PAPER); s.line(14, 38, 17, 41, "#d9574f"); s.line(21, 38, 18, 41, "#d9574f")
     elif theme == "rainy":                                                 # hood-string toggles + pocket
         s.rect(18, 35, 19, 39, WHITE); s.rect(28, 35, 29, 39, WHITE); s.rect(14, 41, 33, 44, d)
     elif theme == "picnic":
         motif(s, 24, 41, t["motif"], a)
+    elif theme == "forest":                                                # elbow-style leaf patches + wooden toggles
+        blit(s, 8, 40, MOTIFS["leaf"], "#93c488"); blit(s, 34, 40, MOTIFS["leaf"], "#93c488"); s.rect(23, 38, 25, 39, "#a8764a"); s.rect(23, 42, 25, 43, "#a8764a")
+    elif theme == "winter":                                                # snowflake yoke + fluffy cuff row
+        blit(s, 9, 38, MOTIFS["snow"], WHITE); blit(s, 33, 38, MOTIFS["snow"], WHITE)
+        for x in range(3, 45, 2):
+            if s.get(x, 44) is not None:
+                s.px(x, 44, WHITE)
     else:
         motif(s, 24, 41, t["motif"], a); s.rect(2, 38, 45, 38, GOLD_D)
     for x in range(3, 45, 3):

@@ -19,7 +19,7 @@ def err(msg):
     errors.append(msg)
 
 
-SLOTS = {"head", "body", "front", "feet", "hand", "costume", "costume_back"}
+SLOTS = {"head", "body", "front", "feet", "hand", "costume", "costume_back", "back"}
 warnings = []
 
 

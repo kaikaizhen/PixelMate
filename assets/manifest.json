@@ -575,6 +575,44 @@
       "name": "星夜髮夾",
       "batch": "B3"
     },
+    "equip.accessory.sash_festival": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "front",
+      "z": 3,
+      "path": "sprites/equipment/accessories/sash_festival.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0204",
+      "name": "慶典徽章帶",
+      "batch": "B5"
+    },
+    "equip.accessory.sash_forest": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "front",
+      "z": 3,
+      "path": "sprites/equipment/accessories/sash_forest.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0203",
+      "name": "森林徽章帶",
+      "batch": "B5"
+    },
     "equip.accessory.sash_friendship": {
       "type": "image",
       "layer": "pet_front_accessory",
@@ -612,6 +650,44 @@
       "designId": "D0200",
       "name": "花園徽章帶",
       "batch": "B4"
+    },
+    "equip.accessory.sash_seaside": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "front",
+      "z": 3,
+      "path": "sprites/equipment/accessories/sash_seaside.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0201",
+      "name": "海風徽章帶",
+      "batch": "B5"
+    },
+    "equip.accessory.sash_starlight": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "front",
+      "z": 3,
+      "path": "sprites/equipment/accessories/sash_starlight.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0202",
+      "name": "星夜徽章帶",
+      "batch": "B5"
     },
     "equip.accessory.scarf_festival": {
       "type": "image",
@@ -840,6 +916,120 @@
       "designId": "D0196",
       "name": "星夜肩披",
       "batch": "B4"
+    },
+    "equip.accessory.wings_festival": {
+      "type": "image",
+      "layer": "pet_back_accessory",
+      "slot": "back",
+      "z": 0,
+      "path": "sprites/equipment/accessories/wings_festival.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0210",
+      "name": "慶典小翅膀",
+      "batch": "B5"
+    },
+    "equip.accessory.wings_forest": {
+      "type": "image",
+      "layer": "pet_back_accessory",
+      "slot": "back",
+      "z": 0,
+      "path": "sprites/equipment/accessories/wings_forest.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0209",
+      "name": "森林小翅膀",
+      "batch": "B5"
+    },
+    "equip.accessory.wings_friendship": {
+      "type": "image",
+      "layer": "pet_back_accessory",
+      "slot": "back",
+      "z": 0,
+      "path": "sprites/equipment/accessories/wings_friendship.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0205",
+      "name": "友誼小翅膀",
+      "batch": "B5"
+    },
+    "equip.accessory.wings_garden": {
+      "type": "image",
+      "layer": "pet_back_accessory",
+      "slot": "back",
+      "z": 0,
+      "path": "sprites/equipment/accessories/wings_garden.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0206",
+      "name": "花園小翅膀",
+      "batch": "B5"
+    },
+    "equip.accessory.wings_seaside": {
+      "type": "image",
+      "layer": "pet_back_accessory",
+      "slot": "back",
+      "z": 0,
+      "path": "sprites/equipment/accessories/wings_seaside.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0207",
+      "name": "海風小翅膀",
+      "batch": "B5"
+    },
+    "equip.accessory.wings_starlight": {
+      "type": "image",
+      "layer": "pet_back_accessory",
+      "slot": "back",
+      "z": 0,
+      "path": "sprites/equipment/accessories/wings_starlight.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0208",
+      "name": "星夜小翅膀",
+      "batch": "B5"
     },
     "equip.costume.bear": {
       "type": "image",
@@ -2001,6 +2191,158 @@
       "name": "下雨旅行靴",
       "batch": "B4"
     },
+    "equip.feet.trail_boot_winter": {
+      "type": "image",
+      "layer": "pet_outfit",
+      "slot": "feet",
+      "z": 1,
+      "path": "sprites/equipment/feet/trail_boot_winter.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0231",
+      "name": "冬日旅行靴",
+      "batch": "B5"
+    },
+    "equip.feet.warm_socks_picnic": {
+      "type": "image",
+      "layer": "pet_outfit",
+      "slot": "feet",
+      "z": 1,
+      "path": "sprites/equipment/feet/warm_socks_picnic.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0232",
+      "name": "野餐毛絨襪",
+      "batch": "B5"
+    },
+    "equip.feet.warm_socks_rainy": {
+      "type": "image",
+      "layer": "pet_outfit",
+      "slot": "feet",
+      "z": 1,
+      "path": "sprites/equipment/feet/warm_socks_rainy.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0233",
+      "name": "下雨毛絨襪",
+      "batch": "B5"
+    },
+    "equip.feet.warm_socks_winter": {
+      "type": "image",
+      "layer": "pet_outfit",
+      "slot": "feet",
+      "z": 1,
+      "path": "sprites/equipment/feet/warm_socks_winter.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0234",
+      "name": "冬日毛絨襪",
+      "batch": "B5"
+    },
+    "equip.handheld.binoculars_adventure": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "hand",
+      "z": 4,
+      "path": "sprites/equipment/handheld/binoculars_adventure.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0270",
+      "name": "冒險望遠鏡",
+      "batch": "B5"
+    },
+    "equip.handheld.binoculars_garden": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "hand",
+      "z": 4,
+      "path": "sprites/equipment/handheld/binoculars_garden.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0268",
+      "name": "花園望遠鏡",
+      "batch": "B5"
+    },
+    "equip.handheld.binoculars_post": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "hand",
+      "z": 4,
+      "path": "sprites/equipment/handheld/binoculars_post.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0267",
+      "name": "郵局望遠鏡",
+      "batch": "B5"
+    },
+    "equip.handheld.binoculars_starlight": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "hand",
+      "z": 4,
+      "path": "sprites/equipment/handheld/binoculars_starlight.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0269",
+      "name": "星夜望遠鏡",
+      "batch": "B5"
+    },
     "equip.handheld.book_adventure": {
       "type": "image",
       "layer": "pet_front_accessory",
@@ -2381,6 +2723,44 @@
       "name": "星夜信封",
       "batch": "B1"
     },
+    "equip.handheld.snack_box_adventure": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "hand",
+      "z": 4,
+      "path": "sprites/equipment/handheld/snack_box_adventure.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0266",
+      "name": "冒險點心盒",
+      "batch": "B5"
+    },
+    "equip.handheld.snack_box_garden": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "hand",
+      "z": 4,
+      "path": "sprites/equipment/handheld/snack_box_garden.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0264",
+      "name": "花園點心盒",
+      "batch": "B5"
+    },
     "equip.handheld.snack_box_post": {
       "type": "image",
       "layer": "pet_front_accessory",
@@ -2399,6 +2779,25 @@
       "designId": "D0263",
       "name": "郵局點心盒",
       "batch": "B4"
+    },
+    "equip.handheld.snack_box_starlight": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "hand",
+      "z": 4,
+      "path": "sprites/equipment/handheld/snack_box_starlight.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0265",
+      "name": "星夜點心盒",
+      "batch": "B5"
     },
     "equip.handheld.umbrella_adventure": {
       "type": "image",
@@ -2837,6 +3236,25 @@
       "name": "星夜小皇冠",
       "batch": "B2"
     },
+    "equip.hat.explorer_forest": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "head",
+      "z": 5,
+      "path": "sprites/equipment/hats/explorer_forest.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0074",
+      "name": "森林探險帽",
+      "batch": "B5"
+    },
     "equip.hat.explorer_garden": {
       "type": "image",
       "layer": "pet_front_accessory",
@@ -2893,6 +3311,120 @@
       "designId": "D0072",
       "name": "海風探險帽",
       "batch": "B4"
+    },
+    "equip.hat.explorer_starlight": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "head",
+      "z": 5,
+      "path": "sprites/equipment/hats/explorer_starlight.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0073",
+      "name": "星夜探險帽",
+      "batch": "B5"
+    },
+    "equip.hat.flower_forest": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "head",
+      "z": 5,
+      "path": "sprites/equipment/hats/flower_forest.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0079",
+      "name": "森林花環帽",
+      "batch": "B5"
+    },
+    "equip.hat.flower_garden": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "head",
+      "z": 5,
+      "path": "sprites/equipment/hats/flower_garden.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0076",
+      "name": "花園花環帽",
+      "batch": "B5"
+    },
+    "equip.hat.flower_post": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "head",
+      "z": 5,
+      "path": "sprites/equipment/hats/flower_post.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0075",
+      "name": "郵局花環帽",
+      "batch": "B5"
+    },
+    "equip.hat.flower_seaside": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "head",
+      "z": 5,
+      "path": "sprites/equipment/hats/flower_seaside.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0077",
+      "name": "海風花環帽",
+      "batch": "B5"
+    },
+    "equip.hat.flower_starlight": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "head",
+      "z": 5,
+      "path": "sprites/equipment/hats/flower_starlight.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0078",
+      "name": "星夜花環帽",
+      "batch": "B5"
     },
     "equip.hat.knit_forest": {
       "type": "image",
@@ -3083,6 +3615,101 @@
       "designId": "D0063",
       "name": "星夜郵差帽",
       "batch": "B4"
+    },
+    "equip.hat.rain_forest": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "head",
+      "z": 5,
+      "path": "sprites/equipment/hats/rain_forest.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0084",
+      "name": "森林雨帽",
+      "batch": "B5"
+    },
+    "equip.hat.rain_garden": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "head",
+      "z": 5,
+      "path": "sprites/equipment/hats/rain_garden.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0081",
+      "name": "花園雨帽",
+      "batch": "B5"
+    },
+    "equip.hat.rain_post": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "head",
+      "z": 5,
+      "path": "sprites/equipment/hats/rain_post.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0080",
+      "name": "郵局雨帽",
+      "batch": "B5"
+    },
+    "equip.hat.rain_seaside": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "head",
+      "z": 5,
+      "path": "sprites/equipment/hats/rain_seaside.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0082",
+      "name": "海風雨帽",
+      "batch": "B5"
+    },
+    "equip.hat.rain_starlight": {
+      "type": "image",
+      "layer": "pet_front_accessory",
+      "slot": "head",
+      "z": 5,
+      "path": "sprites/equipment/hats/rain_starlight.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "anchor": [
+        24,
+        46
+      ],
+      "rigs": [
+        "star_01"
+      ],
+      "designId": "D0083",
+      "name": "星夜雨帽",
+      "batch": "B5"
     },
     "equip.hat.sleep_forest": {
       "type": "image",
@@ -3464,880 +4091,6 @@
       "name": "星夜巫師帽",
       "batch": "B3"
     },
-    "equip.outfit.cape_forest": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/cape_forest.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0107",
-      "name": "森林斗篷",
-      "batch": "B2"
-    },
-    "equip.outfit.cape_picnic": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/cape_picnic.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0104",
-      "name": "野餐斗篷",
-      "batch": "B2"
-    },
-    "equip.outfit.cape_post": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/cape_post.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0103",
-      "name": "郵局斗篷",
-      "batch": "B2"
-    },
-    "equip.outfit.cape_rainy": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/cape_rainy.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0105",
-      "name": "下雨斗篷",
-      "batch": "B2"
-    },
-    "equip.outfit.cape_starlight": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/cape_starlight.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0106",
-      "name": "星夜斗篷",
-      "batch": "B2"
-    },
-    "equip.outfit.cape_winter": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/cape_winter.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0108",
-      "name": "冬日斗篷",
-      "batch": "B2"
-    },
-    "equip.outfit.hoodie_forest": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/hoodie_forest.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0095",
-      "name": "森林連帽衣",
-      "batch": "B1"
-    },
-    "equip.outfit.hoodie_picnic": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/hoodie_picnic.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0092",
-      "name": "野餐連帽衣",
-      "batch": "B1"
-    },
-    "equip.outfit.hoodie_post": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/hoodie_post.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0091",
-      "name": "郵局連帽衣",
-      "batch": "B1"
-    },
-    "equip.outfit.hoodie_rainy": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/hoodie_rainy.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0093",
-      "name": "下雨連帽衣",
-      "batch": "B1"
-    },
-    "equip.outfit.hoodie_starlight": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/hoodie_starlight.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0094",
-      "name": "星夜連帽衣",
-      "batch": "B1"
-    },
-    "equip.outfit.hoodie_winter": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/hoodie_winter.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0096",
-      "name": "冬日連帽衣",
-      "batch": "B1"
-    },
-    "equip.outfit.pajamas_forest": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/pajamas_forest.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0131",
-      "name": "森林睡衣",
-      "batch": "B4"
-    },
-    "equip.outfit.pajamas_picnic": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/pajamas_picnic.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0128",
-      "name": "野餐睡衣",
-      "batch": "B3"
-    },
-    "equip.outfit.pajamas_post": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/pajamas_post.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0127",
-      "name": "郵局睡衣",
-      "batch": "B3"
-    },
-    "equip.outfit.pajamas_rainy": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/pajamas_rainy.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0129",
-      "name": "下雨睡衣",
-      "batch": "B4"
-    },
-    "equip.outfit.pajamas_starlight": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/pajamas_starlight.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0130",
-      "name": "星夜睡衣",
-      "batch": "B4"
-    },
-    "equip.outfit.pajamas_winter": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/pajamas_winter.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0132",
-      "name": "冬日睡衣",
-      "batch": "B4"
-    },
-    "equip.outfit.raincoat_forest": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/raincoat_forest.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0101",
-      "name": "森林雨衣",
-      "batch": "B2"
-    },
-    "equip.outfit.raincoat_picnic": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/raincoat_picnic.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0098",
-      "name": "野餐雨衣",
-      "batch": "B1"
-    },
-    "equip.outfit.raincoat_post": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/raincoat_post.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0097",
-      "name": "郵局雨衣",
-      "batch": "B1"
-    },
-    "equip.outfit.raincoat_rainy": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/raincoat_rainy.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0099",
-      "name": "下雨雨衣",
-      "batch": "B1"
-    },
-    "equip.outfit.raincoat_starlight": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/raincoat_starlight.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0100",
-      "name": "星夜雨衣",
-      "batch": "B1"
-    },
-    "equip.outfit.raincoat_winter": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/raincoat_winter.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0102",
-      "name": "冬日雨衣",
-      "batch": "B2"
-    },
-    "equip.outfit.sailor_forest": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/sailor_forest.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0137",
-      "name": "森林水手服",
-      "batch": "B4"
-    },
-    "equip.outfit.sailor_picnic": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/sailor_picnic.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0134",
-      "name": "野餐水手服",
-      "batch": "B4"
-    },
-    "equip.outfit.sailor_post": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/sailor_post.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0133",
-      "name": "郵局水手服",
-      "batch": "B4"
-    },
-    "equip.outfit.sailor_rainy": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/sailor_rainy.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0135",
-      "name": "下雨水手服",
-      "batch": "B4"
-    },
-    "equip.outfit.sailor_starlight": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/sailor_starlight.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0136",
-      "name": "星夜水手服",
-      "batch": "B4"
-    },
-    "equip.outfit.sailor_winter": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/sailor_winter.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0138",
-      "name": "冬日水手服",
-      "batch": "B4"
-    },
-    "equip.outfit.suit_forest": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/suit_forest.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0125",
-      "name": "森林小西裝",
-      "batch": "B3"
-    },
-    "equip.outfit.suit_picnic": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/suit_picnic.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0122",
-      "name": "野餐小西裝",
-      "batch": "B3"
-    },
-    "equip.outfit.suit_post": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/suit_post.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0121",
-      "name": "郵局小西裝",
-      "batch": "B3"
-    },
-    "equip.outfit.suit_rainy": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/suit_rainy.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0123",
-      "name": "下雨小西裝",
-      "batch": "B3"
-    },
-    "equip.outfit.suit_starlight": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/suit_starlight.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0124",
-      "name": "星夜小西裝",
-      "batch": "B3"
-    },
-    "equip.outfit.suit_winter": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/suit_winter.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0126",
-      "name": "冬日小西裝",
-      "batch": "B3"
-    },
-    "equip.outfit.sweater_picnic": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/sweater_picnic.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0140",
-      "name": "野餐毛衣",
-      "batch": "B4"
-    },
-    "equip.outfit.sweater_post": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/sweater_post.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0139",
-      "name": "郵局毛衣",
-      "batch": "B4"
-    },
-    "equip.outfit.sweater_rainy": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/sweater_rainy.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0141",
-      "name": "下雨毛衣",
-      "batch": "B4"
-    },
-    "equip.outfit.sweater_starlight": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/sweater_starlight.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0142",
-      "name": "星夜毛衣",
-      "batch": "B4"
-    },
-    "equip.outfit.vest_forest": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/vest_forest.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0089",
-      "name": "森林背心",
-      "batch": "B1"
-    },
-    "equip.outfit.vest_picnic": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/vest_picnic.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0086",
-      "name": "野餐背心",
-      "batch": "B1"
-    },
-    "equip.outfit.vest_post": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/vest_post.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0085",
-      "name": "郵局背心",
-      "batch": "B1"
-    },
-    "equip.outfit.vest_rainy": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/vest_rainy.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0087",
-      "name": "下雨背心",
-      "batch": "B1"
-    },
-    "equip.outfit.vest_starlight": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/vest_starlight.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0088",
-      "name": "星夜背心",
-      "batch": "B1"
-    },
-    "equip.outfit.vest_winter": {
-      "type": "image",
-      "layer": "pet_outfit",
-      "slot": "body",
-      "z": 2,
-      "path": "sprites/equipment/outfits/vest_winter.png",
-      "frameWidth": 48,
-      "frameHeight": 48,
-      "anchor": [
-        24,
-        46
-      ],
-      "rigs": [
-        "star_01"
-      ],
-      "designId": "D0090",
-      "name": "冬日背心",
-      "batch": "B1"
-    },
     "fx.alert_bounce": {
       "type": "spritesheet",
       "layer": "foreground_effects",
@@ -4491,6 +4244,57 @@
       "name": "緩慢愛心",
       "batch": "B1"
     },
+    "fx.leaves_bounce": {
+      "type": "spritesheet",
+      "layer": "foreground_effects",
+      "slot": "effect",
+      "path": "sprites/effects/leaves_bounce.png",
+      "frames": 4,
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "fps": 6,
+      "anchor": [
+        24,
+        46
+      ],
+      "designId": "D0563",
+      "name": "跳躍葉片粒子",
+      "batch": "B5"
+    },
+    "fx.leaves_burst": {
+      "type": "spritesheet",
+      "layer": "foreground_effects",
+      "slot": "effect",
+      "path": "sprites/effects/leaves_burst.png",
+      "frames": 4,
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "fps": 6,
+      "anchor": [
+        24,
+        46
+      ],
+      "designId": "D0564",
+      "name": "散開葉片粒子",
+      "batch": "B5"
+    },
+    "fx.leaves_drift": {
+      "type": "spritesheet",
+      "layer": "foreground_effects",
+      "slot": "effect",
+      "path": "sprites/effects/leaves_drift.png",
+      "frames": 4,
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "fps": 6,
+      "anchor": [
+        24,
+        46
+      ],
+      "designId": "D0562",
+      "name": "緩慢葉片粒子",
+      "batch": "B5"
+    },
     "fx.note_bounce": {
       "type": "spritesheet",
       "layer": "foreground_effects",
@@ -4542,6 +4346,57 @@
       "name": "緩慢音符",
       "batch": "B2"
     },
+    "fx.petals_bounce": {
+      "type": "spritesheet",
+      "layer": "foreground_effects",
+      "slot": "effect",
+      "path": "sprites/effects/petals_bounce.png",
+      "frames": 4,
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "fps": 6,
+      "anchor": [
+        24,
+        46
+      ],
+      "designId": "D0560",
+      "name": "跳躍花瓣粒子",
+      "batch": "B5"
+    },
+    "fx.petals_burst": {
+      "type": "spritesheet",
+      "layer": "foreground_effects",
+      "slot": "effect",
+      "path": "sprites/effects/petals_burst.png",
+      "frames": 4,
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "fps": 6,
+      "anchor": [
+        24,
+        46
+      ],
+      "designId": "D0561",
+      "name": "散開花瓣粒子",
+      "batch": "B5"
+    },
+    "fx.petals_drift": {
+      "type": "spritesheet",
+      "layer": "foreground_effects",
+      "slot": "effect",
+      "path": "sprites/effects/petals_drift.png",
+      "frames": 4,
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "fps": 6,
+      "anchor": [
+        24,
+        46
+      ],
+      "designId": "D0559",
+      "name": "緩慢花瓣粒子",
+      "batch": "B5"
+    },
     "fx.sparkle_bounce": {
       "type": "spritesheet",
       "layer": "foreground_effects",
@@ -4558,6 +4413,23 @@
       "designId": "D0557",
       "name": "跳躍閃光",
       "batch": "B4"
+    },
+    "fx.sparkle_burst": {
+      "type": "spritesheet",
+      "layer": "foreground_effects",
+      "slot": "effect",
+      "path": "sprites/effects/sparkle_burst.png",
+      "frames": 4,
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "fps": 6,
+      "anchor": [
+        24,
+        46
+      ],
+      "designId": "D0558",
+      "name": "散開閃光",
+      "batch": "B5"
     },
     "fx.sparkle_drift": {
       "type": "spritesheet",
@@ -4794,6 +4666,138 @@
       "designId": "D0444",
       "name": "冬日鈴鐺",
       "batch": "B2"
+    },
+    "item.collectible.coin_forest": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "inventory",
+      "path": "sprites/items/coin_forest.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0491",
+      "name": "森林紀念硬幣",
+      "batch": "B5"
+    },
+    "item.collectible.coin_garden": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "inventory",
+      "path": "sprites/items/coin_garden.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0488",
+      "name": "花園紀念硬幣",
+      "batch": "B5"
+    },
+    "item.collectible.coin_post": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "inventory",
+      "path": "sprites/items/coin_post.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0487",
+      "name": "郵局紀念硬幣",
+      "batch": "B5"
+    },
+    "item.collectible.coin_seaside": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "inventory",
+      "path": "sprites/items/coin_seaside.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0489",
+      "name": "海風紀念硬幣",
+      "batch": "B5"
+    },
+    "item.collectible.coin_starlight": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "inventory",
+      "path": "sprites/items/coin_starlight.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0490",
+      "name": "星夜紀念硬幣",
+      "batch": "B5"
+    },
+    "item.collectible.coin_winter": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "inventory",
+      "path": "sprites/items/coin_winter.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0492",
+      "name": "冬日紀念硬幣",
+      "batch": "B5"
+    },
+    "item.collectible.glass_bottle_forest": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "inventory",
+      "path": "sprites/items/glass_bottle_forest.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0497",
+      "name": "森林玻璃瓶",
+      "batch": "B5"
+    },
+    "item.collectible.glass_bottle_garden": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "inventory",
+      "path": "sprites/items/glass_bottle_garden.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0494",
+      "name": "花園玻璃瓶",
+      "batch": "B5"
+    },
+    "item.collectible.glass_bottle_post": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "inventory",
+      "path": "sprites/items/glass_bottle_post.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0493",
+      "name": "郵局玻璃瓶",
+      "batch": "B5"
+    },
+    "item.collectible.glass_bottle_seaside": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "inventory",
+      "path": "sprites/items/glass_bottle_seaside.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0495",
+      "name": "海風玻璃瓶",
+      "batch": "B5"
+    },
+    "item.collectible.glass_bottle_starlight": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "inventory",
+      "path": "sprites/items/glass_bottle_starlight.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0496",
+      "name": "星夜玻璃瓶",
+      "batch": "B5"
+    },
+    "item.collectible.glass_bottle_winter": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "inventory",
+      "path": "sprites/items/glass_bottle_winter.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0498",
+      "name": "冬日玻璃瓶",
+      "batch": "B5"
     },
     "item.collectible.keyring_forest": {
       "type": "image",
@@ -5125,6 +5129,17 @@
       "name": "冬日布娃娃",
       "batch": "B4"
     },
+    "item.collectible.postcard_forest": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "inventory",
+      "path": "sprites/items/postcard_forest.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0485",
+      "name": "森林明信片",
+      "batch": "B5"
+    },
     "item.collectible.postcard_garden": {
       "type": "image",
       "layer": "ui_icon",
@@ -5157,6 +5172,28 @@
       "designId": "D0483",
       "name": "海風明信片",
       "batch": "B4"
+    },
+    "item.collectible.postcard_starlight": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "inventory",
+      "path": "sprites/items/postcard_starlight.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0484",
+      "name": "星夜明信片",
+      "batch": "B5"
+    },
+    "item.collectible.postcard_winter": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "inventory",
+      "path": "sprites/items/postcard_winter.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0486",
+      "name": "冬日明信片",
+      "batch": "B5"
     },
     "item.collectible.pottery_forest": {
       "type": "image",
@@ -5356,6 +5393,50 @@
       "name": "冬日石頭",
       "batch": "B1"
     },
+    "item.stationery.gift_wrap_festival": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "mail",
+      "path": "sprites/mail/gift_wrap_festival.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0534",
+      "name": "慶典禮物包裝",
+      "batch": "B5"
+    },
+    "item.stationery.gift_wrap_garden": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "mail",
+      "path": "sprites/mail/gift_wrap_garden.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0532",
+      "name": "花園禮物包裝",
+      "batch": "B5"
+    },
+    "item.stationery.gift_wrap_post": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "mail",
+      "path": "sprites/mail/gift_wrap_post.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0531",
+      "name": "郵局禮物包裝",
+      "batch": "B5"
+    },
+    "item.stationery.gift_wrap_starlight": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "mail",
+      "path": "sprites/mail/gift_wrap_starlight.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0533",
+      "name": "星夜禮物包裝",
+      "batch": "B5"
+    },
     "item.stationery.invitation_festival": {
       "type": "image",
       "layer": "ui_icon",
@@ -5532,6 +5613,28 @@
       "name": "星夜信箋頁角",
       "batch": "B3"
     },
+    "item.stationery.postmark_festival": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "mail",
+      "path": "sprites/mail/postmark_festival.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0530",
+      "name": "慶典郵戳",
+      "batch": "B5"
+    },
+    "item.stationery.postmark_garden": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "mail",
+      "path": "sprites/mail/postmark_garden.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0528",
+      "name": "花園郵戳",
+      "batch": "B5"
+    },
     "item.stationery.postmark_post": {
       "type": "image",
       "layer": "ui_icon",
@@ -5542,6 +5645,17 @@
       "designId": "D0527",
       "name": "郵局郵戳",
       "batch": "B4"
+    },
+    "item.stationery.postmark_starlight": {
+      "type": "image",
+      "layer": "ui_icon",
+      "slot": "mail",
+      "path": "sprites/mail/postmark_starlight.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "designId": "D0529",
+      "name": "星夜郵戳",
+      "batch": "B5"
     },
     "item.stationery.stamp_festival": {
       "type": "image",
@@ -5942,6 +6056,61 @@
       "name": "星夜掛鐘",
       "batch": "B1"
     },
+    "world.decor.desk_obj_festival": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/decor/desk_obj_festival.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "designId": "D0421",
+      "name": "慶典書桌擺件",
+      "batch": "B5"
+    },
+    "world.decor.desk_obj_forest": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/decor/desk_obj_forest.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "designId": "D0420",
+      "name": "森林書桌擺件",
+      "batch": "B5"
+    },
+    "world.decor.desk_obj_garden": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/decor/desk_obj_garden.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "designId": "D0417",
+      "name": "花園書桌擺件",
+      "batch": "B5"
+    },
+    "world.decor.desk_obj_seaside": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/decor/desk_obj_seaside.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "designId": "D0418",
+      "name": "海風書桌擺件",
+      "batch": "B5"
+    },
+    "world.decor.desk_obj_starlight": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/decor/desk_obj_starlight.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "designId": "D0419",
+      "name": "星夜書桌擺件",
+      "batch": "B5"
+    },
     "world.decor.doorplate_festival": {
       "type": "image",
       "layer": "furniture_back",
@@ -6107,6 +6276,28 @@
       "name": "星夜地板拼貼",
       "batch": "B2"
     },
+    "world.decor.mat_festival": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/decor/mat_festival.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "designId": "D0416",
+      "name": "慶典地墊",
+      "batch": "B5"
+    },
+    "world.decor.mat_forest": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/decor/mat_forest.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "designId": "D0415",
+      "name": "森林地墊",
+      "batch": "B5"
+    },
     "world.decor.mat_garden": {
       "type": "image",
       "layer": "furniture_back",
@@ -6249,6 +6440,61 @@
       "designId": "D0409",
       "name": "星夜角落植物",
       "batch": "B4"
+    },
+    "world.decor.wall_hanger_festival": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/decor/wall_hanger_festival.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "designId": "D0426",
+      "name": "慶典牆面掛飾",
+      "batch": "B5"
+    },
+    "world.decor.wall_hanger_forest": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/decor/wall_hanger_forest.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "designId": "D0425",
+      "name": "森林牆面掛飾",
+      "batch": "B5"
+    },
+    "world.decor.wall_hanger_garden": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/decor/wall_hanger_garden.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "designId": "D0422",
+      "name": "花園牆面掛飾",
+      "batch": "B5"
+    },
+    "world.decor.wall_hanger_seaside": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/decor/wall_hanger_seaside.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "designId": "D0423",
+      "name": "海風牆面掛飾",
+      "batch": "B5"
+    },
+    "world.decor.wall_hanger_starlight": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/decor/wall_hanger_starlight.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "designId": "D0424",
+      "name": "星夜牆面掛飾",
+      "batch": "B5"
     },
     "world.decor.wallpaper_festival": {
       "type": "image",
@@ -6557,6 +6803,72 @@
       "designId": "D0300",
       "name": "冬日靠背椅",
       "batch": "B2"
+    },
+    "world.furniture.coffee_table_forest": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/coffee_table_forest.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0359",
+      "name": "森林茶几",
+      "batch": "B5"
+    },
+    "world.furniture.coffee_table_garden": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/coffee_table_garden.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0356",
+      "name": "花園茶几",
+      "batch": "B5"
+    },
+    "world.furniture.coffee_table_post": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/coffee_table_post.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0355",
+      "name": "郵局茶几",
+      "batch": "B5"
+    },
+    "world.furniture.coffee_table_seaside": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/coffee_table_seaside.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0357",
+      "name": "海風茶几",
+      "batch": "B5"
+    },
+    "world.furniture.coffee_table_starlight": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/coffee_table_starlight.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0358",
+      "name": "星夜茶几",
+      "batch": "B5"
+    },
+    "world.furniture.coffee_table_winter": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/coffee_table_winter.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0360",
+      "name": "冬日茶几",
+      "batch": "B5"
     },
     "world.furniture.curtain_forest": {
       "type": "image",
@@ -6877,6 +7189,17 @@
       "name": "星夜留聲機",
       "batch": "B4"
     },
+    "world.furniture.phonograph_winter": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/phonograph_winter.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0348",
+      "name": "冬日留聲機",
+      "batch": "B5"
+    },
     "world.furniture.plant_shelf_forest": {
       "type": "image",
       "layer": "furniture_back",
@@ -7075,6 +7398,138 @@
       "name": "冬日雙人沙發",
       "batch": "B1"
     },
+    "world.furniture.speaker_forest": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/speaker_forest.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0353",
+      "name": "森林音響",
+      "batch": "B5"
+    },
+    "world.furniture.speaker_garden": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/speaker_garden.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0350",
+      "name": "花園音響",
+      "batch": "B5"
+    },
+    "world.furniture.speaker_post": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/speaker_post.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0349",
+      "name": "郵局音響",
+      "batch": "B5"
+    },
+    "world.furniture.speaker_seaside": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/speaker_seaside.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0351",
+      "name": "海風音響",
+      "batch": "B5"
+    },
+    "world.furniture.speaker_starlight": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/speaker_starlight.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0352",
+      "name": "星夜音響",
+      "batch": "B5"
+    },
+    "world.furniture.speaker_winter": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/speaker_winter.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0354",
+      "name": "冬日音響",
+      "batch": "B5"
+    },
+    "world.furniture.storage_forest": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/storage_forest.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0365",
+      "name": "森林收納櫃",
+      "batch": "B5"
+    },
+    "world.furniture.storage_garden": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/storage_garden.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0362",
+      "name": "花園收納櫃",
+      "batch": "B5"
+    },
+    "world.furniture.storage_post": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/storage_post.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0361",
+      "name": "郵局收納櫃",
+      "batch": "B5"
+    },
+    "world.furniture.storage_seaside": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/storage_seaside.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0363",
+      "name": "海風收納櫃",
+      "batch": "B5"
+    },
+    "world.furniture.storage_starlight": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/storage_starlight.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0364",
+      "name": "星夜收納櫃",
+      "batch": "B5"
+    },
+    "world.furniture.storage_winter": {
+      "type": "image",
+      "layer": "furniture_back",
+      "slot": "room",
+      "path": "sprites/furniture/storage_winter.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "designId": "D0366",
+      "name": "冬日收納櫃",
+      "batch": "B5"
+    },
     "world.furniture.table_forest": {
       "type": "image",
       "layer": "furniture_back",
@@ -7240,6 +7695,39 @@
       "name": "薄雲午後・戶外庭院",
       "batch": "B2"
     },
+    "world.weather.cold_balcony": {
+      "type": "image",
+      "layer": "window_weather",
+      "slot": "window_weather",
+      "path": "backgrounds/cold_balcony.png",
+      "frameWidth": 240,
+      "frameHeight": 240,
+      "designId": "D0593",
+      "name": "寒流・陽台",
+      "batch": "B5"
+    },
+    "world.weather.cold_window": {
+      "type": "image",
+      "layer": "window_weather",
+      "slot": "window_weather",
+      "path": "backgrounds/cold_window.png",
+      "frameWidth": 240,
+      "frameHeight": 240,
+      "designId": "D0592",
+      "name": "寒流・窗戶",
+      "batch": "B5"
+    },
+    "world.weather.cold_yard": {
+      "type": "image",
+      "layer": "window_weather",
+      "slot": "window_weather",
+      "path": "backgrounds/cold_yard.png",
+      "frameWidth": 240,
+      "frameHeight": 240,
+      "designId": "D0594",
+      "name": "寒流・戶外庭院",
+      "batch": "B5"
+    },
     "world.weather.drizzle_balcony": {
       "type": "image",
       "layer": "window_weather",
@@ -7306,6 +7794,39 @@
       "name": "濃霧・戶外庭院",
       "batch": "B4"
     },
+    "world.weather.petals_balcony": {
+      "type": "image",
+      "layer": "window_weather",
+      "slot": "window_weather",
+      "path": "backgrounds/petals_balcony.png",
+      "frameWidth": 240,
+      "frameHeight": 240,
+      "designId": "D0599",
+      "name": "春日花雨・陽台",
+      "batch": "B5"
+    },
+    "world.weather.petals_window": {
+      "type": "image",
+      "layer": "window_weather",
+      "slot": "window_weather",
+      "path": "backgrounds/petals_window.png",
+      "frameWidth": 240,
+      "frameHeight": 240,
+      "designId": "D0598",
+      "name": "春日花雨・窗戶",
+      "batch": "B5"
+    },
+    "world.weather.petals_yard": {
+      "type": "image",
+      "layer": "window_weather",
+      "slot": "window_weather",
+      "path": "backgrounds/petals_yard.png",
+      "frameWidth": 240,
+      "frameHeight": 240,
+      "designId": "D0600",
+      "name": "春日花雨・戶外庭院",
+      "batch": "B5"
+    },
     "world.weather.shower_balcony": {
       "type": "image",
       "layer": "window_weather",
@@ -7338,6 +7859,39 @@
       "designId": "D0582",
       "name": "驟雨・戶外庭院",
       "batch": "B3"
+    },
+    "world.weather.snow_balcony": {
+      "type": "image",
+      "layer": "window_weather",
+      "slot": "window_weather",
+      "path": "backgrounds/snow_balcony.png",
+      "frameWidth": 240,
+      "frameHeight": 240,
+      "designId": "D0596",
+      "name": "飄雪・陽台",
+      "batch": "B5"
+    },
+    "world.weather.snow_window": {
+      "type": "image",
+      "layer": "window_weather",
+      "slot": "window_weather",
+      "path": "backgrounds/snow_window.png",
+      "frameWidth": 240,
+      "frameHeight": 240,
+      "designId": "D0595",
+      "name": "飄雪・窗戶",
+      "batch": "B5"
+    },
+    "world.weather.snow_yard": {
+      "type": "image",
+      "layer": "window_weather",
+      "slot": "window_weather",
+      "path": "backgrounds/snow_yard.png",
+      "frameWidth": 240,
+      "frameHeight": 240,
+      "designId": "D0597",
+      "name": "飄雪・戶外庭院",
+      "batch": "B5"
     },
     "world.weather.starry_balcony": {
       "type": "image",

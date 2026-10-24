@@ -49,7 +49,7 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ink);outline-o
   </section>
 </main>
 <script>
-const TABS=[["head","帽子"],["body","服飾"],["costume","布偶裝"],["front","配件"],["feet","鞋履"],["hand","手持物"],
+const TABS=[["head","帽子"],["costume","布偶裝"],["front","配件"],["back","背飾"],["feet","鞋履"],["hand","手持物"],
  ["furn","家具"],["decor","布置"],["item","收藏品"],["mail","信件"],["fx","特效"]];
 const FACES=["normal","happy","sleepy","blink"];
 let M,A,imgs={},batch="all",tab="head",worn={},scene={},face="normal",playing=true,weatherKey="",t0=0;
@@ -57,7 +57,7 @@ const $=id=>document.getElementById(id),ctx=$("c").getContext("2d");ctx.imageSmo
 const img=k=>{if(!imgs[k]){const i=new Image();i.src="../"+A[k].path;i.onload=()=>draw();imgs[k]=i}return imgs[k]};
 function slotOf(k){const a=A[k];if(a.slot)return a.slot;return null}
 function keysFor(t){return Object.keys(A).filter(k=>{const a=A[k];if(batch!=="all"&&a.batch!==batch)return false;
-  if(["head","body","costume","front","feet","hand"].includes(t))return a.slot===t&&!k.endsWith(".tail");
+  if(["head","body","costume","front","back","feet","hand"].includes(t))return a.slot===t&&!k.endsWith(".tail");
   if(t==="furn")return k.startsWith("world.furniture");if(t==="decor")return k.startsWith("world.decor");
   if(t==="item")return k.startsWith("item.collectible");if(t==="mail")return k.startsWith("item.stationery");
   if(t==="fx")return k.startsWith("fx.");return false}).sort()}
@@ -69,7 +69,7 @@ function renderBatches(){const el=$("batches");el.innerHTML="";
 function renderTabs(){const el=$("tabs");el.innerHTML="";TABS.forEach(([id,label])=>{const b=document.createElement("button");
   b.textContent=`${label} ${keysFor(id).length}`;b.setAttribute("role","tab");b.setAttribute("aria-pressed",id===tab);
   b.onclick=()=>{tab=id;renderTabs();renderGrid()};el.appendChild(b)})}
-function renderGrid(){const g=$("grid");g.innerHTML="";const wearable=["head","body","costume","front","feet","hand"].includes(tab);
+function renderGrid(){const g=$("grid");g.innerHTML="";const wearable=["head","body","costume","front","back","feet","hand"].includes(tab);
   keysFor(tab).forEach(k=>{const a=A[k],d=document.createElement("div");d.className="item";d.tabIndex=0;d.setAttribute("role","button");
     d.setAttribute("aria-pressed",wearable?worn[a.slot]===k:scene[tab]===k);
     const im=document.createElement("img");im.loading="lazy";im.alt=a.name||k;im.src="../"+a.path;
@@ -92,10 +92,10 @@ function draw(now=performance.now()){ctx.clearRect(0,0,240,240);
   if(scene.decor){const k=scene.decor;if(k.includes("floor_tile")){for(let x=0;x<240;x+=48)sc(k,x,192)}else sc(k,96,20)}
   if(scene.furn)sc(scene.furn,124,116);
   const place=(k,dx=0,dy=0)=>{const i=img(k);if(i.complete)ctx.drawImage(i,ox+dx,oy+dy)};
-  Object.values(worn).forEach(k=>{if(A[k].backKey)place(A[k].backKey,ax,ay)});
+  Object.values(worn).forEach(k=>{if(A[k].backKey)place(A[k].backKey,ax,ay);if(A[k].layer==="pet_back_accessory")place(k,ax,ay)});
   const body=img("pet.star_01.body.cream.idle");if(body.complete)ctx.drawImage(body,f.body.index*48,0,48,48,ox,oy,48,48);
   place("pet.star_01.face."+face);
-  Object.values(worn).sort((a,b)=>A[a].z-A[b].z).forEach(k=>place(k,ax,ay));
+  Object.values(worn).filter(k=>A[k].layer!=="pet_back_accessory").sort((a,b)=>A[a].z-A[b].z).forEach(k=>place(k,ax,ay));
   if(scene.item)sc(scene.item,ox+56,oy+40,2);
   if(scene.mail){const w=A[scene.mail].frameWidth;sc(scene.mail,ox+56,oy-20,w===24?2:1)}
   if(scene.fx){const a=A[scene.fx],i=img(scene.fx),n=a.frames||1,fi=playing?Math.floor(now/1000*(a.fps||6))%n:0;

@@ -30,7 +30,7 @@ def sheet(keys, path, cell, cols, sc):
     out.convert("RGB").save(path)
 
 
-wear = sorted(k for k, a in mine.items() if a.get("slot") in ("head", "body", "front", "feet", "hand", "costume"))
+wear = sorted(k for k, a in mine.items() if a.get("slot") in ("head", "body", "front", "feet", "hand", "costume", "back"))
 wear_sheet(m, wear, os.path.join(P, f"{batch.lower()}_wear.png"), cols=8)
 sheet(sorted(k for k in mine if k.startswith("world.furniture")), os.path.join(P, f"{batch.lower()}_furn.png"), 190, 5, lambda a: 2)
 sheet(sorted(k for k in mine if k.startswith(("world.decor", "item.", "fx."))), os.path.join(P, f"{batch.lower()}_small.png"), 100, 10,

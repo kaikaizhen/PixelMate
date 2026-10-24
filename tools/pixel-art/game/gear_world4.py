@@ -387,6 +387,15 @@ def weather_fog(place):
         _balcony(s, "#8a8884", "#6e6c68", "#aaa8a4", "#c8c6c2")
     elif place == "yard":
         _yard(s, "#a8b8a4", "#e6e9ee", "#c8d0d8")
+    if place == "window":                                     # tree silhouettes fading into the fog
+        for x in (30, 90, 170, 215):
+            s.rect(x, 130, x + 3, 175, "#8a948e"); s.ellipse(x - 16, 98, x + 20, 140, "#9aa49e")
+    elif place == "balcony":                                  # hanging lantern with a soft glow
+        s.line(120, 100, 120, 130, "#6a6c74"); s.rect(112, 130, 128, 150, "#6a6c74"); s.rect(115, 133, 125, 147, "#ffe89a")
+        s.circle(120, 140, 18, "#f6ecc8", fill=False)
+    else:                                                     # yard lamp post
+        s.rect(60, 120, 64, 190, "#6a6c74"); s.rect(52, 108, 72, 122, "#6a6c74"); s.rect(55, 111, 69, 119, "#ffe89a")
+        s.circle(62, 115, 16, "#f6ecc8", fill=False)
     for y in range(90, 240):                                  # fog thickens toward the ground (ordered dither)
         p = min(1.0, (y - 90) / 120)
         for xx in range(240):

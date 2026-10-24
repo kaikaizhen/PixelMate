@@ -21,12 +21,14 @@ def pet(m):
 def wear(m, keys):
     """Layer several wearables in z order on the pet."""
     im = Image.new("RGBA", (48, 48), (0, 0, 0, 0))
-    for k in keys:                                                        # back parts (tails) go behind the body
+    for k in keys:
+        if m[k].get("layer") == "pet_back_accessory":                    # back-layer gear (wings) sits behind the body
+            im.alpha_composite(Image.open(os.path.join(ASSETS, m[k]["path"])).convert("RGBA"))                                                        # back parts (tails) go behind the body
         bk = m[k].get("backKey")
         if bk:
             im.alpha_composite(Image.open(os.path.join(ASSETS, m[bk]["path"])).convert("RGBA"))
     im.alpha_composite(pet(m))
-    for k in sorted(keys, key=lambda k: m[k]["z"]):
+    for k in sorted((k for k in keys if m[k].get("layer") != "pet_back_accessory"), key=lambda k: m[k]["z"]):
         im.alpha_composite(Image.open(os.path.join(ASSETS, m[k]["path"])).convert("RGBA"))
     return im
 
@@ -49,7 +51,7 @@ if __name__ == "__main__":
     m = json.load(open(os.path.join(ASSETS, "manifest.json"), encoding="utf-8"))["assets"]
     groups = {}
     for k, a in m.items():
-        if a.get("slot") in ("head", "body", "front", "feet", "hand", "costume"):
+        if a.get("slot") in ("head", "body", "front", "feet", "hand", "costume", "back"):
             groups.setdefault(a["slot"], []).append(k)
     for slot, keys in groups.items():
         p = os.path.join(ASSETS, "preview", f"b1_wear_{slot}.png")
