@@ -3,7 +3,7 @@ import { nextTick, onUnmounted, ref, watch } from 'vue'
 
 // A floating card on top of the room. No dim mask, no blocking: the room stays visible and tappable behind it.
 // Phones: above the tool bar. Wide screens: beside the tool column. Esc or ✕ closes; focus moves in and back out.
-const props = defineProps<{ open: boolean; title: string; subtitle?: string }>()
+const props = defineProps<{ open: boolean; title: string; subtitle?: string; tall?: boolean }>()
 const emit = defineEmits<{ close: [] }>()
 
 const card = ref<HTMLElement | null>(null)
@@ -31,7 +31,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 </script>
 
 <template>
-  <section v-if="open" ref="card" class="panel" role="dialog" aria-modal="false" :aria-label="title" tabindex="-1">
+  <section v-if="open" ref="card" class="panel" :class="{ tall }" role="dialog" aria-modal="false" :aria-label="title" tabindex="-1">
     <header>
       <div class="ttl"><h2>{{ title }}</h2><p v-if="subtitle">{{ subtitle }}</p></div>
       <button type="button" class="x" aria-label="關閉" @click="emit('close')">✕</button>
@@ -59,6 +59,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   box-shadow: 5px 5px 0 var(--c-ink);
   animation: rise 0.18s steps(4);
 }
+.panel.tall { max-height: 62dvh; }
 .panel:focus-visible { outline: 3px solid var(--c-ink); outline-offset: 3px; }
 header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
 h2 { font-size: 1.15rem; line-height: 1.2; }

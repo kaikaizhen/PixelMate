@@ -51,3 +51,6 @@ into `public/game/` (git-ignored). Edit the starter room in `src/constants/defau
   a costume hides the hat and draws its tail behind the body. Room items are listed only; placing them comes later.
 - Life: the API decides what the pet is doing (`pet.activity`, 15-minute slots) and what it finds; the PWA only shows it (label, walking pace, notes
   while humming) and re-reads the pet when its slot ends, on focus and every minute. New finds (`GET /pets/me/events`) pop up once per device.
+- Mail & friends: the 信箱 card has inbox / sent / friends tabs. Pairing is by one-time code (shown once, previewed, then confirmed); letters are
+  plain text (never rendered as HTML) sent with an `Idempotency-Key`, reach the friend after the postman's 5–15 minute walk, and a gift goes
+  into the recipient's bag when they open the letter. The unread badge is polled with the rest of the pet (focus, every minute).

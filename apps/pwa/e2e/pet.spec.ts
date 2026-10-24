@@ -83,7 +83,7 @@ test.describe('領養小夥伴', () => {
     await expect(page.getByRole('dialog')).toHaveCount(0)
 
     await expect(page.getByRole('button', { name: '背包' })).toBeEnabled()
-    await expect(page.getByRole('button', { name: '信箱，即將推出' })).toBeDisabled()
+    await expect(page.getByRole('button', { name: '信箱' })).toBeEnabled()
   })
 
   test('面板沒有遮罩：開著面板時房間仍看得到、小夥伴仍可以點；同一個按鈕再按會收起', async ({ page }) => {

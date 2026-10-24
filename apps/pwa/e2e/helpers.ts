@@ -23,12 +23,12 @@ export const json = (route: Route, status: number, body?: unknown) =>
 
 /** Mock the API. `session` flips to the user after a successful login so /me behaves like the real cookie session. */
 export async function mockApi(page: Page, handlers: Record<string, Handler> = {}, opts: { pet?: typeof PET | null; bag?: typeof BAG } = {}) {
-  const state = { signedIn: false, bag: structuredClone(opts.bag ?? []), pet: opts.pet === undefined ? (PET as typeof PET | null) : opts.pet, calls: [] as { path: string; body: any; csrf: string | undefined }[] }
+  const state = { signedIn: false, bag: structuredClone(opts.bag ?? []), pet: opts.pet === undefined ? (PET as typeof PET | null) : opts.pet, friends: [] as any[], inbox: [] as any[], sent: [] as any[], invites: 0, calls: [] as { path: string; body: any; csrf: string | undefined; key?: string }[] }
   await page.route('**/api/v1/**', async (route) => {
     const req = route.request()
     const path = new URL(req.url()).pathname.replace('/api/v1', '')
     const body = req.postData() ? JSON.parse(req.postData()!) : undefined
-    state.calls.push({ path, body, csrf: req.headers()['x-requested-with'] })
+    state.calls.push({ path, body, csrf: req.headers()['x-requested-with'], key: req.headers()['idempotency-key'] })
     const h = handlers[path]
     if (h) return h(route, body)
     if (path === '/auth/me') return state.signedIn ? json(route, 200, USER) : json(route, 401, { code: 'AUTH_REQUIRED', message: '請先登入。', requestId: 'r' })
@@ -37,6 +37,34 @@ export async function mockApi(page: Page, handlers: Record<string, Handler> = {}
       return json(route, 200, USER)
     }
     if (path === '/pets/me') return state.pet ? json(route, 200, state.pet) : json(route, 404, { code: 'NOT_FOUND', message: '你還沒有小夥伴。', requestId: 'r' })
+    // ---- friends and letters: a small stateful copy of the server rules ----
+    if (path === '/pairing/relationships') return json(route, 200, { relationships: state.friends })
+    if (path === '/pairing/invites' && req.method() === 'POST') return json(route, 201, { inviteId: 'inv' + ++state.invites, code: 'ABCD-2345', kind: body.kind, expiresAt: new Date(Date.now() + 86_400_000).toISOString() })
+    if (path === '/pairing/preview') return body.code.toUpperCase() === 'ABCD-2345' ? json(route, 200, { inviterName: '阿福', inviterPetName: '麻糬', kind: 'friend', expiresAt: '2026-10-26T00:00:00Z' }) : json(route, 404, { code: 'NOT_FOUND', message: '找不到這組邀請碼，或已經過期了。', requestId: 'r' })
+    if (path === '/pairing/accept') {
+      const rel = { relationshipId: 'r1', kind: 'friend', since: new Date().toISOString(), other: { userId: 'u-fu', displayName: '阿福', petName: '麻糬', bodyVariant: 'star_01_mint' } }
+      state.friends = [rel]
+      return json(route, 200, rel)
+    }
+    if (path.startsWith('/pairing/relationships/') && req.method() === 'DELETE') { state.friends = []; return json(route, 204) }
+    if (path === '/mail/unread') return json(route, 200, { unread: state.inbox.filter((l) => !l.readAt).length })
+    if (path === '/mail' && req.method() === 'GET') {
+      const sent = new URL(req.url()).searchParams.get('box') === 'sent'
+      return json(route, 200, { letters: sent ? state.sent : state.inbox, unread: state.inbox.filter((l) => !l.readAt).length, nextCursor: null })
+    }
+    if (path === '/mail' && req.method() === 'POST') {
+      if (!state.friends.length) return json(route, 403, { code: 'NOT_CONNECTED', message: '你們還不是好友，不能寄信。', requestId: 'r' })
+      state.sent = [{ letterId: 's' + (state.sent.length + 1), otherUserId: body.recipientUserId, otherDisplayName: state.friends[0].other.displayName, preview: body.body.slice(0, 30), sentAt: new Date().toISOString(), deliverAt: new Date(Date.now() + 600_000).toISOString(), delivered: false, readAt: null, hasGift: !!body.giftItemId, paperItemId: body.paperItemId ?? null }, ...state.sent]
+      return json(route, 201, { letterId: 's1' })
+    }
+    const mailId = path.match(/^\/mail\/([^/]+)(\/read)?$/)
+    if (mailId) {
+      const l = state.inbox.find((x) => x.letterId === mailId[1])
+      if (!l) return json(route, 404, { code: 'NOT_FOUND', message: '找不到這封信。', requestId: 'r' })
+      if (mailId[2]) { l.readAt ??= new Date().toISOString(); return json(route, 200, { readAt: l.readAt, gift: l.gift ?? null, giftGranted: !!l.gift }) }
+      if (req.method() === 'DELETE') { state.inbox = state.inbox.filter((x) => x !== l); return json(route, 204) }
+      return json(route, 200, { letterId: l.letterId, senderUserId: l.otherUserId, senderDisplayName: l.otherDisplayName, recipientUserId: 'me', body: l.body, sentAt: l.sentAt, deliverAt: l.deliverAt, readAt: l.readAt, paperItemId: null, gift: l.gift ?? null, mine: false })
+    }
     if (path === '/pets/me/events') return json(route, 200, { events: [] })
     if (path === '/inventory') return json(route, 200, { items: state.bag })
     if (path === '/pets/me/equipment' && state.pet) {                       // a small copy of the server rules
