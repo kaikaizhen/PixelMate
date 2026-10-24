@@ -29,3 +29,8 @@ assets/preview/b2_*
 assets/preview/esp32_*
 assets/preview/stats.md
 assets/preview/similarity_report.txt
+
+# .NET
+bin/
+obj/
+*.user
