@@ -19,10 +19,12 @@ async function setup() {
   return mount(RegisterView, { global: { plugins: [router] } })
 }
 
-const fill = async (w: Awaited<ReturnType<typeof setup>>, name: string, email: string, password: string) => {
+const fill = async (w: Awaited<ReturnType<typeof setup>>, name: string, email: string, password: string, confirm = password) => {
   await w.find('input[autocomplete=nickname]').setValue(name)
   await w.find('input[type=email]').setValue(email)
-  await w.find('input[autocomplete=new-password]').setValue(password)
+  const pw = w.findAll('input[autocomplete=new-password]')
+  await pw[0].setValue(password)
+  await pw[1].setValue(confirm)
 }
 
 beforeEach(() => vi.resetAllMocks())
@@ -30,9 +32,9 @@ beforeEach(() => vi.resetAllMocks())
 describe('RegisterView', () => {
   it('shows the live password checklist', async () => {
     const w = await setup()
-    await w.find('input[autocomplete=new-password]').setValue('abc')
+    await w.findAll('input[autocomplete=new-password]')[0].setValue('abc')
     expect(w.findAll('.rules li.ok')).toHaveLength(1)
-    await w.find('input[autocomplete=new-password]').setValue('abcdefghij1')
+    await w.findAll('input[autocomplete=new-password]')[0].setValue('abcdefghij1')
     expect(w.findAll('.rules li.ok')).toHaveLength(3)
   })
 
@@ -43,6 +45,22 @@ describe('RegisterView', () => {
     expect(w.text()).toContain('請輸入暱稱')
     expect(w.text()).toContain('Email 格式不正確')
     expect(w.text()).toContain('至少 10 個字元')
+    expect(authApi.register).not.toHaveBeenCalled()
+  })
+
+  it('refuses to submit when the two passwords differ', async () => {
+    const w = await setup()
+    await fill(w, '小栗', 'a@example.com', 'Passw0rd-123', 'Passw0rd-124')
+    await w.find('form').trigger('submit')
+    expect(w.text()).toContain('兩次輸入的密碼不一樣')
+    expect(authApi.register).not.toHaveBeenCalled()
+  })
+
+  it('asks for the confirmation when it is empty', async () => {
+    const w = await setup()
+    await fill(w, '小栗', 'a@example.com', 'Passw0rd-123', '')
+    await w.find('form').trigger('submit')
+    expect(w.text()).toContain('請再輸入一次密碼')
     expect(authApi.register).not.toHaveBeenCalled()
   })
 

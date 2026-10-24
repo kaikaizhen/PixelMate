@@ -17,6 +17,7 @@ const online = useOnline()
 const displayName = ref('')
 const email = ref('')
 const password = ref('')
+const confirm = ref('')
 const local = ref<Record<string, string>>({})
 const done = ref<{ confirm: boolean } | null>(null)
 
@@ -32,6 +33,7 @@ function onSubmit() {
     displayName: validateDisplayName(displayName.value),
     email: validateEmail(email.value),
     password: validatePassword(password.value),
+    confirm: confirm.value === '' ? '請再輸入一次密碼。' : confirm.value !== password.value ? '兩次輸入的密碼不一樣。' : '',
   }
   if (Object.values(local.value).every((v) => !v)) void submit()
 }
@@ -54,6 +56,7 @@ function onSubmit() {
       <PasswordField v-model="password" label="密碼" autocomplete="new-password" :error="errors.password">
         <PasswordChecklist :password="password" />
       </PasswordField>
+      <PasswordField v-model="confirm" label="再輸入一次密碼" autocomplete="new-password" :error="errors.confirm" />
       <PixelButton type="submit" :loading="loading" :disabled="!online">{{ online ? '註冊' : '目前沒有網路' }}</PixelButton>
     </form>
 
