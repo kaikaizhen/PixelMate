@@ -4,7 +4,7 @@ import sys
 
 from common import CANVAS, save_json
 
-STAGES = ["stage1_pet"]
+STAGES = ["stage1_pet", "stage2_gear", "stage3_world", "stage4_costume"]
 
 
 def main():
