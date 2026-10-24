@@ -53,7 +53,7 @@ public class PetTests
         Assert.Equal(new[] { "creativity", "empathy", "exploration", "wisdom" }, snap.Skills.Keys.Order().ToArray());
         Assert.All(snap.Skills.Values, v => Assert.Equal(0, v));
         Assert.Equal(0, snap.RemainingSkillPoints);
-        Assert.Equal("home", snap.World.Scene);
+        Assert.Contains(snap.World.Scene, PixelMate.Api.Life.Scenes.All);                       // where the pet is depends on the slot
 
         var mine = (await c.GetFromJsonAsync<PetSnapshot>("/api/v1/pets/me", Web))!;
         Assert.Equal(snap.PetId, mine.PetId);
