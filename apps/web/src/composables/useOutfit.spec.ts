@@ -34,3 +34,14 @@ describe('useOutfit', () => {
     expect(outfit.wornItems.value).toHaveLength(0)
   })
 })
+
+describe('useOutfit 藍白拖', () => {
+  it('藍白拖屬於腳部欄位，可與帽子、圍巾同時穿', () => {
+    const outfit = useOutfit(DRESS_ITEMS)
+    const slippers = DRESS_ITEMS.find((i) => i.id === 'slippers')!
+    outfit.toggle(straw)
+    outfit.toggle(scarf)
+    outfit.toggle(slippers)
+    expect(outfit.wornItems.value).toHaveLength(3)
+  })
+})

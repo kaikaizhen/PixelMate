@@ -3,7 +3,7 @@ import type { DressItem, DressSlot } from '@/types/dress.types'
 
 // 同一欄位只能穿一件；再點一次同一件即脫下。官網示範用，不儲存。
 export function useOutfit(items: readonly DressItem[]) {
-  const worn = ref<Record<DressSlot, DressItem['id'] | null>>({ hat: null, neck: null })
+  const worn = ref<Record<DressSlot, DressItem['id'] | null>>({ hat: null, neck: null, feet: null })
   const changeCount = ref(0)
 
   function toggle(item: DressItem) {
@@ -12,7 +12,7 @@ export function useOutfit(items: readonly DressItem[]) {
   }
 
   function clear() {
-    worn.value = { hat: null, neck: null }
+    worn.value = { hat: null, neck: null, feet: null }
     changeCount.value++
   }
 

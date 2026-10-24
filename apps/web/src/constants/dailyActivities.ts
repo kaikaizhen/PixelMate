@@ -3,6 +3,8 @@ import petSleep from '@/assets/pixel/pet_sleep.png'
 import petRead from '@/assets/pixel/pet_read.png'
 import petWatch from '@/assets/pixel/pet_watch.png'
 import petGift from '@/assets/pixel/pet_gift.png'
+import petBoba from '@/assets/pixel/pet_boba.png'
+import petChicken from '@/assets/pixel/pet_chicken.png'
 
 export const DAILY_ACTIVITIES: readonly DailyActivity[] = [
   {
@@ -50,5 +52,40 @@ export const DAILY_ACTIVITIES: readonly DailyActivity[] = [
     petX: 96,
     petY: 166,
     extra: 'sparkle',
+  },
+  {
+    id: 'boba',
+    label: '喝珍奶',
+    caption: '手搖杯一杯，微糖少冰加珍珠，是今天最大的幸福。',
+    weather: 'sunny',
+    sprite: petBoba,
+    frames: 4,
+    duration: '1.6s',
+    petX: 96,
+    petY: 166,
+  },
+  {
+    id: 'chicken',
+    label: '吃雞排',
+    caption: '夜市買了一塊比臉還大的雞排，熱呼呼的，咬下去喀滋一聲。',
+    weather: 'night',
+    sprite: petChicken,
+    frames: 4,
+    duration: '1.6s',
+    petX: 96,
+    petY: 166,
+    extra: 'steam',
+  },
+  {
+    id: 'beach',
+    label: '海邊吹風',
+    caption: '傍晚跑去海邊，坐在消波塊上，看浪一波一波推過來。',
+    weather: 'sunny',
+    scene: 'beach',
+    sprite: petWatch,
+    frames: 4,
+    duration: '1.8s',
+    petX: 58,
+    petY: 22,
   },
 ]
