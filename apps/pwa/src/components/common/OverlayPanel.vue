@@ -78,5 +78,6 @@ h2 { font-size: 1.15rem; line-height: 1.2; }
 @keyframes rise { from { transform: translateY(24px); opacity: 0; } }
 @media (min-width: 860px) {
   .panel { inset: 50% 10.5rem auto auto; transform: translateY(-50%); width: 24rem; max-width: none; margin: 0; max-height: 80dvh; animation: none; }
+  .panel.tall { max-height: 80dvh; }
 }
 </style>

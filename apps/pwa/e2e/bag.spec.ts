@@ -154,4 +154,31 @@ test.describe('背包與穿戴', () => {
     const overflow = await page.evaluate(() => document.documentElement.scrollHeight > window.innerHeight + 1)
     expect(overflow).toBe(false)
   })
+
+  test('發呆時會眨眼；下雨天待在家會看向窗外；去戶外時背景延伸到螢幕邊緣', async ({ page }) => {
+    const now = Date.now()
+    const pet = (scene: string, weather: string, key: string) => ({ ...structuredClone(PET), revision: 30, equipment: { ...EQUIP }, world: { mood: 'happy', scene, weather },
+      activity: { key, startedAt: new Date(now - 60_000).toISOString(), endsAt: new Date(now + 600_000).toISOString() } })
+    await mockApi(page, {}, { pet: pet('home', 'cloudy', 'idle') as typeof PET, bag: BAG })
+    await page.goto('login')
+    await page.getByLabel('Email').fill('a@example.com')
+    await page.getByLabel('密碼').fill('Passw0rd-123')
+    await page.getByRole('button', { name: '登入' }).click()
+    await expect(page.locator('[data-blink]')).toHaveCount(1)
+    await expect(page.locator('button.pet img.face').first()).toHaveAttribute('src', /face_normal/)
+
+    const show = async (p: ReturnType<typeof pet>) => {
+      await page.route('**/api/v1/pets/me', (r) => (r.request().method() === 'GET' ? r.fulfill({ json: p }) : r.fallback()))
+      await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+    }
+    await show(pet('home', 'shower', 'idle'))
+    await expect(page.locator('button.pet img.face').first()).toHaveAttribute('src', /face_look_right/)       // watching the rain
+    await expect(page.locator('[data-blink]')).toHaveCount(0)
+    await show(pet('home', 'shower', 'read'))
+    await expect(page.locator('button.pet img.face').first()).toHaveAttribute('src', /face_look_down/)        // reading is not interrupted by the rain
+    await show(pet('yard', 'cloudy', 'walk'))
+    await expect(page.locator('[data-scene="outdoor"]')).toHaveCount(1)
+    await expect(page.locator('[data-extend]')).toHaveCount(1)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1 || document.documentElement.scrollHeight > window.innerHeight + 1)).toBe(false)
+  })
 })
