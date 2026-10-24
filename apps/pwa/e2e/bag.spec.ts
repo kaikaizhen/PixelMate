@@ -86,4 +86,39 @@ test.describe('背包與穿戴', () => {
     await page.evaluate(() => window.dispatchEvent(new Event('focus')))
     await expect(worn(page)).toHaveCount(1)
   })
+
+  test('小夥伴現在在做什麼：顯示後端給的活動；哼歌時頭上有音符', async ({ page }) => {
+    const now = Date.now()
+    const activity = (key: string) => ({ key, startedAt: new Date(now - 60_000).toISOString(), endsAt: new Date(now + 600_000).toISOString() })
+    await mockApi(page, {}, { pet: { ...structuredClone(PET), equipment: { ...EQUIP }, activity: activity('read') } as typeof PET, bag: BAG })
+    await page.goto('login')
+    await page.getByLabel('Email').fill('a@example.com')
+    await page.getByLabel('密碼').fill('Passw0rd-123')
+    await page.getByRole('button', { name: '登入' }).click()
+    await expect(page.getByText('小栗正在看書')).toBeVisible()
+    await expect(page.locator('[data-fx="note"]')).toHaveCount(0)
+
+    await page.route('**/api/v1/pets/me', (r) =>
+      r.request().method() === 'GET' ? r.fulfill({ json: { ...structuredClone(PET), revision: 9, equipment: { ...EQUIP }, activity: activity('hum') } }) : r.fallback())
+    await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+    await expect(page.getByText('小栗正在哼歌')).toBeVisible()
+    await expect(page.locator('[data-fx="note"]')).toHaveCount(1)
+  })
+
+  test('散步時撿到東西：只對沒看過的事件跳出提示', async ({ page }) => {
+    const found = (id: string, at: number) => ({ eventId: id, kind: 'find', itemId: 'equip.hat.straw_post', name: '郵局草帽', assetKey: 'equip.hat.straw_post', rarity: 'common', occurredAt: new Date(at).toISOString() })
+    let events = [found('e1', Date.now() - 3_600_000)]
+    await mockApi(page, { '/pets/me/events': (r) => r.fulfill({ json: { events } }) }, { pet: { ...structuredClone(PET), equipment: { ...EQUIP } } as typeof PET, bag: BAG })
+    await page.goto('login')
+    await page.getByLabel('Email').fill('a@example.com')
+    await page.getByLabel('密碼').fill('Passw0rd-123')
+    await page.getByRole('button', { name: '登入' }).click()
+    await expect(page.getByRole('button', { name: '背包' })).toBeVisible()
+    await expect(page.getByText('散步時撿到了')).toHaveCount(0)            // the first look only records what is already there
+
+    events = [found('e2', Date.now() + 1000), ...events]
+    await page.waitForTimeout(1200)
+    await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+    await expect(page.getByText('小栗散步時撿到了「郵局草帽」')).toBeVisible()
+  })
 })

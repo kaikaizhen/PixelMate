@@ -8,7 +8,7 @@ import floor from '@/assets/pixel/room_floor_tile.png'
 
 // The house at full screen: the 240x240 room is scaled to the short side of the screen and its wall, baseboard and
 // floor are continued with seamless tiles cut from the same art, so the screen is one room edge to edge.
-const props = defineProps<{ color: string; happy: boolean; name: string; weather?: string; equipment?: Record<string, string | null> }>()
+const props = defineProps<{ color: string; happy: boolean; name: string; weather?: string; equipment?: Record<string, string | null>; activity?: string }>()
 defineEmits<{ pat: [] }>()
 
 const w = ref(typeof window === 'undefined' ? 393 : window.innerWidth)
@@ -30,7 +30,7 @@ const vars = computed(() => ({ '--s': s.value, '--l': `${left.value}px`, '--t': 
     <div class="wall pixelated" :style="{ backgroundImage: `url(${wall})` }" />
     <div class="base pixelated" :style="{ backgroundImage: `url(${base})` }" />
     <div class="floor pixelated" :style="{ backgroundImage: `url(${floor})` }" />
-    <RoomScene class="scene-box" bare :scale="s" :color="color" :happy="happy" :name="name" :weather="weather" :equipment="equipment" @pat="$emit('pat')" />
+    <RoomScene class="scene-box" bare :scale="s" :color="color" :happy="happy" :name="name" :weather="weather" :equipment="equipment" :activity="activity" @pat="$emit('pat')" />
     <span v-if="night" class="dim" aria-hidden="true" />
   </div>
 </template>

@@ -1,4 +1,4 @@
-import type { CreatePetInput, EquipResult, InventoryItem, Pet, SkillKey, SkillsResult } from '@/types/pet.types'
+import type { CreatePetInput, EquipResult, InventoryItem, Pet, PetEvent, SkillKey, SkillsResult } from '@/types/pet.types'
 import { ApiError, request } from './http'
 
 export const petApi = {
@@ -15,6 +15,8 @@ export const petApi = {
   allocate: (skillKey: SkillKey, pointsToAdd: number, expectedRevision: number) =>
     request<SkillsResult>('POST', '/pets/me/skills/allocate', { skillKey, pointsToAdd, expectedRevision }),
   resetSkills: (expectedRevision: number) => request<SkillsResult>('POST', '/pets/me/skills/reset', { expectedRevision }),
+  /** What the pet found lately, newest first. */
+  events: async (limit = 10) => (await request<{ events: PetEvent[] }>('GET', `/pets/me/events?limit=${limit}`)).events,
   inventory: async () => (await request<{ items: InventoryItem[] }>('GET', '/inventory')).items,
   equip: (slot: string, itemId: string | null, expectedRevision: number) =>
     request<EquipResult>('POST', '/pets/me/equipment', { slot, itemId, expectedRevision }),

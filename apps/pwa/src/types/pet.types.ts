@@ -12,6 +12,24 @@ export interface Pet {
   equipment: Record<string, string | null>
   world: { mood: string; scene: string; weather: string }
   updatedAt: string
+  activity?: PetActivity
+}
+
+/** What the pet is doing right now, decided by the API (15-minute slots). */
+export interface PetActivity {
+  key: string
+  startedAt: string
+  endsAt: string
+}
+
+export interface PetEvent {
+  eventId: string
+  kind: string
+  itemId: string
+  name: string
+  assetKey: string
+  rarity: string
+  occurredAt: string
 }
 
 export interface CreatePetInput {

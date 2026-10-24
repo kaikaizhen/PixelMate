@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import OverlayPanel from '@/components/common/OverlayPanel.vue'
 import PixelButton from '@/components/common/PixelButton.vue'
 import FullRoom from '@/components/business/FullRoom.vue'
 import { SKILLS, colorOf } from '@/constants/petLooks'
+import { ACTIVITIES } from '@/constants/activities'
+import { petApi } from '@/api/petApi'
 import { ApiError } from '@/api/http'
 import { MAX_SKILL_POINTS, type SkillKey } from '@/types/pet.types'
 import { useSubmit } from '@/composables/useSubmit'
@@ -30,20 +32,53 @@ const toggle = (id: Exclude<PanelId, null>) => {
   if (panel.value === 'bag') void loadBag()
 }
 
-// Another device may have changed the pet (worn items, skills): re-read when this screen comes back and every minute.
-const resync = () => {
-  if (document.visibilityState === 'visible') void Promise.all([pets.load(true), panel.value === 'bag' ? bag.load(true) : null]).catch(() => {})
+// The pet lives on the server: re-read it when this screen comes back, every minute, and when its activity slot ends
+// (that also makes the server catch up on anything it found meanwhile). Other devices' changes show up the same way.
+const found = ref('')
+let foundTimer: number | undefined
+const utc = (t: string) => Date.parse(/Z|[+-]\d\d:\d\d$/.test(t) ? t : `${t}Z`)
+
+async function checkFinds() {
+  const key = `pm.seen.${pet.value.petId}`
+  let seen: number | null = null
+  try { seen = Number(localStorage.getItem(key)) || null } catch { /* private mode */ }
+  const events = await petApi.events(10)
+  const fresh = events.filter((e) => seen !== null && utc(e.occurredAt) > seen)
+  const newest = events.reduce((m, e) => Math.max(m, utc(e.occurredAt)), seen ?? Date.now())
+  try { localStorage.setItem(key, String(newest)) } catch { /* private mode */ }
+  if (!fresh.length) return
+  found.value = fresh.length === 1 ? `${pet.value.name}散步時撿到了「${fresh[0].name}」` : `${pet.value.name}散步時撿到了 ${fresh.length} 樣東西`
+  window.clearTimeout(foundTimer)
+  foundTimer = window.setTimeout(() => (found.value = ''), 6000)
+  if (bag.loaded) void bag.load(true).catch(() => {})
 }
-const resyncTimer = window.setInterval(resync, 60_000)
+
+async function refreshLife() {
+  if (document.visibilityState !== 'visible') return
+  try {
+    await Promise.all([pets.load(true), panel.value === 'bag' ? bag.load(true) : null])
+    await checkFinds()
+  } catch { /* offline: the next tick tries again */ }
+}
+const resyncTimer = window.setInterval(refreshLife, 60_000)
+let slotTimer: number | undefined
+watch(() => pet.value.activity?.endsAt, (end) => {
+  window.clearTimeout(slotTimer)
+  if (end) slotTimer = window.setTimeout(refreshLife, Math.max(1000, utc(end) - Date.now() + 1500))
+}, { immediate: true })
 onMounted(() => {
-  document.addEventListener('visibilitychange', resync)
-  window.addEventListener('focus', resync)
+  document.addEventListener('visibilitychange', refreshLife)
+  window.addEventListener('focus', refreshLife)
+  void checkFinds().catch(() => {})
 })
 onUnmounted(() => {
   window.clearInterval(resyncTimer)
-  document.removeEventListener('visibilitychange', resync)
-  window.removeEventListener('focus', resync)
+  window.clearTimeout(slotTimer)
+  window.clearTimeout(foundTimer)
+  document.removeEventListener('visibilitychange', refreshLife)
+  window.removeEventListener('focus', refreshLife)
 })
+const doing = computed(() => ACTIVITIES[pet.value.activity?.key ?? ''])
 
 // ---- backpack ---------------------------------------------------------------------------------------------------
 const TABS = [
@@ -135,12 +170,14 @@ const { loading, submit } = useSubmit(async () => {
 
 <template>
   <main class="home game-screen" @contextmenu.prevent>
-    <FullRoom :color="colorOf(pet.bodyVariant)" :happy="happy" :name="pet.name" :weather="pet.world.weather" :equipment="pet.equipment" @pat="pat" />
+    <FullRoom :color="colorOf(pet.bodyVariant)" :happy="happy" :name="pet.name" :weather="pet.world.weather" :equipment="pet.equipment" :activity="pet.activity?.key" @pat="pat" />
 
     <!-- HUD: nothing here blocks the room; every function opens in a panel on top of it -->
     <button type="button" class="chip" aria-haspopup="dialog" @click="toggle('pet')">
       <strong>{{ pet.name }}</strong><span>Lv.{{ pet.level }}</span><em v-if="pet.remainingSkillPoints" class="badge">+{{ pet.remainingSkillPoints }}</em>
     </button>
+    <p v-if="doing" class="doing" role="status" :data-activity="pet.activity?.key">{{ doing.emoji }} {{ pet.name }}正在{{ doing.label }}</p>
+    <p v-if="found && !welcome" class="toast" role="status">🎁 {{ found }}</p>
     <p v-if="welcome" class="toast" role="status">領養成功！{{ pet.name }} 住進你的小屋了。</p>
 
     <nav class="bar" aria-label="功能">
@@ -218,6 +255,18 @@ const { loading, submit } = useSubmit(async () => {
 }
 .chip span { font-family: var(--font-pixel); font-size: 0.65rem; color: var(--c-ink-soft); }
 
+.doing {
+  position: absolute;
+  top: calc(0.75rem + env(safe-area-inset-top) + var(--tap-min) + 0.5rem);
+  left: 0.75rem;
+  margin: 0;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.8rem;
+  color: var(--c-ink);
+  background: var(--c-paper);
+  border: 3px solid var(--c-ink);
+  border-radius: var(--radius);
+}
 .toast {
   position: absolute;
   top: calc(0.75rem + env(safe-area-inset-top));
@@ -302,5 +351,6 @@ const { loading, submit } = useSubmit(async () => {
   /* wide screens: the tools stand in a column at the right edge so they never cover the room */
   .bar { inset: 50% 1.25rem auto auto; transform: translateY(-50%); width: 7.5rem; margin: 0; grid-template-columns: 1fr; }
   .chip { top: 1.25rem; left: 1.25rem; }
+  .doing { top: calc(1.25rem + var(--tap-min) + 0.5rem); left: 1.25rem; }
 }
 </style>
