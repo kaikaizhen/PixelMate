@@ -6,6 +6,10 @@ export interface GameAsset {
   frames?: number
   frameWidth?: number
   frameHeight?: number
+  slot?: string
+  z?: number
+  layer?: string
+  backKey?: string
 }
 
 /** The game asset manifest (assets/manifest.json, copied to /web/game/). Everything is looked up by assetKey. */

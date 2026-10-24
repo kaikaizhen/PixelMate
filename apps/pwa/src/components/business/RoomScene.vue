@@ -13,7 +13,7 @@ import curtainR from '@/assets/pixel/curtain_r.png'
 import bars from '@/assets/pixel/window_bars.png'
 
 // The house: the website's room art + the weather outside (game assets by assetKey) + furniture + the pet.
-const props = defineProps<{ color: string; happy: boolean; name: string; weather?: string; bare?: boolean; scale?: number }>()
+const props = defineProps<{ color: string; happy: boolean; name: string; weather?: string; bare?: boolean; scale?: number; equipment?: Record<string, string | null> }>()
 defineEmits<{ pat: [] }>()
 
 const el = ref<HTMLElement | null>(null)
@@ -45,7 +45,7 @@ const night = computed(() => windowWeatherKey(new Date(), props.weather).include
     </template>
     <!-- 4. the pet -->
     <button type="button" class="pet" :class="{ hop: happy }" :style="{ left: u(PET_SPOT.x), top: u(PET_SPOT.y) }" :aria-label="`摸摸 ${name}`" @click="$emit('pat')">
-      <GamePet :color="color" :face="happy ? 'happy' : 'normal'" />
+      <GamePet :color="color" :face="happy ? 'happy' : 'normal'" :equipment="equipment" />
     </button>
     <span v-if="night && !bare" class="dim" aria-hidden="true" />
   </div>

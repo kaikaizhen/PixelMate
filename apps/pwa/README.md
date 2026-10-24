@@ -46,3 +46,6 @@ into `public/game/` (git-ignored). Edit the starter room in `src/constants/defau
   `/api/*` is never cached or used as a navigation fallback.
 - Every state-changing request sends `X-Requested-With: pixelmate` (the API's CSRF check).
 - Icons are generated from the star pet: `python tools/pixel-art/pwa_icons.py`.
+- Bag (背包): `useInventoryStore` lists owned items and wears/removes them through `POST /pets/me/equipment`
+  (sends the pet `revision`; a conflict re-reads the pet). Worn items are drawn on the pet by `GamePet` using the manifest `slot`/`z`;
+  a costume hides the hat and draws its tail behind the body. Room items are listed only; placing them comes later.

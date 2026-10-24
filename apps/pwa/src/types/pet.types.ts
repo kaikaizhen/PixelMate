@@ -26,3 +26,20 @@ export interface SkillsResult {
 }
 
 export const MAX_SKILL_POINTS = 5
+
+export interface InventoryItem {
+  inventoryId: string
+  itemId: string
+  name: string
+  category: string
+  rarity: 'common' | 'rare' | 'precious'
+  slot: string | null
+  assetKey: string
+  quantity: number
+  equipped: boolean
+}
+
+export interface EquipResult {
+  revision: number
+  equipment: Record<string, string | null>
+}
