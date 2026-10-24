@@ -317,7 +317,7 @@ def held_bouquet(theme):
         s.rect(x, y, x + 2, y + 2, c); s.px(x + 1, y + 1, GOLD_D if c != "#ffd86b" else WHITE)
         s.px(x + 1, y + 3, stem); s.px(x + 1, y + 4, stem)
     if theme == "starlight":
-        blit(s, 32, 26, MOTIFS["star"], GOLD)
+        blit(s, 39, 22, MOTIFS["star"], GOLD)
     edge(s)
     return s
 

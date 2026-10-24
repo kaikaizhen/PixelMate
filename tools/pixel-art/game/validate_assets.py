@@ -57,6 +57,15 @@ def gear_checks(assets):
                 err(f"{key}: gear does not touch the pet body (floating)")
             if a["slot"] == "head" and min(y for _, y in mask) > 20:
                 err(f"{key}: hat is not on the head")
+        # nothing may cover the pet's face: eyes/mouth box for handheld, whole face window for effects
+        if a.get("slot") == "hand" and any((13 <= x <= 34 and 23 <= y <= 29) or (20 <= x <= 28 and 29 <= y <= 34) for x, y in mask):
+            err(f"{key}: handheld covers the face")
+        if a.get("slot") == "effect" or key.startswith("fx."):
+            n = a.get("frames", 1)
+            for fi in range(n):
+                fm = {(x - 48 * fi, y) for x, y in _mask(im) if 48 * fi <= x < 48 * fi + 48}
+                if any(9 <= x <= 38 and 22 <= y <= 35 for x, y in fm):
+                    err(f"{key}: effect frame {fi} covers the face"); break
         if not (a.get("designId") and a.get("name")):
             err(f"{key}: missing designId/name metadata")
         h = hash(im.tobytes())

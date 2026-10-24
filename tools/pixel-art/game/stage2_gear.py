@@ -6,10 +6,11 @@ import os
 
 import catalog
 import gear_wear
+import gear_wear2  # noqa: F401  (registers B2 generators)
 from common import ANCHOR, FRAME, write_strip
 from gear_base import finish
 
-BATCHES = [b for b in os.environ.get("GEAR_BATCHES", "B1").split(",") if b]
+BATCHES = [b for b in os.environ.get("GEAR_BATCHES", "B1,B2").split(",") if b]
 CATS = {"帽子", "服飾", "配件", "鞋履", "手持物"}
 LAYER = {"head": "pet_front_accessory", "body": "pet_outfit", "front": "pet_front_accessory",
          "feet": "pet_outfit", "hand": "pet_front_accessory"}
