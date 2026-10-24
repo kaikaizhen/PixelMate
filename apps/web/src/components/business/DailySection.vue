@@ -22,7 +22,7 @@ function onKey(event: KeyboardEvent) {
     <div class="page-width daily__inner">
       <div class="daily__copy">
         <h2 id="daily-title" class="daily__title">牠有自己的日常</h2>
-        <p class="daily__lead">你忙的時候，牠也沒閒著。可能在午睡、看雨，或撿回一個小禮物。</p>
+        <p class="daily__lead">你忙的時候，牠也沒閒著。可能在午睡、看雨，也可能提著一杯珍奶，跑去海邊的消波塊上吹風。</p>
         <div class="daily__tabs" role="tablist" aria-label="牠的日常" @keydown="onKey">
           <button
             v-for="(activity, i) in DAILY_ACTIVITIES"

@@ -52,7 +52,7 @@ const caption = computed(() =>
 
       <div class="dress__copy">
         <h2 id="dress-title" class="dress__title">長成獨一無二的模樣</h2>
-        <p class="dress__lead">一頂帽子、一條圍巾，都是你們一起走過的小日子。</p>
+        <p class="dress__lead">一頂帽子、一條圍巾，連夜市散步的藍白拖，都是你們一起走過的小日子。</p>
         <div class="dress__items" role="group" aria-label="挑一件給牠">
           <button
             v-for="item in DRESS_ITEMS"
@@ -171,7 +171,7 @@ const caption = computed(() =>
 .dress__icon {
   width: 48px;
   height: 32px;
-  background-size: 144px 32px;
+  background-size: 192px 32px;
   background-repeat: no-repeat;
   flex: none;
 }
