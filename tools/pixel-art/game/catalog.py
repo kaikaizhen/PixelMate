@@ -27,7 +27,8 @@ def load_extra():
 
 
 def in_scope(rows):
-    return [r for r in rows if r["category"] not in DROPPED_CATEGORIES]
+    """Rows still planned: not a dropped category, not individually marked status=dropped."""
+    return [r for r in rows if r["category"] not in DROPPED_CATEGORIES and r.get("status") != "dropped"]
 
 
 def validate(rows):

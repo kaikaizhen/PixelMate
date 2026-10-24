@@ -44,6 +44,7 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ink);outline-o
   </section>
   <section>
     <div class="tabs" id="tabs" role="tablist"></div>
+    <div class="tabs" id="batches" role="group" aria-label="批次篩選"></div>
     <div class="grid" id="grid"></div>
   </section>
 </main>
@@ -51,15 +52,20 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ink);outline-o
 const TABS=[["head","帽子"],["body","服飾"],["costume","布偶裝"],["front","配件"],["feet","鞋履"],["hand","手持物"],
  ["furn","家具"],["decor","布置"],["item","收藏品"],["mail","信件"],["fx","特效"]];
 const FACES=["normal","happy","sleepy","blink"];
-let M,A,imgs={},tab="head",worn={},scene={},face="normal",playing=true,weatherKey="",t0=0;
+let M,A,imgs={},batch="all",tab="head",worn={},scene={},face="normal",playing=true,weatherKey="",t0=0;
 const $=id=>document.getElementById(id),ctx=$("c").getContext("2d");ctx.imageSmoothingEnabled=false;
 const img=k=>{if(!imgs[k]){const i=new Image();i.src="../"+A[k].path;i.onload=()=>draw();imgs[k]=i}return imgs[k]};
 function slotOf(k){const a=A[k];if(a.slot)return a.slot;return null}
-function keysFor(t){return Object.keys(A).filter(k=>{const a=A[k];
+function keysFor(t){return Object.keys(A).filter(k=>{const a=A[k];if(batch!=="all"&&a.batch!==batch)return false;
   if(["head","body","costume","front","feet","hand"].includes(t))return a.slot===t&&!k.endsWith(".tail");
   if(t==="furn")return k.startsWith("world.furniture");if(t==="decor")return k.startsWith("world.decor");
   if(t==="item")return k.startsWith("item.collectible");if(t==="mail")return k.startsWith("item.stationery");
   if(t==="fx")return k.startsWith("fx.");return false}).sort()}
+function renderBatches(){const el=$("batches");el.innerHTML="";
+  const names=["all",...[...new Set(Object.values(A).map(a=>a.batch).filter(Boolean))].sort()];
+  names.forEach(b=>{const n=b==="all"?Object.values(A).filter(a=>a.batch).length:Object.values(A).filter(a=>a.batch===b).length;
+    const x=document.createElement("button");x.textContent=(b==="all"?"全部批次":b==="X1"?"追加 X1":b)+" "+n;
+    x.setAttribute("aria-pressed",b===batch);x.onclick=()=>{batch=b;renderBatches();renderTabs();renderGrid()};el.appendChild(x)})}
 function renderTabs(){const el=$("tabs");el.innerHTML="";TABS.forEach(([id,label])=>{const b=document.createElement("button");
   b.textContent=`${label} ${keysFor(id).length}`;b.setAttribute("role","tab");b.setAttribute("aria-pressed",id===tab);
   b.onclick=()=>{tab=id;renderTabs();renderGrid()};el.appendChild(b)})}
@@ -69,7 +75,7 @@ function renderGrid(){const g=$("grid");g.innerHTML="";const wearable=["head","b
     const im=document.createElement("img");im.loading="lazy";im.alt=a.name||k;im.src="../"+a.path;
     if(a.frames>1){im.style.objectPosition="0 0";im.style.width="96px";im.style.height="96px"}
     d.append(im,Object.assign(document.createElement("div"),{textContent:a.name||k}),
-      Object.assign(document.createElement("small"),{textContent:k.split(".").slice(1).join(".")}));
+      Object.assign(document.createElement("small"),{textContent:(a.batch?a.batch+" · ":"")+k.split(".").slice(1).join(".")}));
     const act=()=>{if(wearable)toggle(k);else toggleScene(k)};
     d.onclick=act;d.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();act()}};g.appendChild(d)})}
 function toggle(k){const a=A[k],s=a.slot;if(worn[s]===k){delete worn[s]}else{worn[s]=k;
@@ -101,7 +107,7 @@ fetch("../manifest.json").then(r=>r.json()).then(m=>{M=m;A=m.assets;
   FACES.forEach(f=>{const b=document.createElement("button");b.textContent=f;b.setAttribute("aria-pressed",f===face);b.onclick=()=>{face=f;[...$("faces").children].forEach(c=>c.setAttribute("aria-pressed",c===b));draw()};$("faces").appendChild(b)});
   $("play").onclick=e=>{playing=!playing;e.target.setAttribute("aria-pressed",playing);if(playing)requestAnimationFrame(loop);else draw()};
   $("clear").onclick=()=>{worn={};scene={};$("worn").textContent="穿著：無";renderGrid();draw()};
-  renderTabs();renderGrid();requestAnimationFrame(loop)});
+  renderBatches();renderTabs();renderGrid();requestAnimationFrame(loop)});
 </script>
 </body>
 </html>
