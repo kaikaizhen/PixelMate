@@ -1,0 +1,24 @@
+:root {
+  --c-cream: #fff8ec;
+  --c-paper: #fff3dc;
+  --c-ink: #4a3040;
+  --c-ink-soft: #7a5f6c;
+  --c-pink: #f4a6a0;
+  --c-pink-soft: #fde2dd;
+  --c-blue: #8fc4e8;
+  --c-green: #7fbf6a;
+  --c-yellow: #ffd86b;
+
+  --font-body: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
+  --font-pixel: 'Press Start 2P', monospace;
+
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --space-5: 4rem;
+
+  --page-gutter: 1.25rem;
+  --page-max: 1200px;
+  --tap-min: 44px;
+}
