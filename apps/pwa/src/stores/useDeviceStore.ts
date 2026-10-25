@@ -12,15 +12,10 @@ export const useDeviceStore = defineStore('devices', () => {
     loaded.value = true
   }
 
-  async function pair(code: string, name?: string): Promise<Device> {
-    const d = await deviceApi.pair(code, name)
+  async function pair(code: string): Promise<Device> {
+    const d = await deviceApi.pair(code)
     await load()
     return d
-  }
-
-  async function rename(id: string, name: string): Promise<void> {
-    await deviceApi.rename(id, name)
-    await load()
   }
 
   async function revoke(id: string): Promise<void> {
@@ -33,5 +28,5 @@ export const useDeviceStore = defineStore('devices', () => {
     loaded.value = false
   }
 
-  return { devices, loaded, load, pair, rename, revoke, clear }
+  return { devices, loaded, load, pair, revoke, clear }
 })

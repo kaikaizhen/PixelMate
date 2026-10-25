@@ -25,15 +25,17 @@ test.describe('配對裝置', () => {
     await expect(dlg.getByRole('button', { name: '確認配對' })).toBeDisabled()          // nothing typed yet
   })
 
-  test('輸入裝置畫面上的配對碼（大小寫、空白都可以）：核准後出現在清單，等裝置連線', async ({ page }) => {
+  test('輸入裝置畫面上的配對碼（大小寫都可以）：不用幫裝置取名，核准後顯示的就是現在這隻小夥伴', async ({ page }) => {
     const { state, dlg } = await start(page)
+    await expect(dlg.getByLabel(/名稱|名字/)).toHaveCount(0)                                // nothing to name: the device shows the pet you already have
     await dlg.getByLabel('配對碼', { exact: true }).fill('abcd-2345')
-    await dlg.getByLabel('裝置名稱（選填）').fill('客廳的小栗')
     await dlg.getByRole('button', { name: '確認配對' }).click()
-    await expect(dlg.getByText('已核准「客廳的小栗」')).toBeVisible()
-    await expect(dlg.getByRole('list', { name: '已配對的裝置' })).toContainText('客廳的小栗')
+    await expect(dlg.getByText('顯示的就是小栗')).toBeVisible()
+    await expect(dlg.getByRole('list', { name: '已配對的裝置' })).toContainText('Waveshare-AMOLED-2.16')
+    await expect(dlg.getByRole('list', { name: '已配對的裝置' })).toContainText('顯示：小栗（和 App、其他裝置是同一隻）')
     await expect(dlg.getByText('等裝置連線中…')).toBeVisible()
     expect(state.devices).toHaveLength(1)
+    expect(state.calls.find((c) => c.path === '/devices/pair')?.body).toEqual({ code: 'abcd-2345' })      // no name is sent
     await expect(dlg.getByLabel('配對碼', { exact: true })).toHaveValue('')                // cleared for the next one
   })
 
@@ -45,15 +47,12 @@ test.describe('配對裝置', () => {
     expect(state.devices).toHaveLength(0)
   })
 
-  test('清單顯示使用中與最後連線；改名；移除要按兩次', async ({ page }) => {
+  test('清單顯示使用中與最後連線；移除要按兩次', async ({ page }) => {
     const { state, dlg } = await start(page, [DEVICE()])
     await expect(dlg.getByText('使用中')).toBeVisible()
     await expect(dlg.getByText('5 分鐘前')).toBeVisible()
 
-    await dlg.getByRole('button', { name: '改名' }).click()
-    await dlg.getByLabel('裝置名稱', { exact: true }).fill('臥室')
-    await dlg.getByRole('button', { name: '儲存' }).click()
-    await expect(dlg.getByRole('list', { name: '已配對的裝置' })).toContainText('臥室')
+    await expect(dlg.getByRole('button', { name: '改名' })).toHaveCount(0)
 
     await dlg.getByRole('button', { name: '移除' }).click()
     expect(state.devices).toHaveLength(1)                                                   // the first tap only asks
