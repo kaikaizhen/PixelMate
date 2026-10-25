@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import RoomScene from './RoomScene.vue'
-import { weatherKey, windowWeatherKey } from '@/utils/roomWeather'
+import WeatherFx from './WeatherFx.vue'
+import { weatherKey, weatherName, windowWeatherKey } from '@/utils/roomWeather'
 import { useEdgeColors } from '@/composables/useEdgeColors'
 import { useGameStore } from '@/stores/useGameStore'
 import wall from '@/assets/pixel/room_wall_tile.png'
@@ -39,6 +40,10 @@ const floorStyle = computed(() => {
 const outdoors = computed(() => (props.scene === 'balcony' || props.scene === 'yard' ? props.scene : null))
 const outdoorUrl = computed(() => (outdoors.value ? game.url(weatherKey(new Date(), props.weather, outdoors.value)) : ''))
 const edge = useEdgeColors(outdoorUrl)
+const wxName = computed(() => weatherName(new Date(), props.weather))
+// outdoors the weather fills the whole screen (not only the 240x240 picture), at the same pixel size as the art
+const fxW = computed(() => Math.ceil(stageW.value / s.value))
+const fxH = computed(() => Math.ceil(h.value / s.value))
 const night = computed(() => windowWeatherKey(new Date(), props.weather).includes('starry'))
 const vars = computed(() => ({ '--s': s.value, '--l': `${left.value}px`, '--t': `${top.value}px` }))
 </script>
@@ -55,6 +60,7 @@ const vars = computed(() => ({ '--s': s.value, '--l': `${left.value}px`, '--t': 
           <div class="floor pixelated" :style="floorStyle" />
         </template>
         <RoomScene class="scene-box" bare :scale="s" :color="color" :happy="happy" :name="name" :weather="weather" :equipment="equipment" :activity="activity" :scene="scene" :placements="placements" :floor="floor" :editing="editing" :selected="selected" @pat="$emit('pat')" @select="$emit('select', $event)" @move="(i, x, y) => $emit('move', i, x, y)" />
+        <div v-if="outdoors" class="outfx" data-outdoor-fx><WeatherFx :weather="wxName" :w="fxW" :h="fxH" /></div>
         <span v-if="night && !outdoors" class="dim" aria-hidden="true" />
       </div>
     </Transition>
@@ -73,6 +79,7 @@ const vars = computed(() => ({ '--s': s.value, '--l': `${left.value}px`, '--t': 
   background-position: var(--l) calc(8 * var(--s) * 1px);
 }
 .stage { position: absolute; inset: 0; }
+.outfx { position: absolute; inset: 0; z-index: 400; pointer-events: none; }
 /* outdoors on a wide or tall screen: the scenery's own row colours carry on to the edges of the screen */
 .extend { position: absolute; left: 0; right: 0; top: var(--t); height: calc(240 * var(--s) * 1px); background-size: 100% 100%; }
 .scene-enter-active, .scene-leave-active { transition: opacity 0.35s; }

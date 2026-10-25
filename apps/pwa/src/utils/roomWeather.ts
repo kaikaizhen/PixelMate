@@ -12,10 +12,14 @@ function byClock(date: Date): string {
   return 'starry'
 }
 
+/** The weather's name as the art knows it: the server's word when it is one of ours, else the clock's. */
+export function weatherName(date = new Date(), serverWeather?: string): string {
+  return serverWeather === 'rain' || serverWeather === 'rainy' ? 'shower' : (WEATHERS as readonly string[]).includes(serverWeather ?? '') ? serverWeather! : byClock(date)
+}
+
 /** assetKey of the outdoor picture for a weather (the server's word wins over the clock) and a view. */
 export function weatherKey(date = new Date(), serverWeather?: string, view: OutdoorView = 'window'): string {
-  const name = serverWeather === 'rain' || serverWeather === 'rainy' ? 'shower' : (WEATHERS as readonly string[]).includes(serverWeather ?? '') ? serverWeather! : byClock(date)
-  return `world.weather.${name}_${view}`
+  return `world.weather.${weatherName(date, serverWeather)}_${view}`
 }
 
 /** Kept for the room's window. */
