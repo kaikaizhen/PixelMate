@@ -2,6 +2,7 @@ using System.Threading.RateLimiting;
 using PixelMate.Api.Realtime;
 using PixelMate.Api.Rooms;
 using PixelMate.Api.Social;
+using PixelMate.Api.Weather;
 using FluentValidation;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -95,6 +96,21 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<PixelMate.Api.Life.LifeService>();
 builder.Services.AddHostedService<PixelMate.Api.Life.LifeWorker>();
 builder.Services.AddSignalR();
+
+// ---- weather: CWA (Taiwan) + Open-Meteo, shared through HybridCache (memory + Redis when configured) ----------------------------------
+var weatherOptions = builder.Configuration.GetSection("Weather").Get<WeatherOptions>() ?? new WeatherOptions();
+builder.Services.Configure<WeatherOptions>(builder.Configuration.GetSection("Weather"));
+var redis = builder.Configuration.GetConnectionString("Redis");
+if (!string.IsNullOrWhiteSpace(redis))
+{
+    builder.Services.AddStackExchangeRedisCache(o => { o.Configuration = redis; o.InstanceName = "pixelmate:"; });   // the level-2 cache; if Redis is down the caches fall back to memory
+}
+builder.Services.AddHybridCache();
+builder.Services.AddHttpClient("openmeteo", c => { c.BaseAddress = new Uri(weatherOptions.OpenMeteoBaseUrl); c.Timeout = TimeSpan.FromSeconds(weatherOptions.TimeoutSeconds); });
+builder.Services.AddHttpClient("cwa", c => { c.BaseAddress = new Uri(weatherOptions.CwaBaseUrl); c.Timeout = TimeSpan.FromSeconds(weatherOptions.TimeoutSeconds); });
+builder.Services.AddSingleton<OpenMeteoClient>();
+builder.Services.AddSingleton<CwaClient>();
+builder.Services.AddSingleton<WeatherService>();
 builder.Services.Configure<RealtimeOptions>(builder.Configuration.GetSection("Realtime"));
 builder.Services.AddScoped<EventOutbox>();
 builder.Services.AddSingleton<OutboxDispatcher>();
@@ -169,6 +185,7 @@ api.MapItems();
 api.MapPairing();
 api.MapRoom();
 api.MapEvents();
+api.MapWeather();
 api.MapMail();
 if (app.Environment.IsDevelopment())
 {

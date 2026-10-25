@@ -154,7 +154,8 @@ public class LifeTests
         var (c, pet) = await Player(f);
         var now = f.Clock.GetUtcNow().UtcDateTime;
         var snap = await Get(c);
-        Assert.Equal(WorldRules.WeatherAt(now, 8), snap.World.Weather);
+        Assert.Equal("clear", snap.World.Weather);                                   // the (fake) Open-Meteo says clear: the device adds sunrise/day/sunset/night itself
+        Assert.Equal("open-meteo", snap.World.WeatherSource);
         Assert.Equal(WorldRules.SceneAt(pet.PetId, snap.Activity.Key, LifeScheduler.SlotOf(now)), snap.World.Scene);
         Assert.Contains(snap.World.Scene, Scenes.All);
     }

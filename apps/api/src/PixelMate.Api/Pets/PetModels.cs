@@ -9,7 +9,7 @@ public sealed record PetSnapshot(
     IDictionary<string, int> Skills, int RemainingSkillPoints,
     IDictionary<string, string?> Equipment, PetWorld World, DateTime UpdatedAt, PixelMate.Api.Life.ActivityInfo Activity);
 
-public sealed record PetWorld(string Mood, string Scene, string Weather);
+public sealed record PetWorld(string Mood, string Scene, string Weather, double? TemperatureC = null, string WeatherSource = "simulated", string TimeZone = "Asia/Taipei");
 
 public sealed record AllocateSkillRequest(string SkillKey, int PointsToAdd, int ExpectedRevision);
 public sealed record ResetSkillsRequest(int ExpectedRevision);
