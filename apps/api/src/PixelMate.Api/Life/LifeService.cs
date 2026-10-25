@@ -7,7 +7,7 @@ using PixelMate.Api.Pets;
 namespace PixelMate.Api.Life;
 
 /// <summary>Makes up a pet's life for finished slots: writes find events and puts the items in the owner's bag, all in one transaction.</summary>
-public sealed class LifeService(IOptions<LifeOptions> options)
+public sealed class LifeService(IOptions<LifeOptions> options, TimeProvider clock)
 {
     private readonly LifeOptions _o = options.Value;
 
@@ -63,6 +63,12 @@ public sealed class LifeService(IOptions<LifeOptions> options)
             added++;
         }
 
+        if (added > 0)
+        {
+            var outbox = new Realtime.EventOutbox(db, clock);
+            outbox.Add(ownerId, Realtime.EventTypes.PetFind, new { count = added }, petId);
+            outbox.Add(ownerId, Realtime.EventTypes.InventoryUpdated, new { reason = "find" });
+        }
         foreach (var (itemId, qty) in granted)
         {
             var row = await db.InventoryEntries.FirstOrDefaultAsync(i => i.OwnerId == ownerId && i.ItemId == itemId, ct);

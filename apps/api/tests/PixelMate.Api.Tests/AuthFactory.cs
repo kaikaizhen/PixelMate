@@ -53,7 +53,7 @@ public sealed class AuthFactory(IDictionary<string, string?>? settings = null) :
         builder.UseEnvironment("Production");
         builder.ConfigureAppConfiguration((_, cfg) =>
         {
-            var s = new Dictionary<string, string?> { ["Auth:SecureCookie"] = "false", ["Auth:SecurityStampValidationSeconds"] = "0", ["RateLimit:AuthPerMinute"] = "1000", ["Life:WorkerIntervalSeconds"] = "0" };
+            var s = new Dictionary<string, string?> { ["Auth:SecureCookie"] = "false", ["Auth:SecurityStampValidationSeconds"] = "0", ["RateLimit:AuthPerMinute"] = "1000", ["Life:WorkerIntervalSeconds"] = "0", ["Realtime:DispatchIntervalSeconds"] = "0" };
             foreach (var kv in settings ?? new Dictionary<string, string?>())
             {
                 s[kv.Key] = kv.Value;

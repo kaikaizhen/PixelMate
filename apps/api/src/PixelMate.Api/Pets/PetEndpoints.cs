@@ -106,7 +106,7 @@ public static class PetEndpoints
     }
 
     /// <summary>All-or-nothing: points, cap and revision are checked, then skill + revision are written in one transaction.</summary>
-    private static async Task<IResult> Allocate(AllocateSkillRequest req, ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct)
+    private static async Task<IResult> Allocate(AllocateSkillRequest req, ClaimsPrincipal principal, AppDbContext db, Realtime.EventOutbox outbox, HttpContext ctx, CancellationToken ct)
     {
         var owner = UserId(principal);
         var pet = await WithEquipment(db.Pets).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
@@ -127,6 +127,7 @@ public static class PetEndpoints
         skill.Points += req.PointsToAdd;
         pet.Revision++;
         pet.UpdatedAt = DateTime.UtcNow;
+        outbox.Add(owner, Realtime.EventTypes.PetUpdated, new { reason = "skills" }, pet.PetId, pet.Revision);
         try
         {
             await db.SaveChangesAsync(ct);
@@ -139,7 +140,7 @@ public static class PetEndpoints
     }
 
     /// <summary>Free reset (MVP): every skill back to 0, all points become spendable again.</summary>
-    private static async Task<IResult> Reset(ResetSkillsRequest req, ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct)
+    private static async Task<IResult> Reset(ResetSkillsRequest req, ClaimsPrincipal principal, AppDbContext db, Realtime.EventOutbox outbox, HttpContext ctx, CancellationToken ct)
     {
         var owner = UserId(principal);
         var pet = await WithEquipment(db.Pets).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
@@ -149,6 +150,7 @@ public static class PetEndpoints
         foreach (var s in pet.Skills) s.Points = 0;
         pet.Revision++;
         pet.UpdatedAt = DateTime.UtcNow;
+        outbox.Add(owner, Realtime.EventTypes.PetUpdated, new { reason = "skills" }, pet.PetId, pet.Revision);
         try
         {
             await db.SaveChangesAsync(ct);
@@ -163,7 +165,7 @@ public static class PetEndpoints
     /// <summary>Development only (not mapped in any other environment): gives levels so skill points can be tested before XP exists.</summary>
     internal static RouteGroupBuilder MapDev(this RouteGroupBuilder api)
     {
-        api.MapPost("/dev/pets/me/level-up", async (ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct) =>
+        api.MapPost("/dev/pets/me/level-up", async (ClaimsPrincipal principal, AppDbContext db, Realtime.EventOutbox outbox, HttpContext ctx, CancellationToken ct) =>
         {
             var owner = UserId(principal);
             var pet = await WithEquipment(db.Pets).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
@@ -171,6 +173,7 @@ public static class PetEndpoints
             pet.Level = Math.Min(pet.Level + 1, 30);
             pet.Revision++;
             pet.UpdatedAt = DateTime.UtcNow;
+            outbox.Add(owner, Realtime.EventTypes.PetUpdated, new { reason = "level" }, pet.PetId, pet.Revision);
             await db.SaveChangesAsync(ct);
             return Results.Ok(ToSnapshot(pet, null, LifeOf(ctx)));
         }).RequireAuthorization();

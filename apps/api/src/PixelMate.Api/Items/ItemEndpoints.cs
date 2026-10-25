@@ -39,7 +39,7 @@ public static class ItemEndpoints
     /// Wear (itemId) or take off (itemId = null) one slot. The player must own the item, it must belong to that slot, and a
     /// costume and a hat exclude each other (the costume already includes the head). Pet + equipment change in one transaction.
     /// </summary>
-    private static async Task<IResult> Equip(EquipRequest req, ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct)
+    private static async Task<IResult> Equip(EquipRequest req, ClaimsPrincipal principal, AppDbContext db, Realtime.EventOutbox outbox, HttpContext ctx, CancellationToken ct)
     {
         var owner = UserId(principal);
         for (var attempt = 0; attempt < 3; attempt++)
@@ -71,6 +71,7 @@ public static class ItemEndpoints
 
             pet.Revision++;
             pet.UpdatedAt = DateTime.UtcNow;
+            outbox.Add(owner, Realtime.EventTypes.PetUpdated, new { reason = "equipment" }, pet.PetId, pet.Revision);
             try
             {
                 await db.SaveChangesAsync(ct);

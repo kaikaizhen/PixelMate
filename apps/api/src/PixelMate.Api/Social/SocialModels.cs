@@ -49,6 +49,8 @@ public class Letter
     public bool SenderDeleted { get; set; }
     public bool RecipientDeleted { get; set; }
     public string IdempotencyKey { get; set; } = "";
+    /// <summary>Set when the recipient was told (mail.received) after the postman arrived.</summary>
+    public DateTime? NotifiedAt { get; set; }
 }
 
 public sealed class LetterOptions
