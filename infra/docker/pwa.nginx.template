@@ -4,6 +4,12 @@ server {
     server_name _;
     root /usr/share/nginx/html;
 
+    # nginx's default mime table has no webmanifest type
+    types {
+        include /etc/nginx/mime.types;
+        application/manifest+json webmanifest;
+    }
+
     gzip on;
     gzip_types text/css application/javascript application/json image/svg+xml text/plain application/manifest+json;
 
