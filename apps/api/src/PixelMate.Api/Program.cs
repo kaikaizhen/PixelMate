@@ -36,9 +36,11 @@ builder.Host.UseSerilog((ctx, cfg) => cfg
 // ---- configuration: secrets come from user-secrets (dev) or environment variables (prod); never from the repo.
 var connectionString = builder.Configuration.GetConnectionString("Default") ?? "Server=localhost;Database=pixelmate;Uid=unset;Pwd=unset";
 
+// No EnableRetryOnFailure: it forbids the explicit transactions that gifts, pairing and the room editor use (EF throws on BeginTransaction).
+// Conflicts are handled where they happen (revision / unique keys); a dropped connection simply fails the request and the app retries.
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseMySql(connectionString, new MariaDbServerVersion(new Version(10, 11, 8)),
-            my => my.EnableRetryOnFailure(3).CommandTimeout(15))
+            my => my.CommandTimeout(15))
         .UseSnakeCaseNamingConvention());
 
 // ---- identity (cookie sessions) -------------------------------------------------------------------------------
