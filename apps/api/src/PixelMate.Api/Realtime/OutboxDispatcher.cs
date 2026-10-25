@@ -42,7 +42,7 @@ public sealed class OutboxDispatcher(IServiceScopeFactory scopes, IHubContext<Pe
         var now = clock.GetUtcNow().UtcDateTime;
 
         // 1. letters whose postman has arrived: tell the recipient once (the UPDATE decides who announces it when several servers run)
-        var arrived = await db.Letters.AsNoTracking().Where(l => l.DeliverAt <= now && l.NotifiedAt == null).Select(l => new { l.LetterId, l.RecipientId }).Take(200).ToListAsync(ct);
+        var arrived = await db.Letters.AsNoTracking().Where(l => l.DeliverAt <= now && l.NotifiedAt == null).OrderBy(l => l.DeliverAt).Select(l => new { l.LetterId, l.RecipientId }).Take(200).ToListAsync(ct);
         var outbox = new EventOutbox(db, clock);
         foreach (var l in arrived)
         {
