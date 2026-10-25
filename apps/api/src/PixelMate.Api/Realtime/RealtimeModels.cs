@@ -32,4 +32,5 @@ public static class EventTypes
     public const string RoomUpdated = "room.updated";
     public const string MailReceived = "mail.received";
     public const string FriendsUpdated = "friends.updated";
+    public const string DevicesUpdated = "devices.updated";    // a device was paired, activated or revoked
 }

@@ -83,13 +83,19 @@ public static class PetEndpoints
     /// <summary>Reading the pet also makes up any finished slots that the worker has not reached yet (lazy half of the hybrid).</summary>
     private static async Task<IResult> GetMine(ClaimsPrincipal principal, AppDbContext db, Life.LifeService life, TimeProvider clock, Microsoft.Extensions.Options.IOptions<Life.LifeOptions> lifeOptions, HttpContext ctx, CancellationToken ct)
     {
-        var owner = UserId(principal);
+        var snap = await SnapshotOf(UserId(principal), db, life, clock, lifeOptions.Value, ctx, ct);
+        return snap is null ? NoPet(ctx) : Results.Ok(snap);
+    }
+
+    /// <summary>The pet as every client sees it: makes up what it found while nobody looked, adds the weather of its owner's place.</summary>
+    internal static async Task<PetSnapshot?> SnapshotOf(Guid owner, AppDbContext db, Life.LifeService life, TimeProvider clock, Life.LifeOptions lifeOptions, HttpContext ctx, CancellationToken ct)
+    {
         var now = clock.GetUtcNow().UtcDateTime;
         var pet = await WithEquipment(db.Pets.AsNoTracking()).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
-        if (pet is null) return NoPet(ctx);
+        if (pet is null) return null;
         await life.CatchUpAsync(db, pet.PetId, owner, pet.CreatedAt, now, ct);
         var (w, loc) = await Weather.WeatherEndpoints.ForUser(owner, db, ctx.RequestServices.GetRequiredService<Weather.WeatherService>(), ct);
-        return Results.Ok(ToSnapshot(pet, now, lifeOptions.Value, w, loc?.TimeZone));
+        return ToSnapshot(pet, now, lifeOptions, w, loc?.TimeZone);
     }
 
     /// <summary>The latest things the pet found, newest first.</summary>

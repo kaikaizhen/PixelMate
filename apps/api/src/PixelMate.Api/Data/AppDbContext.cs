@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PixelMate.Api.Items;
+using PixelMate.Api.Devices;
 using PixelMate.Api.Life;
 using PixelMate.Api.Pets;
 using PixelMate.Api.Realtime;
@@ -30,6 +31,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<RoomState> RoomStates => Set<RoomState>();
     public DbSet<OutboxEvent> OutboxEvents => Set<OutboxEvent>();
     public DbSet<UserLocation> UserLocations => Set<UserLocation>();
+    public DbSet<Device> Devices => Set<Device>();
+    public DbSet<DevicePairing> DevicePairings => Set<DevicePairing>();
     public DbSet<RoomPlacement> RoomPlacements => Set<RoomPlacement>();
 
     protected override void OnModelCreating(ModelBuilder b)
@@ -192,6 +195,29 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             e.Property(x => x.Label).HasMaxLength(40).IsRequired();
             e.Property(x => x.Source).HasMaxLength(10).IsRequired();
             e.HasOne<AppUser>().WithOne().HasForeignKey<UserLocation>(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+        });
+        b.Entity<Device>(e =>
+        {
+            e.ToTable("devices");
+            e.HasKey(x => x.DeviceId);
+            e.Property(x => x.Model).HasMaxLength(40).IsRequired();
+            e.Property(x => x.Name).HasMaxLength(30).IsRequired();
+            e.Property(x => x.CredentialHash).HasMaxLength(64);
+            e.Ignore(x => x.State);
+            e.HasIndex(x => x.PetId);
+            e.HasIndex(x => x.OwnerId);
+            e.HasOne<Pet>().WithMany().HasForeignKey(x => x.PetId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<AppUser>().WithMany().HasForeignKey(x => x.OwnerId).OnDelete(DeleteBehavior.Cascade);    // MariaDB refuses to delete a user while a RESTRICT row still points at it, even if the pet cascade would remove it
+        });
+        b.Entity<DevicePairing>(e =>
+        {
+            e.ToTable("device_pairings");
+            e.HasKey(x => x.PairingId);
+            e.Property(x => x.CodeHash).HasMaxLength(64).IsRequired();
+            e.Property(x => x.PollTokenHash).HasMaxLength(64).IsRequired();
+            e.Property(x => x.Model).HasMaxLength(40).IsRequired();
+            e.HasIndex(x => x.CodeHash).IsUnique();
+            e.HasIndex(x => x.ExpiresAt);
         });
     }
 }

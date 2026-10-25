@@ -37,3 +37,4 @@ obj/
 
 # game art copied from /assets at dev/build time
 apps/pwa/public/game/
+apps/device-simulator/.device.json
