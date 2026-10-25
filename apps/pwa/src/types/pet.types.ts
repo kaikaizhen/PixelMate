@@ -10,7 +10,7 @@ export interface Pet {
   skills: Record<SkillKey, number>
   remainingSkillPoints: number
   equipment: Record<string, string | null>
-  world: { mood: string; scene: string; weather: string }
+  world: { mood: string; scene: string; weather: string; temperatureC?: number | null; weatherSource?: string; timeZone?: string }
   updatedAt: string
   activity?: PetActivity
 }

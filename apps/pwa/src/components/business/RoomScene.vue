@@ -6,7 +6,8 @@ import WeatherFx from './WeatherFx.vue'
 import { OUTDOOR_SPOT, PET_SPOT, ROOM_SIZE, WINDOW, WINDOW_VIEW } from '@/constants/defaultRoom'
 import { useSceneScale } from '@/composables/useSceneScale'
 import { useGameStore } from '@/stores/useGameStore'
-import { weatherKey, weatherName, windowWeatherKey } from '@/utils/roomWeather'
+import { isNightHour, weatherKey, weatherName, windowWeatherKey } from '@/utils/roomWeather'
+import { useNow } from '@/composables/useNow'
 import room from '@/assets/pixel/room.png'
 import plant from '@/assets/pixel/plant.png'
 import curtainL from '@/assets/pixel/curtain_l.png'
@@ -22,9 +23,10 @@ const el = ref<HTMLElement | null>(null)
 const measured = useSceneScale(el)
 const s = computed(() => props.scale ?? measured.value)   // fullscreen passes its own scale
 const game = useGameStore()
+const now = useNow()
 onMounted(() => void game.load())
 
-const weatherUrl = computed(() => game.url(windowWeatherKey(new Date(), props.weather)))
+const weatherUrl = computed(() => game.url(windowWeatherKey(now.value, props.weather)))
 const u = (n: number) => `calc(${n} * var(--s) * 1px)`
 const floorUrl = computed(() => (props.floor ? game.url(props.floor) : ''))
 const size = (key: string) => ({ w: game.assets[key]?.frameWidth ?? 48, h: game.assets[key]?.frameHeight ?? 48 })
@@ -50,10 +52,10 @@ function drag(e: PointerEvent, i: number) {
 const up = () => { grab = null }
 const noteUrl = computed(() => game.url('fx.note_drift'))
 const outdoors = computed(() => (props.scene === 'balcony' || props.scene === 'yard' ? props.scene : null))
-const outdoorUrl = computed(() => (outdoors.value ? game.url(weatherKey(new Date(), props.weather, outdoors.value)) : ''))
+const outdoorUrl = computed(() => (outdoors.value ? game.url(weatherKey(now.value, props.weather, outdoors.value)) : ''))
 const spot = computed(() => (outdoors.value ? OUTDOOR_SPOT[outdoors.value] : PET_SPOT))
-const wxName = computed(() => weatherName(new Date(), props.weather))
-const night = computed(() => windowWeatherKey(new Date(), props.weather).includes('starry'))
+const wxName = computed(() => weatherName(now.value, props.weather))
+const night = computed(() => isNightHour(now.value))
 </script>
 
 <template>

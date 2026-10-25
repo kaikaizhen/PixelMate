@@ -2,7 +2,8 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import RoomScene from './RoomScene.vue'
 import WeatherFx from './WeatherFx.vue'
-import { weatherKey, weatherName, windowWeatherKey } from '@/utils/roomWeather'
+import { isNightHour, weatherKey, weatherName } from '@/utils/roomWeather'
+import { useNow } from '@/composables/useNow'
 import { useEdgeColors } from '@/composables/useEdgeColors'
 import { useGameStore } from '@/stores/useGameStore'
 import wall from '@/assets/pixel/room_wall_tile.png'
@@ -30,6 +31,7 @@ const portrait = computed(() => h.value > w.value)
 const left = computed(() => (stageW.value - 240 * s.value) / 2)
 const top = computed(() => (portrait.value ? (h.value - 240 * s.value) * 0.05 : 0)) // phones: a little wall above, lots of floor below for the tool bar and the panels
 const game = useGameStore()
+const now = useNow()
 // the floor beyond the house art: the player's floor tile when they chose one, else the house's own
 const floorStyle = computed(() => {
   const chosen = props.floor ? game.url(props.floor) : ''
@@ -38,13 +40,13 @@ const floorStyle = computed(() => {
     : { backgroundImage: `url(${floorTile})` }
 })
 const outdoors = computed(() => (props.scene === 'balcony' || props.scene === 'yard' ? props.scene : null))
-const outdoorUrl = computed(() => (outdoors.value ? game.url(weatherKey(new Date(), props.weather, outdoors.value)) : ''))
+const outdoorUrl = computed(() => (outdoors.value ? game.url(weatherKey(now.value, props.weather, outdoors.value)) : ''))
 const edge = useEdgeColors(outdoorUrl)
-const wxName = computed(() => weatherName(new Date(), props.weather))
+const wxName = computed(() => weatherName(now.value, props.weather))
 // outdoors the weather fills the whole screen (not only the 240x240 picture), at the same pixel size as the art
 const fxW = computed(() => Math.ceil(stageW.value / s.value))
 const fxH = computed(() => Math.ceil(h.value / s.value))
-const night = computed(() => windowWeatherKey(new Date(), props.weather).includes('starry'))
+const night = computed(() => isNightHour(now.value))
 const vars = computed(() => ({ '--s': s.value, '--l': `${left.value}px`, '--t': `${top.value}px` }))
 </script>
 
@@ -61,7 +63,7 @@ const vars = computed(() => ({ '--s': s.value, '--l': `${left.value}px`, '--t': 
         </template>
         <RoomScene class="scene-box" bare :scale="s" :color="color" :happy="happy" :name="name" :weather="weather" :equipment="equipment" :activity="activity" :scene="scene" :placements="placements" :floor="floor" :editing="editing" :selected="selected" @pat="$emit('pat')" @select="$emit('select', $event)" @move="(i, x, y) => $emit('move', i, x, y)" />
         <div v-if="outdoors" class="outfx" data-outdoor-fx><WeatherFx :weather="wxName" :w="fxW" :h="fxH" /></div>
-        <span v-if="night && !outdoors" class="dim" aria-hidden="true" />
+        <span v-if="night && (!outdoors || wxName !== 'starry')" class="dim" aria-hidden="true" />
       </div>
     </Transition>
   </div>
