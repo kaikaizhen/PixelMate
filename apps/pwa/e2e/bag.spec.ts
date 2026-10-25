@@ -56,16 +56,17 @@ test.describe('背包與穿戴', () => {
     await expect(page.locator('button.pet img[data-item="equip.hat.straw_post"]')).toHaveCount(1)
   })
 
-  test('分頁會篩選；房間用品點了只提示，不會穿上', async ({ page }) => {
+  test('分頁會篩選；房間用品點了會進入布置小屋，不會穿上', async ({ page }) => {
     const dlg = await openBag(page)
     await dlg.getByRole('tab', { name: '房間' }).click()
     await expect(dlg.getByRole('button', { name: /花園單人床/ })).toBeVisible()
     await expect(dlg.getByRole('button', { name: /郵局草帽/ })).toHaveCount(0)
-    await dlg.getByRole('button', { name: /花園單人床/ }).click()
-    await expect(dlg.getByRole('alert')).toContainText('很快就會開放')
-    await expect(worn(page)).toHaveCount(0)
     await dlg.getByRole('tab', { name: '收藏' }).click()
     await expect(dlg.getByText('這一類還沒有道具。')).toBeVisible()
+    await dlg.getByRole('tab', { name: '房間' }).click()
+    await dlg.getByRole('button', { name: /花園單人床/ }).click()
+    await expect(page.getByRole('dialog', { name: '布置小屋' })).toBeVisible()
+    await expect(worn(page)).toHaveCount(0)
   })
 
   test('穿戴的狀態重新整理後還在（以後端為準）', async ({ page }) => {
