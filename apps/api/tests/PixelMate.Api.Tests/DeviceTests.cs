@@ -336,6 +336,68 @@ public class DeviceTests
     }
 
     [Fact]
+    public async Task The_device_shows_the_same_pet_as_the_app_and_follows_every_change_made_anywhere()
+    {
+        using var f = new AuthFactory();
+        var (owner, ownerId) = await Owner(f);
+        var (device, _, _) = await Pair(f, owner);
+        using (var scope = f.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.InventoryEntries.Add(new PixelMate.Api.Items.InventoryEntry { OwnerId = ownerId, ItemId = "equip.hat.straw_post", Quantity = 1 });
+            await db.SaveChangesAsync();
+        }
+
+        async Task<(JsonElement App, JsonElement Dev)> Both() => (await owner.GetFromJsonAsync<JsonElement>("/api/v1/pets/me", Web),
+            (await device.GetFromJsonAsync<JsonElement>("/api/v1/device/snapshot", Web)).GetProperty("pet"));
+
+        var (app, dev) = await Both();
+        Assert.Equal(app.GetProperty("petId").GetGuid(), dev.GetProperty("petId").GetGuid());      // one pet, not one per platform
+        Assert.Equal(app.GetProperty("name").GetString(), dev.GetProperty("name").GetString());
+
+        // dressed in the app -> the device sees it
+        var rev = app.GetProperty("revision").GetInt32();
+        Assert.Equal(HttpStatusCode.OK, (await owner.PostAsJsonAsync("/api/v1/pets/me/equipment", new { slot = "head", itemId = "equip.hat.straw_post", expectedRevision = rev })).StatusCode);
+        (app, dev) = await Both();
+        Assert.Equal("equip.hat.straw_post", dev.GetProperty("equipment").GetProperty("head").GetString());
+        Assert.Equal(app.GetProperty("revision").GetInt32(), dev.GetProperty("revision").GetInt32());
+
+        // skills changed in the app -> the device sees it
+        Assert.Equal(HttpStatusCode.OK, (await owner.PostAsJsonAsync("/api/v1/pets/me/skills/reset", new { expectedRevision = dev.GetProperty("revision").GetInt32() })).StatusCode);
+        (app, dev) = await Both();
+        Assert.Equal(app.GetProperty("revision").GetInt32(), dev.GetProperty("revision").GetInt32());
+
+        // what it is doing, where it is and the weather are the same answer on both
+        foreach (var path in new[] { new[] { "activity", "key" }, new[] { "activity", "startedAt" }, new[] { "world", "scene" }, new[] { "world", "weather" } })
+            Assert.Equal(path.Aggregate(app, (e, k) => e.GetProperty(k)).ToString(), path.Aggregate(dev, (e, k) => e.GetProperty(k)).ToString());
+    }
+
+    [Fact]
+    public async Task Two_devices_and_the_app_all_share_one_pet_and_a_device_cannot_create_another()
+    {
+        using var f = new AuthFactory();
+        var (owner, _) = await Owner(f);
+        var (d1, _, _) = await Pair(f, owner);
+        var (d2, _, _) = await Pair(f, owner);
+        var ids = new[]
+        {
+            (await owner.GetFromJsonAsync<JsonElement>("/api/v1/pets/me", Web)).GetProperty("petId").GetGuid(),
+            (await d1.GetFromJsonAsync<JsonElement>("/api/v1/device/snapshot", Web)).GetProperty("pet").GetProperty("petId").GetGuid(),
+            (await d2.GetFromJsonAsync<JsonElement>("/api/v1/device/snapshot", Web)).GetProperty("pet").GetProperty("petId").GetGuid(),
+        };
+        Assert.Single(ids.Distinct());
+
+        // a device has no way to adopt its own pet
+        var plain = await d1.PostAsJsonAsync("/api/v1/pets", new { name = "另一隻", bodyVariant = "star_01_mint" });
+        Assert.False(plain.IsSuccessStatusCode);                                                    // refused at the CSRF check already
+        var withMarker = new HttpRequestMessage(HttpMethod.Post, "/api/v1/pets") { Content = JsonContent.Create(new { name = "另一隻", bodyVariant = "star_01_mint" }) };
+        withMarker.Headers.Add("X-Requested-With", "pixelmate");
+        Assert.Equal(HttpStatusCode.Unauthorized, (await d1.SendAsync(withMarker)).StatusCode);      // and refused by authentication even with it
+        using var scope = f.Services.CreateScope();
+        Assert.Equal(1, await scope.ServiceProvider.GetRequiredService<AppDbContext>().Pets.CountAsync());
+    }
+
+    [Fact]
     public async Task The_model_name_is_checked()
     {
         using var f = new AuthFactory();

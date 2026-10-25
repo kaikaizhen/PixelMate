@@ -104,7 +104,7 @@ public static class DeviceEndpoints
     private static async Task<IResult> Snapshot(ClaimsPrincipal principal, AppDbContext db, LifeService life, TimeProvider clock, IOptions<LifeOptions> lifeOptions, HttpContext ctx, CancellationToken ct)
     {
         var owner = UserId(principal);
-        var snap = await PetEndpoints.SnapshotOf(owner, db, life, clock, lifeOptions.Value, ctx, ct);
+        var snap = await PetEndpoints.SnapshotOf(owner, db, life, clock, lifeOptions.Value, ctx, ct, Guid.Parse(principal.FindFirstValue("pet_id")!));   // the pet this device is bound to
         if (snap is null) return Err(ctx, 404, ErrorCodes.NotFound, "找不到角色。");
         var now = clock.GetUtcNow().UtcDateTime;
         var unread = await db.Letters.CountAsync(l => l.RecipientId == owner && !l.RecipientDeleted && l.ReadAt == null && l.DeliverAt <= now, ct);

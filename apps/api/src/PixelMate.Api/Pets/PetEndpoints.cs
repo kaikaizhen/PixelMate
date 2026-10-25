@@ -88,10 +88,11 @@ public static class PetEndpoints
     }
 
     /// <summary>The pet as every client sees it: makes up what it found while nobody looked, adds the weather of its owner's place.</summary>
-    internal static async Task<PetSnapshot?> SnapshotOf(Guid owner, AppDbContext db, Life.LifeService life, TimeProvider clock, Life.LifeOptions lifeOptions, HttpContext ctx, CancellationToken ct)
+    internal static async Task<PetSnapshot?> SnapshotOf(Guid owner, AppDbContext db, Life.LifeService life, TimeProvider clock, Life.LifeOptions lifeOptions, HttpContext ctx, CancellationToken ct, Guid? petId = null)
     {
         var now = clock.GetUtcNow().UtcDateTime;
-        var pet = await WithEquipment(db.Pets.AsNoTracking()).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
+        // a device passes the pet it is bound to; the app does not (one pet per account today)
+        var pet = await WithEquipment(db.Pets.AsNoTracking()).FirstOrDefaultAsync(p => p.OwnerId == owner && (petId == null || p.PetId == petId), ct);
         if (pet is null) return null;
         await life.CatchUpAsync(db, pet.PetId, owner, pet.CreatedAt, now, ct);
         var (w, loc) = await Weather.WeatherEndpoints.ForUser(owner, db, ctx.RequestServices.GetRequiredService<Weather.WeatherService>(), ct);
