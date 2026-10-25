@@ -14,10 +14,10 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine
 RUN apk add --no-cache tzdata
 WORKDIR /app
 COPY --from=build /out .
-ENV ASPNETCORE_URLS=http://+:8082 \
+ENV ASPNETCORE_URLS=http://+:5176 \
     ASPNETCORE_ENVIRONMENT=Production \
     DOTNET_EnableDiagnostics=0
 USER app
-EXPOSE 8082
-HEALTHCHECK --interval=30s --timeout=4s --start-period=40s --retries=3 CMD wget -q -O /dev/null http://127.0.0.1:8082/api/v1/health || exit 1
+EXPOSE 5176
+HEALTHCHECK --interval=30s --timeout=4s --start-period=40s --retries=3 CMD wget -q -O /dev/null http://127.0.0.1:5176/api/v1/health || exit 1
 ENTRYPOINT ["dotnet", "PixelMate.Api.dll"]
