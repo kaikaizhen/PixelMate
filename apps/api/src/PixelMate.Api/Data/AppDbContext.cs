@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using PixelMate.Api.Items;
 using PixelMate.Api.Life;
 using PixelMate.Api.Pets;
+using PixelMate.Api.Realtime;
 using PixelMate.Api.Rooms;
 using PixelMate.Api.Social;
 
@@ -26,6 +27,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<Relationship> Relationships => Set<Relationship>();
     public DbSet<Letter> Letters => Set<Letter>();
     public DbSet<RoomState> RoomStates => Set<RoomState>();
+    public DbSet<OutboxEvent> OutboxEvents => Set<OutboxEvent>();
     public DbSet<RoomPlacement> RoomPlacements => Set<RoomPlacement>();
 
     protected override void OnModelCreating(ModelBuilder b)
@@ -167,6 +169,18 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             e.HasIndex(x => x.OwnerId);
             e.HasOne<AppUser>().WithMany().HasForeignKey(x => x.OwnerId).OnDelete(DeleteBehavior.Cascade);
             e.HasOne<ItemDefinition>().WithMany().HasForeignKey(x => x.ItemId).OnDelete(DeleteBehavior.Restrict);
+        });
+        b.Entity<OutboxEvent>(e =>
+        {
+            e.ToTable("outbox_events");
+            e.HasKey(x => x.Seq);
+            e.Property(x => x.Seq).ValueGeneratedOnAdd();
+            e.Property(x => x.Type).HasMaxLength(40).IsRequired();
+            e.Property(x => x.PayloadJson).HasMaxLength(1000).IsRequired();
+            e.HasIndex(x => x.EventId).IsUnique();
+            e.HasIndex(x => new { x.UserId, x.Seq });
+            e.HasIndex(x => x.DispatchedAt);
+            e.HasOne<AppUser>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

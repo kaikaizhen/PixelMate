@@ -572,6 +572,67 @@ namespace PixelMate.Api.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PixelMate.Api.Realtime.OutboxEvent", b =>
+                {
+                    b.Property<long>("Seq")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("seq");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Seq"));
+
+                    b.Property<DateTime?>("DispatchedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("dispatched_at");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("event_id");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("occurred_at");
+
+                    b.Property<string>("PayloadJson")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("payload_json");
+
+                    b.Property<Guid?>("PetId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("pet_id");
+
+                    b.Property<int?>("Revision")
+                        .HasColumnType("int")
+                        .HasColumnName("revision");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("type");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Seq")
+                        .HasName("pk_outbox_events");
+
+                    b.HasIndex("DispatchedAt")
+                        .HasDatabaseName("ix_outbox_events_dispatched_at");
+
+                    b.HasIndex("EventId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_outbox_events_event_id");
+
+                    b.HasIndex("UserId", "Seq")
+                        .HasDatabaseName("ix_outbox_events_user_id_seq");
+
+                    b.ToTable("outbox_events", (string)null);
+                });
+
             modelBuilder.Entity("PixelMate.Api.Rooms.RoomPlacement", b =>
                 {
                     b.Property<Guid>("PlacementId")
@@ -667,6 +728,10 @@ namespace PixelMate.Api.Data.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("varchar(64)")
                         .HasColumnName("idempotency_key");
+
+                    b.Property<DateTime?>("NotifiedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("notified_at");
 
                     b.Property<string>("PaperItemId")
                         .HasMaxLength(80)
@@ -952,6 +1017,16 @@ namespace PixelMate.Api.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_pet_skills_pets_pet_id");
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Realtime.OutboxEvent", b =>
+                {
+                    b.HasOne("PixelMate.Api.Data.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_outbox_events_users_user_id");
                 });
 
             modelBuilder.Entity("PixelMate.Api.Rooms.RoomPlacement", b =>

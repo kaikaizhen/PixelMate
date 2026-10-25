@@ -33,7 +33,7 @@ public static class MailEndpoints
     }
 
     /// <summary>Sends a letter. The gift leaves the sender's bag now and reaches the recipient when they open the letter. Idempotency-Key makes a retry return the same letter.</summary>
-    private static async Task<IResult> Send(SendLetterRequest req, System.Security.Claims.ClaimsPrincipal principal, AppDbContext db, IOptions<LetterOptions> options, TimeProvider clock, HttpContext ctx, CancellationToken ct)
+    private static async Task<IResult> Send(SendLetterRequest req, System.Security.Claims.ClaimsPrincipal principal, AppDbContext db, Realtime.EventOutbox outbox, IOptions<LetterOptions> options, TimeProvider clock, HttpContext ctx, CancellationToken ct)
     {
         var me = UserId(principal);
         var o = options.Value;
@@ -71,6 +71,7 @@ public static class MailEndpoints
                 + await db.RoomStates.CountAsync(x => x.OwnerId == me && x.FloorItemId == req.GiftItemId, ct);
             if (placed > 0 && row.Quantity - placed < 1) return Err(ctx, 422, ErrorCodes.InvalidState, "這件正擺在小屋裡，請先收起來再送。");
             row.Quantity -= 1;                                          // out of the sender's bag in the same transaction as the letter
+            outbox.Add(me, Realtime.EventTypes.InventoryUpdated, new { reason = "gift-sent" });
         }
         db.Letters.Add(letter);
         try
@@ -137,7 +138,7 @@ public static class MailEndpoints
     }
 
     /// <summary>Opening a letter marks it read and hands over its gift, exactly once however often it is called.</summary>
-    private static async Task<IResult> Read(Guid id, System.Security.Claims.ClaimsPrincipal principal, AppDbContext db, TimeProvider clock, HttpContext ctx, CancellationToken ct)
+    private static async Task<IResult> Read(Guid id, System.Security.Claims.ClaimsPrincipal principal, AppDbContext db, Realtime.EventOutbox outbox, TimeProvider clock, HttpContext ctx, CancellationToken ct)
     {
         var me = UserId(principal);
         var now = clock.GetUtcNow().UtcDateTime;
@@ -158,6 +159,7 @@ public static class MailEndpoints
             var row = await db.InventoryEntries.FirstOrDefaultAsync(i => i.OwnerId == me && i.ItemId == l.GiftItemId, ct);
             if (row is null) db.InventoryEntries.Add(new InventoryEntry { OwnerId = me, ItemId = l.GiftItemId, Quantity = 1 });
             else row.Quantity += 1;
+            outbox.Add(me, Realtime.EventTypes.InventoryUpdated, new { reason = "gift-received" });
             await db.SaveChangesAsync(ct);
         }
         await tx.CommitAsync(ct);

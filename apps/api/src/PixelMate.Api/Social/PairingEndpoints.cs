@@ -108,7 +108,7 @@ public static class PairingEndpoints
     }
 
     /// <summary>The second confirmation: the code's owner chose to invite, the person who enters it chooses to accept.</summary>
-    private static async Task<IResult> Accept(CodeRequest req, ClaimsPrincipal principal, AppDbContext db, IOptions<LetterOptions> options, TimeProvider clock, HttpContext ctx, CancellationToken ct)
+    private static async Task<IResult> Accept(CodeRequest req, ClaimsPrincipal principal, AppDbContext db, Realtime.EventOutbox outbox, IOptions<LetterOptions> options, TimeProvider clock, HttpContext ctx, CancellationToken ct)
     {
         var me = UserId(principal);
         var now = clock.GetUtcNow().UtcDateTime;
@@ -135,6 +135,8 @@ public static class PairingEndpoints
         if (claimed == 0) return NoSuchCode(ctx);                      // someone used it a moment ago: a code works once
         if (existing is null) db.Relationships.Add(new Relationship { UserLowId = low, UserHighId = high, Kind = invite.Kind, CreatedAt = now });
         else { existing.EndedAt = null; existing.Kind = invite.Kind; existing.CreatedAt = now; }
+        outbox.Add(me, Realtime.EventTypes.FriendsUpdated);
+        outbox.Add(other, Realtime.EventTypes.FriendsUpdated);
         try
         {
             await db.SaveChangesAsync(ct);
@@ -165,12 +167,18 @@ public static class PairingEndpoints
         return Results.Ok(new { relationships = list });
     }
 
-    private static async Task<IResult> EndRelationship(Guid id, ClaimsPrincipal principal, AppDbContext db, TimeProvider clock, HttpContext ctx, CancellationToken ct)
+    private static async Task<IResult> EndRelationship(Guid id, ClaimsPrincipal principal, AppDbContext db, Realtime.EventOutbox outbox, TimeProvider clock, HttpContext ctx, CancellationToken ct)
     {
         var me = UserId(principal);
         var now = clock.GetUtcNow().UtcDateTime;
-        var n = await db.Relationships.Where(r => r.RelationshipId == id && r.EndedAt == null && (r.UserLowId == me || r.UserHighId == me))
+        var rel = await db.Relationships.AsNoTracking().FirstOrDefaultAsync(r => r.RelationshipId == id && r.EndedAt == null && (r.UserLowId == me || r.UserHighId == me), ct);
+        if (rel is null) return Err(ctx, 404, ErrorCodes.NotFound, "找不到這段關係。");
+        var n = await db.Relationships.Where(r => r.RelationshipId == id && r.EndedAt == null)
             .ExecuteUpdateAsync(s => s.SetProperty(r => r.EndedAt, now), ct);       // letters already delivered stay in each mailbox
-        return n == 0 ? Err(ctx, 404, ErrorCodes.NotFound, "找不到這段關係。") : Results.NoContent();
+        if (n == 0) return Err(ctx, 404, ErrorCodes.NotFound, "找不到這段關係。");
+        outbox.Add(me, Realtime.EventTypes.FriendsUpdated);
+        outbox.Add(rel.Other(me), Realtime.EventTypes.FriendsUpdated);
+        await db.SaveChangesAsync(ct);
+        return Results.NoContent();
     }
 }

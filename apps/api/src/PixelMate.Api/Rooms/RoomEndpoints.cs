@@ -63,7 +63,7 @@ public static class RoomEndpoints
     /// Replaces the whole layout at once (the editor sends what the room looks like when the player taps 完成): every item must be an
     /// owned furniture / decor / collectible, no more copies than owned, the floor must be an owned floor tile. One transaction + revision.
     /// </summary>
-    private static async Task<IResult> Save(SaveRoomRequest req, ClaimsPrincipal principal, AppDbContext db, TimeProvider clock, HttpContext ctx, CancellationToken ct)
+    private static async Task<IResult> Save(SaveRoomRequest req, ClaimsPrincipal principal, AppDbContext db, Realtime.EventOutbox outbox, TimeProvider clock, HttpContext ctx, CancellationToken ct)
     {
         var me = UserId(principal);
         var state = await StateOrStarter(db, me, clock, ct);
@@ -92,6 +92,7 @@ public static class RoomEndpoints
             .ExecuteUpdateAsync(s => s.SetProperty(x => x.Revision, req.ExpectedRevision + 1).SetProperty(x => x.FloorItemId, req.FloorItemId).SetProperty(x => x.UpdatedAt, now), ct);
         if (bumped == 0) return Err(ctx, 409, ErrorCodes.RevisionConflict, "小屋已經在別的地方更新了，已幫你重新載入。");   // another device saved a moment ago
         await db.RoomPlacements.Where(p => p.OwnerId == me).ExecuteDeleteAsync(ct);
+        outbox.Add(me, Realtime.EventTypes.RoomUpdated, new { revision = req.ExpectedRevision + 1 });
         db.RoomPlacements.AddRange(req.Placements.Select(p => new RoomPlacement { OwnerId = me, ItemId = p.ItemId, X = p.X, Y = p.Y }));
         await db.SaveChangesAsync(ct);
         await tx.CommitAsync(ct);

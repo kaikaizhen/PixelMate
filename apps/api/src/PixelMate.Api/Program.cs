@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using PixelMate.Api.Realtime;
 using PixelMate.Api.Rooms;
 using PixelMate.Api.Social;
 using FluentValidation;
@@ -38,8 +39,10 @@ var connectionString = builder.Configuration.GetConnectionString("Default") ?? "
 
 // No EnableRetryOnFailure: it forbids the explicit transactions that gifts, pairing and the room editor use (EF throws on BeginTransaction).
 // Conflicts are handled where they happen (revision / unique keys); a dropped connection simply fails the request and the app retries.
-builder.Services.AddDbContext<AppDbContext>(o =>
-    o.UseMySql(connectionString, new MariaDbServerVersion(new Version(10, 11, 8)),
+builder.Services.AddSingleton<OutboxSignal>();
+builder.Services.AddSingleton<PokeInterceptor>();
+builder.Services.AddDbContext<AppDbContext>((sp, o) =>
+    o.AddInterceptors(sp.GetRequiredService<PokeInterceptor>()).UseMySql(connectionString, new MariaDbServerVersion(new Version(10, 11, 8)),
             my => my.CommandTimeout(15))
         .UseSnakeCaseNamingConvention());
 
@@ -91,6 +94,11 @@ builder.Services.Configure<PixelMate.Api.Life.LifeOptions>(builder.Configuration
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<PixelMate.Api.Life.LifeService>();
 builder.Services.AddHostedService<PixelMate.Api.Life.LifeWorker>();
+builder.Services.AddSignalR();
+builder.Services.Configure<RealtimeOptions>(builder.Configuration.GetSection("Realtime"));
+builder.Services.AddScoped<EventOutbox>();
+builder.Services.AddSingleton<OutboxDispatcher>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<OutboxDispatcher>());
 builder.Services.Configure<PixelMate.Api.Social.LetterOptions>(builder.Configuration.GetSection("Letters"));
 
 builder.Services.AddOpenApi();
@@ -160,6 +168,7 @@ api.MapPets();
 api.MapItems();
 api.MapPairing();
 api.MapRoom();
+api.MapEvents();
 api.MapMail();
 if (app.Environment.IsDevelopment())
 {
