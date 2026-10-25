@@ -63,6 +63,25 @@ def book_frames():
     return out
 
 
+def letter_frames():
+    """Writing a letter: a sheet of paper on its lap and a quill that scratches along a line (frame 1 has one more word)."""
+    PAPER, FEATHER, SHAFT = "#fff6e2", "#8fc4e8", "#8a5a44"
+    out = []
+    for step in (0, 1):
+        s = Sprite(FRAME, FRAME)
+        s.rect(13, 33, 34, 44, PAPER); s.rect(13, 33, 34, 44, pet.LINE, fill=False)
+        s.line(16, 36, 31, 36, "#cdbfae"); s.line(16, 39, 25 + 5 * step, 39, "#cdbfae")
+        if step:
+            s.line(16, 42, 21, 42, "#cdbfae")
+        x = 26 + 5 * step                                   # the quill follows the end of the line
+        s.line(x, 40, x + 4, 35, SHAFT)
+        s.polygon([(x + 4, 35), (x + 7, 32), (x + 10, 34), (x + 7, 38)], FEATHER)
+        s.polygon([(x + 4, 35), (x + 7, 32), (x + 10, 34), (x + 7, 38)], pet.LINE, fill=False)
+        s.px(x, 40, pet.LINE)
+        out.append(hard_alpha(s.composite(1).copy()))
+    return out
+
+
 def frame(sheet, index, face, attach=(0, 0), root=(0, 0), props=()):
     f = {"body": {"sheet": sheet, "index": index}, "face": face, "attach": list(attach), "root": list(root)}
     if props:
@@ -82,6 +101,12 @@ def animations():
         frame("idle", 0, "look_down", (0, 0), props=[{"key": f"{KEY}.prop.book", "index": 0}]),
         frame("idle", 1, "look_down", (0, 0), props=[{"key": f"{KEY}.prop.book", "index": 1}]),
         frame("idle", 0, "look_down", (0, 0), props=[{"key": f"{KEY}.prop.book", "index": 0}]),
+    ])
+    a["write"] = dict(fps=3, loop=True, frames=[
+        frame("idle", 0, "look_down", (0, 0), props=[{"key": f"{KEY}.prop.letter", "index": 0}]),
+        frame("idle", 0, "look_down", (0, 0), props=[{"key": f"{KEY}.prop.letter", "index": 1}]),
+        frame("idle", 1, "look_down", (0, 0), props=[{"key": f"{KEY}.prop.letter", "index": 0}]),
+        frame("idle", 0, "look_down", (0, 0), props=[{"key": f"{KEY}.prop.letter", "index": 1}]),
     ])
     hop = [0, -3, -6, -3]
     a["react_happy"] = dict(fps=8, loop=False, frames=[frame("idle", 0, "happy", (0, 0), root=(0, hop[i])) for i in range(4)])
@@ -110,4 +135,8 @@ def build():
     write_strip(book_frames(), rel)
     entries[f"{KEY}.prop.book"] = dict(type="spritesheet", layer="pet_front_accessory", path=rel, frames=2,
                                        frameWidth=FRAME, frameHeight=FRAME, fps=2, anchor=ANCHOR)
+    rel = f"{DIR}/prop_letter.png"
+    write_strip(letter_frames(), rel)
+    entries[f"{KEY}.prop.letter"] = dict(type="spritesheet", layer="pet_front_accessory", path=rel, frames=2,
+                                         frameWidth=FRAME, frameHeight=FRAME, fps=3, anchor=ANCHOR)
     return entries, animations()

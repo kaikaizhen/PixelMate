@@ -482,6 +482,22 @@ def weather_sunrise_balcony():
     return s
 
 
+def _tint(base, toward, t):
+    """Mix two #rrggbb colours (t = how far toward the second)."""
+    a = [int(base[i:i + 2], 16) for i in (1, 3, 5)]
+    b = [int(toward[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#%02x%02x%02x" % tuple(round(x + (y - x) * t) for x, y in zip(a, b))
+
+
+def _stones(s, ground):
+    """A few round stepping stones leading down from the gate, tinted from the ground so they belong to every weather and time of day."""
+    stone, edge_c, light = _tint(ground, "#d8c8a8", 0.62), _tint(ground, "#6a5a48", 0.45), _tint(ground, "#f4ead2", 0.7)
+    for x0, y0, x1, y1 in ((112, 196, 132, 205), (122, 208, 144, 218), (104, 221, 126, 231)):
+        s.ellipse(x0, y0 + 1, x1, y1 + 1, edge_c)        # a little shadow under the stone
+        s.ellipse(x0, y0, x1, y1, stone)
+        s.ellipse(x0 + 3, y0 + 1, x0 + 9, y0 + 3, light)  # a highlight on its top-left
+
+
 def weather_sunrise_yard():
     s = weather_sunrise_window()
     s.rect(0, 150, 239, 239, "#a8d890")
@@ -492,7 +508,7 @@ def weather_sunrise_yard():
     for i in range(14):                                                       # grass + flowers
         x, y = (i * 53) % 230 + 4, 204 + (i * 29) % 30
         s.rect(x, y, x + 2, y + 2, ("#f4a6a0", "#ffd86b", "#fff6e2")[i % 3]); s.line(x + 1, y + 3, x + 1, y + 7, "#5f9a6a")
-    s.rect(100, 196, 140, 236, "#c8b090")                                     # stepping path
+    _stones(s, "#a8d890")                                                   # stepping stones
     return s
 
 

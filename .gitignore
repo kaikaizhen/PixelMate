@@ -29,3 +29,12 @@ assets/preview/b2_*
 assets/preview/esp32_*
 assets/preview/stats.md
 assets/preview/similarity_report.txt
+
+# .NET
+bin/
+obj/
+*.user
+
+# game art copied from /assets at dev/build time
+apps/pwa/public/game/
+apps/device-simulator/.device.json

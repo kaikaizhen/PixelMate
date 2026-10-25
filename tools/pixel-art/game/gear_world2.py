@@ -367,7 +367,7 @@ def _yard(s, ground="#a8d890", fence="#fff6e2", shade="#e8dcc4"):
     for i in range(14):
         x, y = (i * 53) % 230 + 4, 204 + (i * 29) % 30
         s.rect(x, y, x + 2, y + 2, ("#f4a6a0", "#ffd86b", "#fff6e2")[i % 3]); s.line(x + 1, y + 3, x + 1, y + 7, "#5f9a6a")
-    s.rect(100, 196, 140, 236, "#c8b090")
+    gear_world._stones(s, ground)                                                  # stepping stones, tinted from the ground
 
 
 def _sunset_sky(s):

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SpriteStrip from '@/components/common/SpriteStrip.vue'
-import { APP_PATH, IS_APP_OPEN } from '@/constants/launch'
+import { APP_PATH, APP_STAGE, IS_APP_OPEN } from '@/constants/launch'
 import petIdle from '@/assets/pixel/pet_idle.png'
 import star from '@/assets/pixel/star.png'
 import moon from '@/assets/pixel/moon.png'
@@ -31,8 +31,10 @@ const STARS = [
       <div class="soon__pet" aria-hidden="true">
         <SpriteStrip :src="petIdle" :frames="4" :width="48" :height="48" duration="0.9s" />
       </div>
-      <h2 id="soon-title" class="soon__title">一個小小的世界，<br />即將與你見面。</h2>
+      <h2 v-if="IS_APP_OPEN" id="soon-title" class="soon__title">一個小小的世界，<br />現在開放試玩。</h2>
+      <h2 v-else id="soon-title" class="soon__title">一個小小的世界，<br />即將與你見面。</h2>
       <p class="soon__lead">先在手機裡認識牠，未來，也能讓牠住進你的桌面。</p>
+      <p v-if="IS_APP_OPEN && APP_STAGE" class="soon__stage" data-testid="app-stage">{{ APP_STAGE }}：註冊的帳號與角色可能隨時被清除。</p>
 
       <a v-if="IS_APP_OPEN" class="soon__cta" :href="APP_PATH">開始養一隻</a>
       <button v-else type="button" class="soon__cta soon__cta--soon" disabled>即將開放</button>
@@ -53,6 +55,17 @@ const STARS = [
   background: linear-gradient(#232a50, #3a4575);
   color: #fff8ec;
   text-align: center;
+}
+
+.soon__stage {
+  display: inline-block;
+  margin: 0 0 var(--space-2);
+  padding: 0.3rem 0.8rem;
+  background: #ffd86b;
+  color: #4a3040;
+  border: 3px solid #fff8ec;
+  font-weight: 700;
+  font-size: 0.95rem;
 }
 
 .soon__sky {
