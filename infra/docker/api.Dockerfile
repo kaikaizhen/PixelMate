@@ -14,7 +14,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine
 RUN apk add --no-cache tzdata
 WORKDIR /app
 COPY --from=build /out .
-ENV ASPNETCORE_URLS=http://+:5176 \
+# 5176: the next port after the website (5174) and the PWA (5175). HTTP_PORTS replaces the image's default 8080, so nothing listens there.
+ENV ASPNETCORE_HTTP_PORTS=5176 \
     ASPNETCORE_ENVIRONMENT=Production \
     DOTNET_EnableDiagnostics=0
 USER app
