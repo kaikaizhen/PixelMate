@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using PixelMate.Api.Rooms;
 using PixelMate.Api.Social;
 using FluentValidation;
 using Microsoft.AspNetCore.DataProtection;
@@ -156,6 +157,7 @@ api.MapAuth();
 api.MapPets();
 api.MapItems();
 api.MapPairing();
+api.MapRoom();
 api.MapMail();
 if (app.Environment.IsDevelopment())
 {

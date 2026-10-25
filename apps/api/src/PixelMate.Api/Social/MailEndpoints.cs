@@ -67,6 +67,9 @@ public static class MailEndpoints
             if (row is null) return Err(ctx, 422, ErrorCodes.InvalidState, "背包裡沒有這個禮物。");
             var worn = await db.PetEquipment.CountAsync(e => e.InventoryId == row.InventoryId, ct);
             if (worn > 0 && row.Quantity <= 1) return Err(ctx, 422, ErrorCodes.InvalidState, "這件正穿在小夥伴身上，請先脫下來再送。");
+            var placed = await db.RoomPlacements.CountAsync(x => x.OwnerId == me && x.ItemId == req.GiftItemId, ct)
+                + await db.RoomStates.CountAsync(x => x.OwnerId == me && x.FloorItemId == req.GiftItemId, ct);
+            if (placed > 0 && row.Quantity - placed < 1) return Err(ctx, 422, ErrorCodes.InvalidState, "這件正擺在小屋裡，請先收起來再送。");
             row.Quantity -= 1;                                          // out of the sender's bag in the same transaction as the letter
         }
         db.Letters.Add(letter);
