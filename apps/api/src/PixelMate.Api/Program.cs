@@ -200,6 +200,13 @@ if (app.Environment.IsDevelopment())
     api.MapItemDev();
 }
 
+// A deployment brings a new image that may carry new migrations: apply them before the first request (Database__MigrateOnStart=true in the NAS .env).
+if (app.Configuration.GetValue<bool>("Database:MigrateOnStart"))
+{
+    using var scope = app.Services.CreateScope();
+    scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+}
+
 app.Run();
 
 public partial class Program;   // for WebApplicationFactory in tests
