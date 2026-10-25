@@ -21,7 +21,7 @@ onMounted(() => window.addEventListener('resize', update))
 onUnmounted(() => window.removeEventListener('resize', update))
 
 // wide screens while decorating: the room moves into the space left of the editor card + tool column so nothing is hidden under them
-const EDITOR_SPACE = 568
+const EDITOR_SPACE = 440
 const squeeze = computed(() => !!props.editing && w.value >= 860)
 const stageW = computed(() => (squeeze.value ? w.value - EDITOR_SPACE : w.value))
 const s = computed(() => Math.min(stageW.value, h.value) / 240)
