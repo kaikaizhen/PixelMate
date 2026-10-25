@@ -1,0 +1,21 @@
+# the images are built from the repository root (infra/docker/*.Dockerfile); keep the context small and free of secrets
+**/node_modules
+**/dist
+**/bin
+**/obj
+**/test-results
+**/playwright-report
+**/.env
+**/.env.*
+!**/.env.example
+**/.git
+docs
+tools
+assets/catalog
+assets/gallery
+assets/preview
+assets/readme
+apps/api/tests
+apps/web
+apps/device-simulator
+apps/pwa/public/game

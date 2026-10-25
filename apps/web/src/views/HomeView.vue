@@ -13,7 +13,7 @@ import ComingSoonSection from '@/components/business/ComingSoonSection.vue'
 
 const TITLE = '小伴星PixelMate｜8-bit 像素虛擬寵物，即將與你見面'
 const DESCRIPTION =
-  '小伴星PixelMate 是一款 8-bit 像素風虛擬寵物：牠在小房間裡過自己的日子，能換帽子、圍巾與藍白拖，也會替你把遠方的信送到身邊。即將推出手機 PWA，之後加入桌面小螢幕。'
+  '小伴星PixelMate 是一款 8-bit 像素風虛擬寵物：牠在小房間裡過自己的日子，能換帽子、圍巾與藍白拖，也會替你把遠方的信送到身邊。手機 PWA 測試服開放中（資料會被清除），之後加入桌面小螢幕。'
 const siteUrl = (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, '')
 
 const jsonLd = {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import DevicePreview from '@/components/business/DevicePreview.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
+import { APP_PATH, APP_STAGE, IS_APP_OPEN } from '@/constants/launch'
 </script>
 
 <template>
@@ -12,9 +13,12 @@ import StatusBadge from '@/components/common/StatusBadge.vue'
       <div class="platforms__grid">
         <article class="platforms__card">
           <div class="platforms__art"><DevicePreview kind="phone" /></div>
-          <StatusBadge>即將登場</StatusBadge>
+          <StatusBadge v-if="IS_APP_OPEN">{{ APP_STAGE ? `開放測試中・${APP_STAGE}` : '現在可以玩' }}</StatusBadge>
+          <StatusBadge v-else>即將登場</StatusBadge>
           <h3 class="platforms__name">手機・網頁 App（PWA）</h3>
           <p class="platforms__text">加到主畫面就像一個 App，打開就能看牠今天在做什麼。</p>
+          <a v-if="IS_APP_OPEN" class="platforms__cta" :href="APP_PATH">進入{{ APP_STAGE ? '測試服' : '遊戲' }}</a>
+          <p v-if="IS_APP_OPEN && APP_STAGE" class="platforms__warn">測試期間帳號與角色可能隨時被清除。</p>
         </article>
 
         <article class="platforms__card">
@@ -36,6 +40,27 @@ import StatusBadge from '@/components/common/StatusBadge.vue'
   background: var(--c-paper);
   border-block: 4px dashed var(--c-ink);
   text-align: center;
+}
+
+.platforms__cta {
+  display: inline-block;
+  padding: 0.6rem 1.4rem;
+  background: var(--c-yellow);
+  color: #4a3040;
+  border: 3px solid var(--c-ink);
+  box-shadow: 4px 4px 0 var(--c-ink);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.platforms__cta:hover {
+  transform: translate(1px, 1px);
+}
+
+.platforms__warn {
+  margin: 0;
+  color: var(--c-ink-soft);
+  font-size: 0.9rem;
 }
 
 .platforms__title {

@@ -1,0 +1,39 @@
+# Static PWA inside the container. TLS / domain / routing (/web/ -> here) are handled by the host's reverse proxy.
+server {
+    listen ${PORT};
+    server_name _;
+    root /usr/share/nginx/html;
+
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml text/plain application/manifest+json;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), payment=(), geolocation=(self)" always;
+    add_header Cross-Origin-Opener-Policy "same-origin" always;
+    add_header X-Frame-Options "DENY" always;
+
+    location = /health {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    # a new build is picked up at once: the service worker, its manifest and the entry page are never cached
+    location = /web/sw.js { add_header Cache-Control "no-cache" always; add_header X-Content-Type-Options "nosniff" always; try_files $uri =404; }
+    location ~ ^/web/(workbox-.*\.js|registerSW\.js|manifest\.webmanifest)$ { add_header Cache-Control "no-cache" always; add_header X-Content-Type-Options "nosniff" always; try_files $uri =404; }
+    location = /web/index.html { add_header Cache-Control "no-cache" always; add_header X-Content-Type-Options "nosniff" always; try_files $uri =404; }
+
+    # hashed build files never change
+    location /web/assets/ { add_header Cache-Control "public, max-age=31536000, immutable" always; add_header X-Content-Type-Options "nosniff" always; try_files $uri =404; }
+
+    # game art keeps its names: browsers must check with the server (ETag) so new art shows up
+    location /web/game/ { add_header Cache-Control "no-cache" always; add_header X-Content-Type-Options "nosniff" always; try_files $uri =404; }
+
+    # the app's own routes (/web/login, /web/register ...) all start the single-page app
+    location /web/ {
+        add_header Cache-Control "no-cache" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        try_files $uri $uri/ /web/index.html;
+    }
+}

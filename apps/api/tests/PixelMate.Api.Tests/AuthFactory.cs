@@ -64,7 +64,9 @@ public sealed class AuthFactory(IDictionary<string, string?>? settings = null) :
 {
     // A named shared-cache in-memory database: every DbContext gets its own connection (one connection shared by parallel requests is not
     // thread-safe), and this first connection keeps the database alive while the factory lives.
-    private readonly string _cs = $"DataSource=file:pm_{Guid.NewGuid():N}?mode=memory&cache=shared";
+    /// <summary>Two factories with the same name share one database: a "new container" talking to the same data as the old one.</summary>
+    public string DbName { get; init; } = Guid.NewGuid().ToString("N");
+    private string _cs => $"DataSource=file:pm_{DbName}?mode=memory&cache=shared";
     private SqliteConnection? _db;
     public FakeMailSender Mail { get; } = new();
     public FakeWeatherHandler Weather { get; } = new();
