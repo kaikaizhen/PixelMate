@@ -45,9 +45,9 @@ export default defineConfig({
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   server: {
     port: 5173,
-    proxy: { '/api': { target: 'http://localhost:5200', changeOrigin: false } },
+    proxy: { '/api': { target: 'http://localhost:5200', changeOrigin: false, ws: true } },   // ws: the SignalR link
   },
-  preview: { port: 4174, proxy: { '/api': { target: 'http://localhost:5200' } } },
+  preview: { port: 4174, proxy: { '/api': { target: 'http://localhost:5200', ws: true } } },
   build: { assetsInlineLimit: 0 },
   test: { environment: 'jsdom', include: ['src/**/*.spec.ts'] },
 })

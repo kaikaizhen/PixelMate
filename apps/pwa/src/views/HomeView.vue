@@ -12,6 +12,8 @@ import { SKILLS, colorOf } from '@/constants/petLooks'
 import { ACTIVITIES } from '@/constants/activities'
 import { petApi } from '@/api/petApi'
 import { utc } from '@/utils/time'
+import { createRealtime } from '@/realtime/connection'
+import { batcher } from '@/realtime/routeEvent'
 import { ApiError } from '@/api/http'
 import { MAX_SKILL_POINTS, type SkillKey } from '@/types/pet.types'
 import { useSubmit } from '@/composables/useSubmit'
@@ -79,7 +81,18 @@ async function refreshLife() {
     if (!room.editing) await room.load(true)
   } catch { /* offline: the next tick tries again */ }
 }
-const resyncTimer = window.setInterval(refreshLife, 60_000)
+// Live link: the API pushes "something changed" and the screen re-reads just that. Without the link the minute timer below does it.
+const quietly = (p: Promise<unknown>) => void p.catch(() => {})
+const onEvent = batcher({
+  pet: () => quietly(pets.load(true)),
+  inventory: () => { if (bag.loaded) quietly(bag.load(true)) },
+  room: () => { if (!room.editing) quietly(room.load(true)) },
+  mail: () => quietly(checkMail().then(() => (panel.value === 'mail' ? social.loadInbox() : undefined))),
+  friends: () => quietly(social.loadFriends()),
+  finds: () => quietly(checkFinds()),
+})
+const realtime = createRealtime(onEvent, () => { void refreshLife(); quietly(social.loadFriends()) })
+const resyncTimer = window.setInterval(() => { if (!realtime.connected.value) void refreshLife() }, 60_000)
 let slotTimer: number | undefined
 watch(() => pet.value.activity?.endsAt, (end) => {
   window.clearTimeout(slotTimer)
@@ -91,11 +104,13 @@ onMounted(() => {
   void checkFinds().catch(() => {})
   void social.refreshUnread().catch(() => {})
   void room.load().catch(() => {})
+  void realtime.start()
 })
 onUnmounted(() => {
   window.clearInterval(resyncTimer)
   window.clearTimeout(slotTimer)
   window.clearTimeout(foundTimer)
+  realtime.stop()
   document.removeEventListener('visibilitychange', refreshLife)
   window.removeEventListener('focus', refreshLife)
 })
