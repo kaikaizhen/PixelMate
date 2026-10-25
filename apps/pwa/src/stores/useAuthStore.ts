@@ -5,6 +5,7 @@ import { ApiError } from '@/api/http'
 import type { LoginInput, RegisterInput, User } from '@/types/auth.types'
 import { useSocialStore } from './useSocialStore'
 import { useRoomStore } from './useRoomStore'
+import { useLocationStore } from './useLocationStore'
 import { useInventoryStore } from './useInventoryStore'
 import { usePetStore } from './usePetStore'
 
@@ -30,6 +31,7 @@ export const useAuthStore = defineStore('auth', () => {
     useInventoryStore().clear()
     useSocialStore().clear()
     useRoomStore().clear()
+    useLocationStore().clear()
     user.value = await authApi.login(input)
     return user.value
   }
@@ -44,7 +46,8 @@ export const useAuthStore = defineStore('auth', () => {
       usePetStore().clear()
       useInventoryStore().clear()
       useSocialStore().clear()
-    useRoomStore().clear()
+      useRoomStore().clear()
+      useLocationStore().clear()
     }
   }
 

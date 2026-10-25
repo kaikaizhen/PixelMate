@@ -4,6 +4,10 @@ import { useRoute, useRouter } from 'vue-router'
 import OverlayPanel from '@/components/common/OverlayPanel.vue'
 import MailPanel from '@/components/business/MailPanel.vue'
 import RoomEditor from '@/components/business/RoomEditor.vue'
+import LocationPicker from '@/components/business/LocationPicker.vue'
+import { useLocationStore } from '@/stores/useLocationStore'
+import { WEATHER_LABEL } from '@/types/weather.types'
+import { isNightHour } from '@/utils/roomWeather'
 import { useRoomStore } from '@/stores/useRoomStore'
 import { useSettingsStore } from '@/stores/useSettingsStore'
 import { useSocialStore } from '@/stores/useSocialStore'
@@ -24,7 +28,7 @@ import { useInventoryStore } from '@/stores/useInventoryStore'
 import { usePetStore } from '@/stores/usePetStore'
 import type { InventoryItem } from '@/types/pet.types'
 
-type PanelId = 'pet' | 'bag' | 'mail' | 'account' | null
+type PanelId = 'pet' | 'bag' | 'mail' | 'account' | 'location' | null
 
 const auth = useAuthStore()
 const pets = usePetStore()
@@ -32,6 +36,7 @@ const bag = useInventoryStore()
 const social = useSocialStore()
 const room = useRoomStore()
 const settings = useSettingsStore()
+const loc = useLocationStore()
 const game = useGameStore()
 const route = useRoute()
 const router = useRouter()
@@ -107,6 +112,8 @@ onMounted(() => {
   void social.refreshUnread().catch(() => {})
   void room.load().catch(() => {})
   void realtime.start()
+  // first time here: offer to show the weather of the player's own place (once; they can change it any time from the weather pill)
+  void loc.load().then(() => { if (!loc.location && !loc.asked() && !panel.value && !room.editing) panel.value = 'location' }).catch(() => {})
 })
 onUnmounted(() => {
   window.clearInterval(resyncTimer)
@@ -117,6 +124,14 @@ onUnmounted(() => {
   window.removeEventListener('focus', refreshLife)
 })
 const doing = computed(() => ACTIVITIES[pet.value.activity?.key ?? ''])
+const SKY_ICON: Record<string, string> = { clear: '☀️', cloudy: '☁️', fog: '🌫️', drizzle: '🌦️', shower: '🌧️', thunder: '⛈️', typhoon: '🌀', snow: '❄️', cold: '🥶', petals: '🌸' }
+const sky = computed(() => {
+  const w = pet.value.world
+  if (!w.weather) return null
+  const icon = w.weather === 'clear' && isNightHour(new Date()) ? '🌙' : SKY_ICON[w.weather] ?? '☁️'
+  const t = typeof w.temperatureC === 'number' ? ` ${Math.round(w.temperatureC)}°` : ''
+  return `${icon} ${WEATHER_LABEL[w.weather] ?? w.weather}${t}`
+})
 const place = computed(() => ({ balcony: '在陽台', yard: '在院子' } as Record<string, string>)[pet.value.world.scene])
 
 // ---- backpack ---------------------------------------------------------------------------------------------------
@@ -233,6 +248,7 @@ const { loading, submit } = useSubmit(async () => {
     <button v-if="!room.editing" type="button" class="chip" aria-haspopup="dialog" @click="toggle('pet')">
       <strong>{{ pet.name }}</strong><span>Lv.{{ pet.level }}</span><em v-if="pet.remainingSkillPoints" class="badge">+{{ pet.remainingSkillPoints }}</em>
     </button>
+ <button v-if="sky && !room.editing" type="button" class="sky" aria-haspopup="dialog" :aria-label="`天氣：${sky}，點一下設定所在地`" @click="toggle('location')">{{ sky }}</button>
     <p v-if="doing" class="doing" role="status" :data-activity="pet.activity?.key">{{ doing.emoji }} {{ pet.name }}正在{{ doing.label }}<template v-if="place">・{{ place }}</template></p>
     <p v-if="found && !welcome" class="toast" role="status">🎁 {{ found }}</p>
     <p v-if="welcome" class="toast" role="status">領養成功！{{ pet.name }} 住進你的小屋了。</p>
@@ -289,6 +305,11 @@ const { loading, submit } = useSubmit(async () => {
       <MailPanel />
     </OverlayPanel>
 
+    <OverlayPanel :open="panel === 'location'" title="所在地與天氣" subtitle="看看你那裡的天氣" @close="loc.markAsked(); panel = null">
+      <LocationPicker @done="panel = null" />
+      <button type="button" class="later" @click="loc.markAsked(); panel = null">之後再說</button>
+    </OverlayPanel>
+
     <OverlayPanel :open="panel === 'account'" title="帳號" @close="panel = null">
       <p class="who"><strong>{{ auth.user?.displayName }}</strong><span>{{ auth.user?.email }}</span></p>
       <label class="opt"><input v-model="settings.weatherMotion" type="checkbox" /> 天氣動態（雨、雪、雲、星星會動）</label>
@@ -320,6 +341,23 @@ const { loading, submit } = useSubmit(async () => {
 }
 .chip span { font-family: var(--font-pixel); font-size: 0.65rem; color: var(--c-ink-soft); }
 
+.sky {
+  position: absolute;
+  top: calc(0.75rem + env(safe-area-inset-top));
+  right: 0.75rem;
+  min-height: 44px;
+  padding: 0 0.8rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--c-ink);
+  background: var(--c-paper);
+  border: 3px solid var(--c-ink);
+  border-radius: var(--radius);
+  box-shadow: 2px 2px 0 var(--c-ink);
+  cursor: pointer;
+}
+.later { margin-top: 0.5rem; width: 100%; min-height: 40px; font: inherit; color: var(--c-ink-soft); background: none; border: 0; text-decoration: underline; cursor: pointer; }
 .doing {
   position: absolute;
   top: calc(0.75rem + env(safe-area-inset-top) + var(--tap-min) + 0.5rem);
@@ -420,6 +458,7 @@ const { loading, submit } = useSubmit(async () => {
   /* wide screens: the tools stand in a column at the right edge so they never cover the room */
   .bar { inset: 50% 1.25rem auto auto; transform: translateY(-50%); width: 7.5rem; margin: 0; grid-template-columns: 1fr; }
   .chip { top: 1.25rem; left: 1.25rem; }
+  .sky { top: 1.25rem; right: 1.25rem; }
   .doing { top: calc(1.25rem + var(--tap-min) + 0.5rem); left: 1.25rem; }
 }
 </style>

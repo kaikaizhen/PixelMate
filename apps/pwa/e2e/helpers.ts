@@ -23,7 +23,7 @@ export const json = (route: Route, status: number, body?: unknown) =>
 
 /** Mock the API. `session` flips to the user after a successful login so /me behaves like the real cookie session. */
 export async function mockApi(page: Page, handlers: Record<string, Handler> = {}, opts: { pet?: typeof PET | null; bag?: typeof BAG } = {}) {
-  const state = { signedIn: false, bag: structuredClone(opts.bag ?? []), pet: opts.pet === undefined ? (PET as typeof PET | null) : opts.pet, room: { revision: 1, floorItemId: null as string | null, placements: [{ placementId: 'p-table', itemId: 'world.furniture.table_garden', x: 150, y: 100 }] as any[] }, friends: [] as any[], inbox: [] as any[], sent: [] as any[], invites: 0, calls: [] as { path: string; body: any; csrf: string | undefined; key?: string }[] }
+  const state = { signedIn: false, bag: structuredClone(opts.bag ?? []), pet: opts.pet === undefined ? (PET as typeof PET | null) : opts.pet, room: { revision: 1, floorItemId: null as string | null, placements: [{ placementId: 'p-table', itemId: 'world.furniture.table_garden', x: 150, y: 100 }] as any[] }, location: { latitude: 25, longitude: 121.5, timeZone: 'Asia/Taipei', label: '臺北市', source: 'city', updatedAt: '2026-10-20T00:00:00Z' } as any, friends: [] as any[], inbox: [] as any[], sent: [] as any[], invites: 0, calls: [] as { path: string; body: any; csrf: string | undefined; key?: string }[] }
   await page.route('**/api/v1/**', async (route) => {
     const req = route.request()
     const path = new URL(req.url()).pathname.replace('/api/v1', '')
@@ -42,6 +42,16 @@ export async function mockApi(page: Page, handlers: Record<string, Handler> = {}
       if (body.expectedRevision !== state.room.revision) return json(route, 409, { code: 'REVISION_CONFLICT', message: 'x', requestId: 'r' })
       state.room = { revision: state.room.revision + 1, floorItemId: body.floorItemId, placements: body.placements.map((p: any, i: number) => ({ placementId: `p${state.room.revision}-${i}`, ...p })) }
       return json(route, 200, state.room)
+    }
+    if (path === '/weather/cities') return json(route, 200, { cities: [
+      { id: 'tpe', name: '臺北市', latitude: 25.04, longitude: 121.56, timeZone: 'Asia/Taipei', group: 'taiwan' },
+      { id: 'khh', name: '高雄市', latitude: 22.63, longitude: 120.3, timeZone: 'Asia/Taipei', group: 'taiwan' },
+      { id: 'tyo', name: '東京', latitude: 35.68, longitude: 139.69, timeZone: 'Asia/Tokyo', group: 'world' }] })
+    if (path === '/me/location' && req.method() === 'GET') return json(route, 200, { location: state.location })
+    if (path === '/me/location' && req.method() === 'PUT') {
+      state.location = { ...body, latitude: Math.round(body.latitude * 10) / 10, longitude: Math.round(body.longitude * 10) / 10, updatedAt: new Date().toISOString() }
+      if (state.pet) (state.pet as any).world = { ...(state.pet as any).world, weather: body.timeZone === 'Asia/Tokyo' ? 'snow' : 'shower', temperatureC: 18.4, weatherSource: body.timeZone === 'Asia/Tokyo' ? 'open-meteo' : 'cwa', timeZone: body.timeZone }
+      return json(route, 200, state.location)
     }
     // ---- friends and letters: a small stateful copy of the server rules ----
     if (path === '/pairing/relationships') return json(route, 200, { relationships: state.friends })

@@ -12,9 +12,18 @@ function byClock(date: Date): string {
   return 'starry'
 }
 
-/** The weather's name as the art knows it: the server's word when it is one of ours, else the clock's. */
+/** Night by the player's own clock (20:00 - 04:59). */
+export const isNightHour = (date: Date): boolean => date.getHours() >= 20 || date.getHours() < 5
+
+/**
+ * The weather's name as the art knows it. The server says what the weather IS (clear, cloudy, shower, snow...); the time of day comes
+ * from this device's own clock: clear weather shows sunrise / day / sunset / starry, and a dry night shows the stars.
+ */
 export function weatherName(date = new Date(), serverWeather?: string): string {
-  return serverWeather === 'rain' || serverWeather === 'rainy' ? 'shower' : (WEATHERS as readonly string[]).includes(serverWeather ?? '') ? serverWeather! : byClock(date)
+  const w = serverWeather === 'rain' || serverWeather === 'rainy' ? 'shower' : serverWeather
+  if (!w || !(WEATHERS as readonly string[]).includes(w)) return byClock(date)       // "clear", an old API word, or nothing yet
+  if (isNightHour(date) && (w === 'cloudy' || w === 'cold' || w === 'petals')) return 'starry'
+  return w
 }
 
 /** assetKey of the outdoor picture for a weather (the server's word wins over the clock) and a view. */

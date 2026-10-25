@@ -63,3 +63,6 @@ into `public/game/` (git-ignored). Edit the starter room in `src/constants/defau
 - Moving weather: `src/utils/weatherFx.ts` draws rain, snow, petals, fog, drifting clouds, birds, twinkling stars with shooting stars and lightning on a
   small canvas at game-pixel resolution (12 fps, seeded, paused when the tab is hidden, a still frame with reduced motion). `WeatherFx.vue` shows it in
   the window (64x72) and across the whole screen when the pet is outdoors, thinned out for the bigger area.
+- Weather & place: the API says what the weather IS (`pet.world.weather`, `temperatureC`, `weatherSource`); `weatherName()` adds the sky from this device's
+  own clock (sunrise 05-09, day, sunset 17-20, night 20-05, re-evaluated every 30 s by `useNow`). The weather pill (top right) opens 所在地與天氣:
+  browser location (named after the nearest city) or a city list; the first visit asks once.
