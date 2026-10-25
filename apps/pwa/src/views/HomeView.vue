@@ -5,6 +5,7 @@ import OverlayPanel from '@/components/common/OverlayPanel.vue'
 import MailPanel from '@/components/business/MailPanel.vue'
 import RoomEditor from '@/components/business/RoomEditor.vue'
 import { useRoomStore } from '@/stores/useRoomStore'
+import { useSettingsStore } from '@/stores/useSettingsStore'
 import { useSocialStore } from '@/stores/useSocialStore'
 import PixelButton from '@/components/common/PixelButton.vue'
 import FullRoom from '@/components/business/FullRoom.vue'
@@ -30,6 +31,7 @@ const pets = usePetStore()
 const bag = useInventoryStore()
 const social = useSocialStore()
 const room = useRoomStore()
+const settings = useSettingsStore()
 const game = useGameStore()
 const route = useRoute()
 const router = useRouter()
@@ -289,6 +291,7 @@ const { loading, submit } = useSubmit(async () => {
 
     <OverlayPanel :open="panel === 'account'" title="帳號" @close="panel = null">
       <p class="who"><strong>{{ auth.user?.displayName }}</strong><span>{{ auth.user?.email }}</span></p>
+      <label class="opt"><input v-model="settings.weatherMotion" type="checkbox" /> 天氣動態（雨、雪、雲、星星會動）</label>
       <PixelButton variant="ghost" :loading="loading" @click="submit()">登出</PixelButton>
     </OverlayPanel>
   </main>
@@ -329,6 +332,8 @@ const { loading, submit } = useSubmit(async () => {
   border: 3px solid var(--c-ink);
   border-radius: var(--radius);
 }
+.opt { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 0.6rem; font-size: 0.9rem; cursor: pointer; }
+.opt input { width: 22px; height: 22px; accent-color: var(--c-ink); }
 .mark { position: absolute; top: -8px; right: -6px; min-width: 20px; padding: 0 0.3rem; font-family: var(--font-pixel); font-size: 0.6rem; line-height: 20px; color: #fff; background: var(--c-error); border: 2px solid var(--c-ink); border-radius: 10px; text-align: center; }
 .toast {
   position: absolute;
