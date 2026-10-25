@@ -372,7 +372,7 @@ const { loading, submit } = useSubmit(async () => {
 }
 .opt { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 0.6rem; font-size: 0.9rem; cursor: pointer; }
 .opt input { width: 22px; height: 22px; accent-color: var(--c-ink); }
-.mark { position: absolute; top: -8px; right: -6px; min-width: 20px; padding: 0 0.3rem; font-family: var(--font-pixel); font-size: 0.6rem; line-height: 20px; color: #fff; background: var(--c-error); border: 2px solid var(--c-ink); border-radius: 10px; text-align: center; }
+.mark { position: absolute; top: -8px; right: -6px; min-width: 20px; padding: 0 0.3rem; font-family: var(--font-pixel); font-size: 0.6rem; line-height: 20px; color: #fff; background: var(--c-error-solid); border: 2px solid var(--c-ink); border-radius: 10px; text-align: center; }
 .toast {
   position: absolute;
   top: calc(0.75rem + env(safe-area-inset-top));
@@ -430,8 +430,8 @@ const { loading, submit } = useSubmit(async () => {
 .name small { color: var(--c-ink-soft); font-size: 0.72rem; }
 .pips { display: inline-flex; gap: 3px; }
 .pips i { width: 12px; height: 12px; background: var(--c-paper); border: 2px solid var(--c-ink); }
-.pips i.on { background: var(--c-yellow); }
-.add { min-width: 44px; min-height: 44px; font: inherit; font-size: 1.2rem; font-weight: 700; color: var(--c-ink); background: var(--c-yellow); border: 3px solid var(--c-ink); border-radius: 8px; box-shadow: 2px 2px 0 var(--c-ink); cursor: pointer; }
+.pips i.on { background: var(--c-yellow); color: var(--c-on-yellow); }
+.add { min-width: 44px; min-height: 44px; font: inherit; font-size: 1.2rem; font-weight: 700; color: var(--c-ink); background: var(--c-yellow); color: var(--c-on-yellow); border: 3px solid var(--c-ink); border-radius: 8px; box-shadow: 2px 2px 0 var(--c-ink); cursor: pointer; }
 .add:disabled { opacity: 0.35; box-shadow: none; cursor: not-allowed; }
 .acts { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .ghost { min-height: 40px; padding: 0 0.9rem; font: inherit; font-size: 0.9rem; color: var(--c-ink); background: var(--c-paper); border: 2px solid var(--c-ink); border-radius: 8px; cursor: pointer; }
@@ -439,7 +439,7 @@ const { loading, submit } = useSubmit(async () => {
 .ghost.dev { background: var(--c-pink-soft); }
 .tabs { display: flex; gap: 0.4rem; margin-bottom: 0.5rem; }
 .tabs button { min-height: 40px; padding: 0 0.8rem; font: inherit; font-size: 0.85rem; color: var(--c-ink); background: var(--c-paper); border: 2px solid var(--c-ink); border-radius: 8px; cursor: pointer; }
-.tabs button.on { background: var(--c-yellow); font-weight: 700; }
+.tabs button.on { background: var(--c-yellow); color: var(--c-on-yellow); font-weight: 700; }
 .empty { color: var(--c-ink-soft); font-size: 0.9rem; padding: 0.5rem 0; }
 .items { margin: 0 0 0.5rem; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; }
 .item { position: relative; display: grid; justify-items: center; gap: 0.15rem; width: 100%; padding: 0.35rem 0.2rem; font: inherit; color: var(--c-ink); background: var(--c-cream); border: 3px solid var(--c-line); border-radius: 8px; cursor: pointer; }
@@ -449,8 +449,8 @@ const { loading, submit } = useSubmit(async () => {
 .item img { width: 48px; height: 48px; object-fit: contain; }
 .nm { font-size: 0.68rem; line-height: 1.2; text-align: center; overflow-wrap: anywhere; }
 .qty { position: absolute; top: 2px; right: 4px; font-style: normal; font-size: 0.7rem; font-weight: 700; }
-.on-tag { position: absolute; top: 2px; left: 2px; font-size: 0.55rem; padding: 0 0.25rem; color: #4a3040; background: var(--c-yellow); border: 1px solid var(--c-ink); border-radius: 4px; }
-.badge { font-style: normal; font-family: var(--font-pixel); font-size: 0.6rem; padding: 0.15rem 0.4rem; color: #4a3040; background: var(--c-yellow); border: 2px solid var(--c-ink); border-radius: 6px; }
+.on-tag { position: absolute; top: 2px; left: 2px; font-size: 0.55rem; padding: 0 0.25rem; color: #4a3040; background: var(--c-yellow); color: var(--c-on-yellow); border: 1px solid var(--c-ink); border-radius: 4px; }
+.badge { font-style: normal; font-family: var(--font-pixel); font-size: 0.6rem; padding: 0.15rem 0.4rem; color: #4a3040; background: var(--c-yellow); color: var(--c-on-yellow); border: 2px solid var(--c-ink); border-radius: 6px; }
 .who { display: grid; gap: 0.15rem; margin-bottom: 1rem; }
 .who span { color: var(--c-ink-soft); font-size: 0.9rem; }
 

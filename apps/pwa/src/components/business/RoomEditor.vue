@@ -115,15 +115,15 @@ h2 { margin: 0; text-align: center; font-size: 1rem; line-height: 1.2; }
 h2 small { display: block; font-size: 0.7rem; font-weight: 400; color: var(--c-ink-soft); }
 .cancel, .done { min-height: 44px; padding: 0 1rem; font: inherit; font-weight: 700; color: var(--c-ink); border: 3px solid var(--c-ink); border-radius: 8px; cursor: pointer; }
 .cancel { background: var(--c-paper); }
-.done { background: var(--c-yellow); box-shadow: 2px 2px 0 var(--c-ink); }
+.done { background: var(--c-yellow); color: var(--c-on-yellow); box-shadow: 2px 2px 0 var(--c-ink); }
 .done:disabled { opacity: 0.5; box-shadow: none; cursor: wait; }
 .notice { margin: 0; padding: 0.4rem 0.7rem; color: var(--c-error); background: var(--c-error-soft); border: 2px solid currentColor; border-radius: 8px; font-size: 0.82rem; }
 .hint, .empty { margin: 0; text-align: center; color: var(--c-ink-soft); font-size: 0.8rem; }
 .picked { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.35rem 0.4rem 0.35rem 0.7rem; font-size: 0.8rem; background: var(--c-pink-soft); border: 2px solid var(--c-ink); border-radius: 8px; }
-.remove { flex: none; min-height: 40px; padding: 0 0.8rem; font: inherit; font-weight: 700; font-size: 0.85rem; color: #fff; background: var(--c-error); border: 2px solid var(--c-ink); border-radius: 8px; cursor: pointer; }
+.remove { flex: none; min-height: 40px; padding: 0 0.8rem; font: inherit; font-weight: 700; font-size: 0.85rem; color: #fff; background: var(--c-error-solid); border: 2px solid var(--c-ink); border-radius: 8px; cursor: pointer; }
 .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem; }
 .tabs button { min-height: 38px; font: inherit; font-size: 0.85rem; color: var(--c-ink); background: var(--c-paper); border: 2px solid var(--c-ink); border-radius: 8px; cursor: pointer; }
-.tabs button.on { background: var(--c-yellow); font-weight: 700; }
+.tabs button.on { background: var(--c-yellow); color: var(--c-on-yellow); font-weight: 700; }
 .tray { margin: 0; padding: 0.2rem 0.1rem 0.35rem; list-style: none; display: flex; gap: 0.4rem; overflow-x: auto; scroll-snap-type: x proximity; }
 .tray li { flex: none; scroll-snap-align: start; }
 .card { position: relative; display: grid; justify-items: center; align-content: start; gap: 0.1rem; width: 4.6rem; height: 5.6rem; padding: 0.3rem 0.2rem; font: inherit; color: var(--c-ink); background: var(--c-cream); border: 3px solid var(--c-line); border-radius: 8px; cursor: pointer; }
@@ -135,7 +135,7 @@ h2 small { display: block; font-size: 0.7rem; font-weight: 400; color: var(--c-i
 .card .ph { font-size: 1.6rem; line-height: 48px; }
 .nm { max-width: 100%; font-size: 0.68rem; line-height: 1.15; text-align: center; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .qty { position: absolute; right: 3px; bottom: 2px; font-style: normal; font-size: 0.6rem; color: var(--c-ink-soft); }
-.tag { position: absolute; top: -7px; left: -5px; padding: 0 0.3rem; font-size: 0.6rem; background: var(--c-yellow); border: 2px solid var(--c-ink); border-radius: 6px; }
+.tag { position: absolute; top: -7px; left: -5px; padding: 0 0.3rem; font-size: 0.6rem; background: var(--c-yellow); color: var(--c-on-yellow); border: 2px solid var(--c-ink); border-radius: 6px; }
 @media (min-width: 860px) {
   .dock { inset: 50% 1.25rem auto auto; transform: translateY(-50%); width: 24rem; max-width: none; margin: 0; animation: none; }
   .tray { flex-wrap: wrap; overflow: visible; }

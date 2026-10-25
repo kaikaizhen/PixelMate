@@ -10,6 +10,10 @@
   --c-green: #5f9a6a;
   --c-green-soft: #e3f3dc;
   --c-yellow: #ffd86b;
+  --c-on-yellow: #4a3040;      /* text on yellow stays dark in every theme */
+  --c-error-solid: #b8403e;    /* red badge / button with white text in every theme */
+  --c-field: #ffffff;          /* inputs and selects */
+  --c-letter: #fff6e2;         /* the paper of a letter */
   --c-error: #b8403e;
   --c-error-soft: #fdeaea;
 
@@ -31,6 +35,8 @@
     --c-ink: #f4e8dc;
     --c-ink-soft: #c8b4bc;
     --c-line: #4a3a4c;
+    --c-field: #3a2e3c;
+    --c-letter: #3b3040;
     --c-pink-soft: #4a2e36;
     --c-green: #8fcf9a;
     --c-green-soft: #24402c;
