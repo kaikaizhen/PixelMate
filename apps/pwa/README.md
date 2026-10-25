@@ -57,3 +57,6 @@ into `public/game/` (git-ignored). Edit the starter room in `src/constants/defau
 - Room: `useRoomStore` keeps the saved layout and a draft. The 布置 tool (or tapping a room item in the bag) opens the editor dock; pieces are dragged on the
   240x240 canvas (pixel-aligned), stacked by how far down they stand (the pet included), 完成 sends the whole layout with `expectedRevision`.
   A chosen floor tile covers the house floor. On wide screens the room shifts left while editing so the card never hides it.
+- Realtime: `src/realtime/` keeps a SignalR link (`/api/v1/hub`, cookie session; the CSRF marker is sent as a header). The API only pushes
+  "something changed" (`pet.updated`, `pet.find`, `inventory.updated`, `room.updated`, `mail.received`, `friends.updated`); the screen re-reads
+  just that, with a 150 ms batch and eventId de-duplication. Without the link it falls back to focus / slot-end / 60 s polling.
