@@ -62,7 +62,10 @@ public sealed class FakeWeatherHandler : HttpMessageHandler
 
 public sealed class AuthFactory(IDictionary<string, string?>? settings = null) : WebApplicationFactory<Program>
 {
-    private readonly SqliteConnection _db = new("DataSource=:memory:");
+    // A named shared-cache in-memory database: every DbContext gets its own connection (one connection shared by parallel requests is not
+    // thread-safe), and this first connection keeps the database alive while the factory lives.
+    private readonly string _cs = $"DataSource=file:pm_{Guid.NewGuid():N}?mode=memory&cache=shared";
+    private SqliteConnection? _db;
     public FakeMailSender Mail { get; } = new();
     public FakeWeatherHandler Weather { get; } = new();
     public FakeClock Clock { get; } = new(DateTimeOffset.UtcNow);
@@ -70,6 +73,7 @@ public sealed class AuthFactory(IDictionary<string, string?>? settings = null) :
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        _db = new SqliteConnection(_cs);
         _db.Open();
         builder.UseEnvironment("Production");
         builder.ConfigureAppConfiguration((_, cfg) =>
@@ -86,7 +90,7 @@ public sealed class AuthFactory(IDictionary<string, string?>? settings = null) :
             services.RemoveAll<DbContextOptions<AppDbContext>>();
             services.RemoveAll<DbContextOptions>();
             services.RemoveAll<IDbContextOptionsConfiguration<AppDbContext>>();   // the MySQL options action registered by Program
-            services.AddDbContext<AppDbContext>(o => o.UseSqlite(_db).UseSnakeCaseNamingConvention());
+            services.AddDbContext<AppDbContext>(o => o.UseSqlite(_cs).UseSnakeCaseNamingConvention());
             services.RemoveAll<IMailSender>();
             services.AddSingleton<IMailSender>(Mail);
             services.AddHttpClient("openmeteo").ConfigurePrimaryHttpMessageHandler(() => Weather);   // never the real internet
@@ -118,6 +122,6 @@ public sealed class AuthFactory(IDictionary<string, string?>? settings = null) :
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
-        _db.Dispose();
+        _db?.Dispose();
     }
 }
