@@ -16,6 +16,7 @@ export interface Refreshers {
   mail(): void
   friends(): void
   finds(): void
+  devices(): void
 }
 
 /** Which re-reads an event asks for (several events in a burst share one set, so a find that also changes the bag reads each once). */
@@ -27,6 +28,7 @@ export function wants(type: string): (keyof Refreshers)[] {
     case 'room.updated': return ['room']
     case 'mail.received': return ['mail']
     case 'friends.updated': return ['friends']
+    case 'devices.updated': return ['devices']
     default: return []
   }
 }

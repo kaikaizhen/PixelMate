@@ -63,6 +63,14 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(await contrast(page, '[aria-label="布置小屋"] .remove')).toBeGreaterThanOrEqual(4.5)
     })
 
+    test('裝置：配對與清單的按鈕和輸入欄', async ({ page }) => {
+      await start(page)
+      await page.getByRole('button', { name: '帳號' }).click()
+      await page.getByRole('button', { name: /我的裝置/ }).click()
+      expect(await contrast(page, '[aria-label="我的裝置"] .primary')).toBeGreaterThanOrEqual(4.5)
+      expect(await contrast(page, '[aria-label="我的裝置"] input')).toBeGreaterThanOrEqual(4.5)
+    })
+
     test('首頁：技能加號、背包分頁', async ({ page }) => {
       await start(page)
       await page.getByRole('button', { name: '背包' }).click()
