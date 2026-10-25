@@ -3,26 +3,25 @@ import { onMounted, ref } from 'vue'
 import { ApiError } from '@/api/http'
 import { useSubmit } from '@/composables/useSubmit'
 import { useDeviceStore } from '@/stores/useDeviceStore'
+import { usePetStore } from '@/stores/usePetStore'
 import { ago } from '@/utils/time'
 
 // The owner's side of pairing: type the code a device shows on its screen, see which devices are connected, rename or remove them.
 const store = useDeviceStore()
+const pets = usePetStore()
 const code = ref('')
-const name = ref('')
 const message = ref('')
 const error = ref('')
 const confirmId = ref('')
-const editing = ref('')
-const newName = ref('')
 
 onMounted(() => void store.load().catch(() => (error.value = '裝置清單暫時載入不了。')))
 
 const pair = useSubmit(async () => {
   error.value = ''; message.value = ''
   try {
-    const d = await store.pair(code.value, name.value)
-    message.value = `已核准「${d.name}」！裝置幾秒內就會完成連線。`
-    code.value = ''; name.value = ''
+    await store.pair(code.value)
+    message.value = `已核准！裝置幾秒內就會連上，顯示的就是${pets.pet?.name ?? '你的小夥伴'}。`
+    code.value = ''
   } catch (e) {
     error.value = e instanceof ApiError ? e.message : '配對失敗了，請再試一次。'
   }
@@ -35,15 +34,6 @@ const revoke = useSubmit(async (id: string) => {
   try { await store.revoke(id) } catch (e) { error.value = e instanceof ApiError ? e.message : '移除失敗了。' }
 })
 
-const rename = useSubmit(async (id: string) => {
-  error.value = ''
-  try {
-    await store.rename(id, newName.value)
-    editing.value = ''
-  } catch (e) { error.value = e instanceof ApiError ? (e.fieldErrors.name?.[0] ?? e.message) : '改名失敗了。' }
-})
-
-function startRename(id: string, current: string) { editing.value = id; newName.value = current; confirmId.value = '' }
 const STATE = { waiting: '等裝置連線中…', active: '使用中', revoked: '已移除' } as const
 </script>
 
@@ -55,21 +45,11 @@ const STATE = { waiting: '等裝置連線中…', active: '使用中', revoked: 
     <ul v-if="store.devices.length" class="list" aria-label="已配對的裝置">
       <li v-for="d in store.devices" :key="d.deviceId" :class="d.state">
         <div class="info">
-          <template v-if="editing === d.deviceId">
-            <form class="rename" @submit.prevent="rename.submit(d.deviceId)">
-              <input v-model="newName" aria-label="裝置名稱" maxlength="30" />
-              <button type="submit" class="ghost" :disabled="!newName.trim() || rename.loading.value">儲存</button>
-              <button type="button" class="ghost" @click="editing = ''">取消</button>
-            </form>
-          </template>
-          <template v-else>
-            <strong>{{ d.name }}</strong>
-            <small>{{ d.model }}</small>
-            <small class="state" :data-state="d.state">{{ STATE[d.state] }}<template v-if="d.state === 'active'">　·　{{ ago(d.lastSeenAt) }}</template></small>
-          </template>
+          <strong>{{ d.model }}</strong>
+          <small>顯示：{{ pets.pet?.name ?? '你的小夥伴' }}（和 App、其他裝置是同一隻）</small>
+          <small class="state" :data-state="d.state">{{ STATE[d.state] }}<template v-if="d.state === 'active'">　·　{{ ago(d.lastSeenAt) }}</template></small>
         </div>
-        <div v-if="editing !== d.deviceId" class="acts">
-          <button type="button" class="ghost" @click="startRename(d.deviceId, d.name)">改名</button>
+        <div class="acts">
           <button type="button" class="ghost danger" :disabled="revoke.loading.value" @click="revoke.submit(d.deviceId)">{{ confirmId === d.deviceId ? '確定移除？' : '移除' }}</button>
         </div>
       </li>
@@ -81,11 +61,8 @@ const STATE = { waiting: '等裝置連線中…', active: '使用中', revoked: 
       <label>裝置畫面上的配對碼
         <input v-model="code" aria-label="配對碼" placeholder="ABCD-EFGH" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12" />
       </label>
-      <label>幫它取個名字（選填）
-        <input v-model="name" aria-label="裝置名稱（選填）" placeholder="例如：書桌上的小栗" maxlength="30" />
-      </label>
       <button type="submit" class="primary" :disabled="!code.trim() || pair.loading.value">{{ pair.loading.value ? '配對中…' : '確認配對' }}</button>
-      <small>配對碼 10 分鐘內有效、只能用一次。一隻小夥伴最多配對 3 台裝置，你隨時可以在這裡移除。</small>
+      <small>配對後，裝置顯示的是你現在這隻小夥伴，不會多出新角色。配對碼 10 分鐘內有效、只能用一次，最多配對 3 台，隨時可以移除。</small>
     </form>
   </div>
 </template>
@@ -103,8 +80,6 @@ const STATE = { waiting: '等裝置連線中…', active: '使用中', revoked: 
 .info small { color: var(--c-ink-soft); font-size: 0.72rem; }
 .state[data-state='active'] { color: var(--c-green); font-weight: 700; }
 .acts { display: flex; gap: 0.35rem; }
-.rename { display: flex; gap: 0.35rem; grid-column: 1 / -1; }
-.rename input { flex: 1; min-width: 0; }
 input { font: inherit; font-size: 1rem; padding: 0.4rem 0.6rem; color: var(--c-ink); background: var(--c-field); border: 2px solid var(--c-ink); border-radius: 8px; }
 .add { display: grid; gap: 0.4rem; padding: 0.6rem 0.7rem; border: 2px solid var(--c-line); border-radius: 8px; }
 .add h3 { margin: 0; font-size: 0.95rem; }

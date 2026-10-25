@@ -66,5 +66,5 @@ into `public/game/` (git-ignored). Edit the starter room in `src/constants/defau
 - Weather & place: the API says what the weather IS (`pet.world.weather`, `temperatureC`, `weatherSource`); `weatherName()` adds the sky from this device's
   own clock (sunrise 05-09, day, sunset 17-20, night 20-05, re-evaluated every 30 s by `useNow`). The weather pill (top right) opens 所在地與天氣:
   browser location (named after the nearest city) or a city list; the first visit asks once.
-- Devices: 帳號 > 我的裝置 (`DevicesPanel`, `useDeviceStore`) is the owner's side of pairing: type the code the ESP32 shows, name it, see waiting / active + last seen,
-  rename, remove (two taps). `devices.updated` events refresh the list live. The device side is `apps/device-simulator` until the hardware arrives.
+- Devices: 帳號 > 我的裝置 (`DevicesPanel`, `useDeviceStore`) is the owner's side of pairing: type the code the ESP32 shows (no naming: a device is just another screen for the same pet), see waiting / active + last seen,
+  remove (two taps). `devices.updated` events refresh the list live. The device side is `apps/device-simulator` until the hardware arrives.
