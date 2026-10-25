@@ -23,7 +23,7 @@ export const json = (route: Route, status: number, body?: unknown) =>
 
 /** Mock the API. `session` flips to the user after a successful login so /me behaves like the real cookie session. */
 export async function mockApi(page: Page, handlers: Record<string, Handler> = {}, opts: { pet?: typeof PET | null; bag?: typeof BAG } = {}) {
-  const state = { signedIn: false, bag: structuredClone(opts.bag ?? []), pet: opts.pet === undefined ? (PET as typeof PET | null) : opts.pet, room: { revision: 1, floorItemId: null as string | null, placements: [{ placementId: 'p-table', itemId: 'world.furniture.table_garden', x: 150, y: 100 }] as any[] }, location: { latitude: 25, longitude: 121.5, timeZone: 'Asia/Taipei', label: '臺北市', source: 'city', updatedAt: '2026-10-20T00:00:00Z' } as any, friends: [] as any[], inbox: [] as any[], sent: [] as any[], invites: 0, calls: [] as { path: string; body: any; csrf: string | undefined; key?: string }[] }
+  const state = { signedIn: false, bag: structuredClone(opts.bag ?? []), pet: opts.pet === undefined ? (PET as typeof PET | null) : opts.pet, room: { revision: 1, floorItemId: null as string | null, placements: [{ placementId: 'p-table', itemId: 'world.furniture.table_garden', x: 150, y: 100 }] as any[] }, location: { latitude: 25, longitude: 121.5, timeZone: 'Asia/Taipei', label: '臺北市', source: 'city', updatedAt: '2026-10-20T00:00:00Z' } as any, devices: [] as any[], friends: [] as any[], inbox: [] as any[], sent: [] as any[], invites: 0, calls: [] as { path: string; body: any; csrf: string | undefined; key?: string }[] }
   await page.route('**/api/v1/**', async (route) => {
     const req = route.request()
     const path = new URL(req.url()).pathname.replace('/api/v1', '')
@@ -52,6 +52,22 @@ export async function mockApi(page: Page, handlers: Record<string, Handler> = {}
       state.location = { ...body, latitude: Math.round(body.latitude * 10) / 10, longitude: Math.round(body.longitude * 10) / 10, updatedAt: new Date().toISOString() }
       if (state.pet) (state.pet as any).world = { ...(state.pet as any).world, weather: body.timeZone === 'Asia/Tokyo' ? 'snow' : 'shower', temperatureC: 18.4, weatherSource: body.timeZone === 'Asia/Tokyo' ? 'open-meteo' : 'cwa', timeZone: body.timeZone }
       return json(route, 200, state.location)
+    }
+    if (path === '/devices' && req.method() === 'GET') return json(route, 200, { devices: state.devices })
+    if (path === '/devices/pair') {
+      if (body.code.toUpperCase() !== 'ABCD-2345') return json(route, 404, { code: 'NOT_FOUND', message: '找不到這組配對碼，或已經過期了。', requestId: 'r' })
+      if (state.devices.length >= 3) return json(route, 422, { code: 'INVALID_STATE', message: '一隻小夥伴最多配對 3 台裝置，請先移除不用的。', requestId: 'r' })
+      const d = { deviceId: 'd' + (state.devices.length + 1), petId: 'p', model: 'Waveshare-AMOLED-2.16', name: body.name || 'Waveshare-AMOLED-2.16', state: 'waiting', createdAt: new Date().toISOString(), activatedAt: null, lastSeenAt: null }
+      state.devices.push(d)
+      return json(route, 200, d)
+    }
+    const dev = path.match(/^\/devices\/([^/]+)$/)
+    if (dev) {
+      const d = state.devices.find((x) => x.deviceId === dev[1])
+      if (!d) return json(route, 404, { code: 'NOT_FOUND', message: '找不到這台裝置。', requestId: 'r' })
+      if (req.method() === 'PUT') d.name = body.name
+      else state.devices = state.devices.filter((x) => x !== d)
+      return json(route, 204)
     }
     // ---- friends and letters: a small stateful copy of the server rules ----
     if (path === '/pairing/relationships') return json(route, 200, { relationships: state.friends })

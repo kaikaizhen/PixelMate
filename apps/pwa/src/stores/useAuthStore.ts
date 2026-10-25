@@ -6,6 +6,7 @@ import type { LoginInput, RegisterInput, User } from '@/types/auth.types'
 import { useSocialStore } from './useSocialStore'
 import { useRoomStore } from './useRoomStore'
 import { useLocationStore } from './useLocationStore'
+import { useDeviceStore } from './useDeviceStore'
 import { useInventoryStore } from './useInventoryStore'
 import { usePetStore } from './usePetStore'
 
@@ -32,6 +33,7 @@ export const useAuthStore = defineStore('auth', () => {
     useSocialStore().clear()
     useRoomStore().clear()
     useLocationStore().clear()
+    useDeviceStore().clear()
     user.value = await authApi.login(input)
     return user.value
   }
@@ -48,6 +50,7 @@ export const useAuthStore = defineStore('auth', () => {
       useSocialStore().clear()
       useRoomStore().clear()
       useLocationStore().clear()
+    useDeviceStore().clear()
     }
   }
 

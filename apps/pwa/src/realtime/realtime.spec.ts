@@ -3,7 +3,7 @@ import { batcher, wants, type Refreshers } from './routeEvent'
 import { createRealtime } from './connection'
 import type { HubConnection } from '@microsoft/signalr'
 
-const refreshers = (): Refreshers => ({ pet: vi.fn(), inventory: vi.fn(), room: vi.fn(), mail: vi.fn(), friends: vi.fn(), finds: vi.fn() })
+const refreshers = (): Refreshers => ({ pet: vi.fn(), inventory: vi.fn(), room: vi.fn(), mail: vi.fn(), friends: vi.fn(), finds: vi.fn(), devices: vi.fn() })
 const ev = (type: string, eventId = type) => ({ seq: 1, eventId, type, occurredAt: '', payload: {} })
 
 describe('wants', () => {
@@ -11,6 +11,7 @@ describe('wants', () => {
     expect(wants('pet.updated')).toEqual(['pet'])
     expect(wants('pet.find')).toEqual(['pet', 'finds'])
     expect(wants('mail.received')).toEqual(['mail'])
+    expect(wants('devices.updated')).toEqual(['devices'])
     expect(wants('something.new')).toEqual([])
   })
 })

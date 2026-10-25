@@ -5,6 +5,8 @@ import OverlayPanel from '@/components/common/OverlayPanel.vue'
 import MailPanel from '@/components/business/MailPanel.vue'
 import RoomEditor from '@/components/business/RoomEditor.vue'
 import LocationPicker from '@/components/business/LocationPicker.vue'
+import DevicesPanel from '@/components/business/DevicesPanel.vue'
+import { useDeviceStore } from '@/stores/useDeviceStore'
 import { useLocationStore } from '@/stores/useLocationStore'
 import { WEATHER_LABEL } from '@/types/weather.types'
 import { isNightHour } from '@/utils/roomWeather'
@@ -28,7 +30,7 @@ import { useInventoryStore } from '@/stores/useInventoryStore'
 import { usePetStore } from '@/stores/usePetStore'
 import type { InventoryItem } from '@/types/pet.types'
 
-type PanelId = 'pet' | 'bag' | 'mail' | 'account' | 'location' | null
+type PanelId = 'pet' | 'bag' | 'mail' | 'account' | 'location' | 'devices' | null
 
 const auth = useAuthStore()
 const pets = usePetStore()
@@ -37,6 +39,7 @@ const social = useSocialStore()
 const room = useRoomStore()
 const settings = useSettingsStore()
 const loc = useLocationStore()
+const devices = useDeviceStore()
 const game = useGameStore()
 const route = useRoute()
 const router = useRouter()
@@ -96,6 +99,7 @@ const onEvent = batcher({
   room: () => { if (!room.editing) quietly(room.load(true)) },
   mail: () => quietly(checkMail().then(() => (panel.value === 'mail' ? social.loadInbox() : undefined))),
   friends: () => quietly(social.loadFriends()),
+  devices: () => { if (devices.loaded) quietly(devices.load()) },
   finds: () => quietly(checkFinds()),
 })
 const realtime = createRealtime(onEvent, () => { void refreshLife(); quietly(social.loadFriends()) })
@@ -310,8 +314,13 @@ const { loading, submit } = useSubmit(async () => {
       <button type="button" class="later" @click="loc.markAsked(); panel = null">之後再說</button>
     </OverlayPanel>
 
+    <OverlayPanel :open="panel === 'devices'" tall title="我的裝置" subtitle="配對你的小伴星實體裝置" @close="panel = 'account'">
+      <DevicesPanel />
+    </OverlayPanel>
+
     <OverlayPanel :open="panel === 'account'" title="帳號" @close="panel = null">
       <p class="who"><strong>{{ auth.user?.displayName }}</strong><span>{{ auth.user?.email }}</span></p>
+ <button type="button" class="ghost wide" aria-haspopup="dialog" @click="panel = 'devices'">🔌 我的裝置（配對小伴星）</button>
       <label class="opt"><input v-model="settings.weatherMotion" type="checkbox" /> 天氣動態（雨、雪、雲、星星會動）</label>
       <PixelButton variant="ghost" :loading="loading" @click="submit()">登出</PixelButton>
     </OverlayPanel>
@@ -370,6 +379,7 @@ const { loading, submit } = useSubmit(async () => {
   border: 3px solid var(--c-ink);
   border-radius: var(--radius);
 }
+.ghost.wide { width: 100%; margin: 0 0 0.6rem; text-align: left; padding: 0 0.9rem; }
 .opt { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 0.6rem; font-size: 0.9rem; cursor: pointer; }
 .opt input { width: 22px; height: 22px; accent-color: var(--c-ink); }
 .mark { position: absolute; top: -8px; right: -6px; min-width: 20px; padding: 0 0.3rem; font-family: var(--font-pixel); font-size: 0.6rem; line-height: 20px; color: #fff; background: var(--c-error-solid); border: 2px solid var(--c-ink); border-radius: 10px; text-align: center; }
