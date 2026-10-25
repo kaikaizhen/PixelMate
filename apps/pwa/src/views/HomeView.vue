@@ -3,6 +3,8 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import OverlayPanel from '@/components/common/OverlayPanel.vue'
 import MailPanel from '@/components/business/MailPanel.vue'
+import RoomEditor from '@/components/business/RoomEditor.vue'
+import { useRoomStore } from '@/stores/useRoomStore'
 import { useSocialStore } from '@/stores/useSocialStore'
 import PixelButton from '@/components/common/PixelButton.vue'
 import FullRoom from '@/components/business/FullRoom.vue'
@@ -25,6 +27,7 @@ const auth = useAuthStore()
 const pets = usePetStore()
 const bag = useInventoryStore()
 const social = useSocialStore()
+const room = useRoomStore()
 const game = useGameStore()
 const route = useRoute()
 const router = useRouter()
@@ -32,6 +35,7 @@ const router = useRouter()
 const pet = computed(() => pets.pet!)
 const panel = ref<PanelId>(null)
 const toggle = (id: Exclude<PanelId, null>) => {
+  if (room.editing) room.cancel()
   panel.value = panel.value === id ? null : id   // same tool again closes it
   if (panel.value === 'bag') void loadBag()
 }
@@ -72,6 +76,7 @@ async function refreshLife() {
     await Promise.all([pets.load(true), panel.value === 'bag' ? bag.load(true) : null])
     await checkFinds()
     await checkMail()
+    if (!room.editing) await room.load(true)
   } catch { /* offline: the next tick tries again */ }
 }
 const resyncTimer = window.setInterval(refreshLife, 60_000)
@@ -85,6 +90,7 @@ onMounted(() => {
   window.addEventListener('focus', refreshLife)
   void checkFinds().catch(() => {})
   void social.refreshUnread().catch(() => {})
+  void room.load().catch(() => {})
 })
 onUnmounted(() => {
   window.clearInterval(resyncTimer)
@@ -130,8 +136,23 @@ const bagOp = useSubmit(async (run: () => Promise<void>) => {
     else throw e
   }
 })
+// Room things (furniture, decor, collectibles) go into the room: tapping one opens the editor with it already placed.
+async function decorate(item?: InventoryItem) {
+  bagError.value = ''
+  try {
+    await room.load()
+  } catch (e) {
+    return void (bagError.value = e instanceof ApiError ? e.message : '小屋暫時打不開，請稍後再試。')
+  }
+  panel.value = null
+  room.startEdit()
+  if (item) {
+    if (item.itemId.startsWith('world.decor.floor_tile_')) room.setFloor(item.itemId)
+    else room.add(item.itemId)
+  }
+}
 const tap = (i: InventoryItem) => {
-  if (!i.slot) return void (bagError.value = '放進房間的功能很快就會開放。')
+  if (!i.slot) return void decorate(i)
   void bagOp.submit(() => bag.equip(i.equipped ? null : i, i.slot!))
 }
 
@@ -186,7 +207,8 @@ const { loading, submit } = useSubmit(async () => {
 
 <template>
   <main class="home game-screen" @contextmenu.prevent>
-    <FullRoom :color="colorOf(pet.bodyVariant)" :happy="happy" :name="pet.name" :weather="pet.world.weather" :equipment="pet.equipment" :activity="pet.activity?.key" :scene="pet.world.scene" @pat="pat" />
+    <FullRoom :color="colorOf(pet.bodyVariant)" :happy="happy" :name="pet.name" :weather="pet.world.weather" :equipment="pet.equipment" :activity="pet.activity?.key" :scene="pet.world.scene" :placements="room.view.placements" :floor="room.view.floorItemId ?? undefined" :editing="room.editing" :selected="room.selected"
+      @select="room.selected = $event" @move="room.move" @pat="pat" />
 
     <!-- HUD: nothing here blocks the room; every function opens in a panel on top of it -->
     <button type="button" class="chip" aria-haspopup="dialog" @click="toggle('pet')">
@@ -238,7 +260,12 @@ const { loading, submit } = useSubmit(async () => {
           </button>
         </li>
       </ul>
+      <div class="acts"><button type="button" class="ghost" @click="decorate()">🏠 布置小屋</button></div>
       <div v-if="isDev" class="acts"><button type="button" class="ghost dev" @click="grant">（測試）領一些道具</button></div>
+    </OverlayPanel>
+
+    <OverlayPanel :open="room.editing" title="布置小屋" :subtitle="`${room.draft?.placements.length ?? 0} 件擺在小屋裡`" @close="room.cancel()">
+      <RoomEditor />
     </OverlayPanel>
 
     <OverlayPanel :open="panel === 'mail'" tall title="信箱" subtitle="寫信給好友，郵差會送過去" @close="panel = null">

@@ -23,7 +23,7 @@ export const json = (route: Route, status: number, body?: unknown) =>
 
 /** Mock the API. `session` flips to the user after a successful login so /me behaves like the real cookie session. */
 export async function mockApi(page: Page, handlers: Record<string, Handler> = {}, opts: { pet?: typeof PET | null; bag?: typeof BAG } = {}) {
-  const state = { signedIn: false, bag: structuredClone(opts.bag ?? []), pet: opts.pet === undefined ? (PET as typeof PET | null) : opts.pet, friends: [] as any[], inbox: [] as any[], sent: [] as any[], invites: 0, calls: [] as { path: string; body: any; csrf: string | undefined; key?: string }[] }
+  const state = { signedIn: false, bag: structuredClone(opts.bag ?? []), pet: opts.pet === undefined ? (PET as typeof PET | null) : opts.pet, room: { revision: 1, floorItemId: null as string | null, placements: [{ placementId: 'p-table', itemId: 'world.furniture.table_garden', x: 150, y: 100 }] as any[] }, friends: [] as any[], inbox: [] as any[], sent: [] as any[], invites: 0, calls: [] as { path: string; body: any; csrf: string | undefined; key?: string }[] }
   await page.route('**/api/v1/**', async (route) => {
     const req = route.request()
     const path = new URL(req.url()).pathname.replace('/api/v1', '')
@@ -37,6 +37,12 @@ export async function mockApi(page: Page, handlers: Record<string, Handler> = {}
       return json(route, 200, USER)
     }
     if (path === '/pets/me') return state.pet ? json(route, 200, state.pet) : json(route, 404, { code: 'NOT_FOUND', message: '你還沒有小夥伴。', requestId: 'r' })
+    if (path === '/room' && req.method() === 'GET') return json(route, 200, state.room)
+    if (path === '/room' && req.method() === 'PUT') {
+      if (body.expectedRevision !== state.room.revision) return json(route, 409, { code: 'REVISION_CONFLICT', message: 'x', requestId: 'r' })
+      state.room = { revision: state.room.revision + 1, floorItemId: body.floorItemId, placements: body.placements.map((p: any, i: number) => ({ placementId: `p${state.room.revision}-${i}`, ...p })) }
+      return json(route, 200, state.room)
+    }
     // ---- friends and letters: a small stateful copy of the server rules ----
     if (path === '/pairing/relationships') return json(route, 200, { relationships: state.friends })
     if (path === '/pairing/invites' && req.method() === 'POST') return json(route, 201, { inviteId: 'inv' + ++state.invites, code: 'ABCD-2345', kind: body.kind, expiresAt: new Date(Date.now() + 86_400_000).toISOString() })

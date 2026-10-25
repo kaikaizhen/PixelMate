@@ -54,3 +54,6 @@ into `public/game/` (git-ignored). Edit the starter room in `src/constants/defau
 - Mail & friends: the 信箱 card has inbox / sent / friends tabs. Pairing is by one-time code (shown once, previewed, then confirmed); letters are
   plain text (never rendered as HTML) sent with an `Idempotency-Key`, reach the friend after the postman's 5–15 minute walk, and a gift goes
   into the recipient's bag when they open the letter. The unread badge is polled with the rest of the pet (focus, every minute).
+- Room: `useRoomStore` keeps the saved layout and a draft. Tapping a room item in the bag (or 🏠 布置小屋) opens the editor; pieces are dragged on the
+  240x240 canvas (pixel-aligned), stacked by how far down they stand (the pet included), 完成 sends the whole layout with `expectedRevision`.
+  A chosen floor tile covers the house floor. On wide screens the room shifts left while editing so the card never hides it.
