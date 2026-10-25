@@ -39,7 +39,7 @@ button {
   min-height: 40px;
   padding: 0 0.9rem;
   font: inherit;
-  color: var(--c-ink);
+  color: var(--c-on-yellow);
   background: var(--c-yellow);
   border: 2px solid var(--c-ink);
   border-radius: 8px;

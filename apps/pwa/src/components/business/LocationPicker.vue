@@ -75,10 +75,10 @@ const pick = useSubmit(async () => {
 .now { margin: 0; padding: 0.4rem 0.7rem; font-weight: 700; background: var(--c-cream); border: 2px solid var(--c-line); border-radius: 8px; font-size: 0.9rem; }
 .where { margin: 0; font-size: 0.9rem; }
 .notice { margin: 0; padding: 0.45rem 0.7rem; color: var(--c-error); background: var(--c-error-soft); border: 2px solid currentColor; border-radius: 8px; font-size: 0.85rem; }
-.primary { min-height: 44px; font: inherit; font-weight: 700; color: var(--c-ink); background: var(--c-yellow); border: 3px solid var(--c-ink); border-radius: 8px; box-shadow: 2px 2px 0 var(--c-ink); cursor: pointer; }
+.primary { min-height: 44px; font: inherit; font-weight: 700; color: var(--c-ink); background: var(--c-yellow); color: var(--c-on-yellow); border: 3px solid var(--c-ink); border-radius: 8px; box-shadow: 2px 2px 0 var(--c-ink); cursor: pointer; }
 .primary:disabled { opacity: 0.5; box-shadow: none; cursor: wait; }
 .pick { display: flex; gap: 0.4rem; }
-.pick select { flex: 1; min-width: 0; font: inherit; padding: 0.4rem 0.5rem; color: var(--c-ink); background: #fff; border: 2px solid var(--c-ink); border-radius: 8px; }
+.pick select { flex: 1; min-width: 0; font: inherit; padding: 0.4rem 0.5rem; color: var(--c-ink); background: var(--c-field); border: 2px solid var(--c-ink); border-radius: 8px; }
 .ghost { min-height: 40px; padding: 0 0.9rem; font: inherit; color: var(--c-ink); background: var(--c-paper); border: 2px solid var(--c-ink); border-radius: 8px; cursor: pointer; }
 .ghost:disabled { opacity: 0.4; cursor: not-allowed; }
 small { font-size: 0.72rem; color: var(--c-ink-soft); }

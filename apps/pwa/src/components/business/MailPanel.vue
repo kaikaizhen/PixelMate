@@ -240,9 +240,9 @@ const errText = (o: { error: { value: ApiError | null } }) => o.error.value?.mes
 .hint, .empty { margin: 0; color: var(--c-ink-soft); font-size: 0.85rem; }
 .tabs { display: flex; gap: 0.4rem; }
 .tabs button, .kinds button { position: relative; min-height: 40px; padding: 0 0.8rem; font: inherit; font-size: 0.85rem; color: var(--c-ink); background: var(--c-paper); border: 2px solid var(--c-ink); border-radius: 8px; cursor: pointer; }
-.tabs button.on, .kinds button.on { background: var(--c-yellow); font-weight: 700; }
-.dot { margin-left: 0.3rem; padding: 0 0.35rem; font-family: var(--font-pixel); font-size: 0.6rem; color: #fff; background: var(--c-error); border-radius: 8px; }
-.primary { min-height: 44px; padding: 0 1rem; font: inherit; font-weight: 700; color: var(--c-ink); background: var(--c-yellow); border: 3px solid var(--c-ink); border-radius: 8px; box-shadow: 2px 2px 0 var(--c-ink); cursor: pointer; }
+.tabs button.on, .kinds button.on { background: var(--c-yellow); color: var(--c-on-yellow); font-weight: 700; }
+.dot { margin-left: 0.3rem; padding: 0 0.35rem; font-family: var(--font-pixel); font-size: 0.6rem; color: #fff; background: var(--c-error-solid); border-radius: 8px; }
+.primary { min-height: 44px; padding: 0 1rem; font: inherit; font-weight: 700; color: var(--c-ink); background: var(--c-yellow); color: var(--c-on-yellow); border: 3px solid var(--c-ink); border-radius: 8px; box-shadow: 2px 2px 0 var(--c-ink); cursor: pointer; }
 .primary:disabled { opacity: 0.4; box-shadow: none; cursor: not-allowed; }
 .ghost { min-height: 40px; padding: 0 0.9rem; font: inherit; font-size: 0.9rem; color: var(--c-ink); background: var(--c-paper); border: 2px solid var(--c-ink); border-radius: 8px; cursor: pointer; }
 .ghost:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -253,7 +253,7 @@ const errText = (o: { error: { value: ApiError | null } }) => o.error.value?.mes
 .letter .who { font-weight: 700; font-size: 0.9rem; }
 .letter .pv { font-size: 0.85rem; color: var(--c-ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .letter small { font-size: 0.7rem; color: var(--c-ink-soft); }
-.paper { padding: 0.7rem 0.9rem; background: #fff6e2; border: 3px solid var(--c-ink); border-radius: 8px; }
+.paper { padding: 0.7rem 0.9rem; background: var(--c-letter); border: 3px solid var(--c-ink); border-radius: 8px; }
 .paper header { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 0.4rem; }
 .paper small { color: var(--c-ink-soft); font-size: 0.7rem; }
 .text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.95rem; line-height: 1.6; }
@@ -261,7 +261,7 @@ const errText = (o: { error: { value: ApiError | null } }) => o.error.value?.mes
 .gift img { width: 40px; height: 40px; object-fit: contain; }
 .write { display: grid; gap: 0.45rem; }
 .write label { display: grid; gap: 0.2rem; font-size: 0.85rem; }
-.write select, .write textarea, .enter input { font: inherit; font-size: 1rem; padding: 0.4rem 0.6rem; color: var(--c-ink); background: #fff; border: 2px solid var(--c-ink); border-radius: 8px; }
+.write select, .write textarea, .enter input { font: inherit; font-size: 1rem; padding: 0.4rem 0.6rem; color: var(--c-ink); background: var(--c-field); border: 2px solid var(--c-ink); border-radius: 8px; }
 .write textarea { resize: none; }
 .presets { display: flex; gap: 0.3rem; flex-wrap: wrap; }
 .presets button { min-height: 32px; padding: 0 0.55rem; font: inherit; font-size: 0.75rem; color: var(--c-ink); background: var(--c-paper); border: 2px solid var(--c-line); border-radius: 14px; cursor: pointer; }
@@ -275,7 +275,7 @@ const errText = (o: { error: { value: ApiError | null } }) => o.error.value?.mes
 .box h3 { margin: 0; font-size: 0.9rem; }
 .kinds { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 .code { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-.code strong { font-family: var(--font-pixel); font-size: 1.1rem; letter-spacing: 0.08em; padding: 0.3rem 0.6rem; background: var(--c-yellow); border: 2px solid var(--c-ink); border-radius: 8px; }
+.code strong { font-family: var(--font-pixel); font-size: 1.1rem; letter-spacing: 0.08em; padding: 0.3rem 0.6rem; background: var(--c-yellow); color: var(--c-on-yellow); border: 2px solid var(--c-ink); border-radius: 8px; }
 .code small { flex-basis: 100%; font-size: 0.72rem; color: var(--c-ink-soft); }
 .enter { display: flex; gap: 0.4rem; }
 .enter input { flex: 1; min-width: 0; text-transform: uppercase; }
