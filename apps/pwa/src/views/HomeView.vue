@@ -140,9 +140,11 @@ const bagOp = useSubmit(async (run: () => Promise<void>) => {
 async function decorate(item?: InventoryItem) {
   bagError.value = ''
   try {
-    await room.load()
+    await Promise.all([room.load(), bag.load(true)])   // the editor lists what the player owns, so the bag must be fresh
   } catch (e) {
-    return void (bagError.value = e instanceof ApiError ? e.message : '小屋暫時打不開，請稍後再試。')
+    bagError.value = e instanceof ApiError ? e.message : '小屋暫時打不開，請稍後再試。'
+    found.value = bagError.value                       // visible even when the bag card is closed
+    return void window.setTimeout(() => (found.value = ''), 6000)
   }
   panel.value = null
   room.startEdit()
@@ -211,16 +213,17 @@ const { loading, submit } = useSubmit(async () => {
       @select="room.selected = $event" @move="room.move" @pat="pat" />
 
     <!-- HUD: nothing here blocks the room; every function opens in a panel on top of it -->
-    <button type="button" class="chip" aria-haspopup="dialog" @click="toggle('pet')">
+    <button v-if="!room.editing" type="button" class="chip" aria-haspopup="dialog" @click="toggle('pet')">
       <strong>{{ pet.name }}</strong><span>Lv.{{ pet.level }}</span><em v-if="pet.remainingSkillPoints" class="badge">+{{ pet.remainingSkillPoints }}</em>
     </button>
     <p v-if="doing" class="doing" role="status" :data-activity="pet.activity?.key">{{ doing.emoji }} {{ pet.name }}正在{{ doing.label }}<template v-if="place">・{{ place }}</template></p>
     <p v-if="found && !welcome" class="toast" role="status">🎁 {{ found }}</p>
     <p v-if="welcome" class="toast" role="status">領養成功！{{ pet.name }} 住進你的小屋了。</p>
 
-    <nav class="bar" aria-label="功能">
+    <nav v-if="!room.editing" class="bar" aria-label="功能">
       <button type="button" class="tool" aria-haspopup="dialog" @click="toggle('pet')"><span aria-hidden="true">🐾</span>小夥伴</button>
       <button type="button" class="tool" aria-haspopup="dialog" @click="toggle('bag')"><span aria-hidden="true">🎒</span>背包</button>
+      <button type="button" class="tool" @click="decorate()"><span aria-hidden="true">🏠</span>布置</button>
       <button type="button" class="tool" aria-haspopup="dialog" :aria-label="social.unread ? `信箱，${social.unread} 封未讀` : '信箱'" @click="toggle('mail')"><span aria-hidden="true">✉️</span>信箱<b v-if="social.unread" class="mark">{{ social.unread }}</b></button>
       <button type="button" class="tool" aria-haspopup="dialog" @click="toggle('account')"><span aria-hidden="true">⚙️</span>帳號</button>
     </nav>
@@ -260,13 +263,10 @@ const { loading, submit } = useSubmit(async () => {
           </button>
         </li>
       </ul>
-      <div class="acts"><button type="button" class="ghost" @click="decorate()">🏠 布置小屋</button></div>
       <div v-if="isDev" class="acts"><button type="button" class="ghost dev" @click="grant">（測試）領一些道具</button></div>
     </OverlayPanel>
 
-    <OverlayPanel :open="room.editing" title="布置小屋" :subtitle="`${room.draft?.placements.length ?? 0} 件擺在小屋裡`" @close="room.cancel()">
-      <RoomEditor />
-    </OverlayPanel>
+    <RoomEditor />
 
     <OverlayPanel :open="panel === 'mail'" tall title="信箱" subtitle="寫信給好友，郵差會送過去" @close="panel = null">
       <MailPanel />
@@ -337,7 +337,7 @@ const { loading, submit } = useSubmit(async () => {
   margin-inline: auto;
   max-width: 28rem;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 0.5rem;
 }
 .tool {

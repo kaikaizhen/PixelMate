@@ -50,19 +50,18 @@ test.describe('布置小屋', () => {
 
   test('取消不會存；收起選取的東西；每個道具不能擺超過擁有的數量', async ({ page }) => {
     const state = await start(page)
-    await page.getByRole('button', { name: '背包' }).click()
-    await page.getByRole('dialog', { name: '背包' }).getByRole('button', { name: '🏠 布置小屋' }).click()
+    await page.getByRole('button', { name: '布置', exact: true }).click()
     const dlg = page.getByRole('dialog', { name: '布置小屋' })
-    await dlg.getByRole('tab', { name: '布置' }).click()
+    await dlg.getByRole('tab', { name: '擺飾' }).click()
     await dlg.getByRole('button', { name: /花園花束，還有 2 個可以擺/ }).click()
-    await dlg.getByRole('tab', { name: '布置' }).click()
+    await dlg.getByRole('tab', { name: '擺飾' }).click()
     await dlg.getByRole('button', { name: /花園花束，還有 1 個可以擺/ }).click()
     await expect(placed(page)).toHaveCount(3)
     await dlg.getByRole('button', { name: /花園花束，還有 0 個可以擺/ }).click()
     await expect(dlg.getByRole('alert')).toContainText('都已經擺出來了')
     await expect(placed(page)).toHaveCount(3)
 
-    await dlg.getByRole('button', { name: '收起選取的' }).click()
+    await dlg.getByRole('button', { name: '🗑 收起' }).click()
     await expect(placed(page)).toHaveCount(2)
     await dlg.getByRole('button', { name: '取消' }).click()
     await expect(placed(page)).toHaveCount(1)                                              // back to what was saved
@@ -71,15 +70,14 @@ test.describe('布置小屋', () => {
 
   test('預設的桌子也可以收起來；換地板後整個地板換成那款', async ({ page }) => {
     const state = await start(page)
-    await page.getByRole('button', { name: '背包' }).click()
-    await page.getByRole('dialog', { name: '背包' }).getByRole('button', { name: '🏠 布置小屋' }).click()
+    await page.getByRole('button', { name: '布置', exact: true }).click()
     const dlg = page.getByRole('dialog', { name: '布置小屋' })
     await page.locator('[data-placed="world.furniture.table_garden"]').click()
-    await dlg.getByRole('button', { name: '收起選取的' }).click()
+    await dlg.getByRole('button', { name: '🗑 收起' }).click()
     await expect(placed(page)).toHaveCount(0)
 
     await dlg.getByRole('tab', { name: '地板' }).click()
-    await dlg.getByRole('button', { name: /花園地板拼貼.*換上/ }).click()
+    await dlg.getByRole('button', { name: /花園地板拼貼，點一下換上/ }).click()
     await expect(page.locator('[data-floor]')).toHaveCount(1)
     await dlg.getByRole('button', { name: '完成' }).click()
     expect(state.room.floorItemId).toBe('world.decor.floor_tile_garden')
@@ -100,8 +98,7 @@ test.describe('布置小屋', () => {
 
   test('手機上布置面板不會讓頁面捲動，小夥伴不能在布置時被點', async ({ page }) => {
     await start(page)
-    await page.getByRole('button', { name: '背包' }).click()
-    await page.getByRole('dialog', { name: '背包' }).getByRole('button', { name: '🏠 布置小屋' }).click()
+    await page.getByRole('button', { name: '布置', exact: true }).click()
     expect(await page.evaluate(() => document.documentElement.scrollHeight > window.innerHeight + 1)).toBe(false)
     await expect(page.locator('button.pet')).toBeDisabled()
   })
