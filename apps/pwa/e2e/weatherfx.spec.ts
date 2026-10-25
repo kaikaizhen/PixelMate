@@ -61,3 +61,27 @@ test.describe('窗外與戶外的天氣會動', () => {
     expect(await page.evaluate(() => document.documentElement.scrollHeight > innerHeight + 1 || document.documentElement.scrollWidth > innerWidth + 1)).toBe(false)
   })
 })
+
+test.describe('天氣動態的開關', () => {
+  test.use({ reducedMotion: 'reduce' })       // a player whose system asks for less motion still sees the weather move (it is on unless they switch it off)
+
+  test('系統開了減少動態也會動；在帳號關掉就停，重新整理後仍是關的', async ({ page }) => {
+    await start(page, 'home', 'shower')
+    const a = await fingerprint(page, '.win [data-weather-fx]')
+    await page.waitForTimeout(700)
+    expect((await fingerprint(page, '.win [data-weather-fx]')).hash).not.toBe(a.hash)
+
+    await page.getByRole('button', { name: '帳號' }).click()
+    await page.getByLabel(/天氣動態/).uncheck()
+    await page.waitForTimeout(300)
+    const still = await fingerprint(page, '.win [data-weather-fx]')
+    await page.waitForTimeout(700)
+    expect((await fingerprint(page, '.win [data-weather-fx]')).hash).toBe(still.hash)
+
+    await page.reload()
+    await expect(page.locator('.win [data-weather-fx]')).toHaveCount(1)
+    const b = await fingerprint(page, '.win [data-weather-fx]')
+    await page.waitForTimeout(700)
+    expect((await fingerprint(page, '.win [data-weather-fx]')).hash).toBe(b.hash)
+  })
+})

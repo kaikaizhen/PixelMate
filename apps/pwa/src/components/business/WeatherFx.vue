@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { createFx, fxFor, type Fx } from '@/utils/weatherFx'
+import { useSettingsStore } from '@/stores/useSettingsStore'
 
 // Moving weather (rain, snow, drifting clouds, twinkling stars...) on a w x h logical-pixel canvas scaled up crisply.
 // It sits on top of the weather picture; the picture is the scenery, this is what moves in it.
@@ -13,7 +14,7 @@ let fx: Fx | null = null
 let raf = 0
 let last = 0
 let acc = 0
-const reduce = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
+const settings = useSettingsStore()           // the player's own switch (帳號 > 天氣動態); the system's reduce-motion flag no longer decides
 
 function build() {
   fx = createFx(props.weather, props.w, props.h, 7)
@@ -35,10 +36,16 @@ function tick(now: number) {
   fx.draw(ctx)
 }
 
+function run(on: boolean) {
+  cancelAnimationFrame(raf)
+  if (on) { last = performance.now(); acc = 0; raf = requestAnimationFrame(tick) }
+}
+
 onMounted(() => {
   build()
-  if (!reduce) { last = performance.now(); raf = requestAnimationFrame(tick) }
+  run(settings.weatherMotion)
 })
+watch(() => settings.weatherMotion, run)
 watch(() => [props.weather, props.w, props.h], build)
 onBeforeUnmount(() => cancelAnimationFrame(raf))
 </script>
