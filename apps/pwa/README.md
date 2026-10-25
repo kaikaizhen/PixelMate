@@ -60,3 +60,6 @@ into `public/game/` (git-ignored). Edit the starter room in `src/constants/defau
 - Realtime: `src/realtime/` keeps a SignalR link (`/api/v1/hub`, cookie session; the CSRF marker is sent as a header). The API only pushes
   "something changed" (`pet.updated`, `pet.find`, `inventory.updated`, `room.updated`, `mail.received`, `friends.updated`); the screen re-reads
   just that, with a 150 ms batch and eventId de-duplication. Without the link it falls back to focus / slot-end / 60 s polling.
+- Moving weather: `src/utils/weatherFx.ts` draws rain, snow, petals, fog, drifting clouds, birds, twinkling stars with shooting stars and lightning on a
+  small canvas at game-pixel resolution (12 fps, seeded, paused when the tab is hidden, a still frame with reduced motion). `WeatherFx.vue` shows it in
+  the window (64x72) and across the whole screen when the pet is outdoors, thinned out for the bigger area.

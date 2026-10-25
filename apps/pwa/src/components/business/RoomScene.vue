@@ -2,10 +2,11 @@
 import { computed, onMounted, ref } from 'vue'
 import SpriteStrip from '@/components/common/SpriteStrip.vue'
 import GamePet from './GamePet.vue'
+import WeatherFx from './WeatherFx.vue'
 import { OUTDOOR_SPOT, PET_SPOT, ROOM_SIZE, WINDOW, WINDOW_VIEW } from '@/constants/defaultRoom'
 import { useSceneScale } from '@/composables/useSceneScale'
 import { useGameStore } from '@/stores/useGameStore'
-import { weatherKey, windowWeatherKey } from '@/utils/roomWeather'
+import { weatherKey, weatherName, windowWeatherKey } from '@/utils/roomWeather'
 import room from '@/assets/pixel/room.png'
 import plant from '@/assets/pixel/plant.png'
 import curtainL from '@/assets/pixel/curtain_l.png'
@@ -51,6 +52,7 @@ const noteUrl = computed(() => game.url('fx.note_drift'))
 const outdoors = computed(() => (props.scene === 'balcony' || props.scene === 'yard' ? props.scene : null))
 const outdoorUrl = computed(() => (outdoors.value ? game.url(weatherKey(new Date(), props.weather, outdoors.value)) : ''))
 const spot = computed(() => (outdoors.value ? OUTDOOR_SPOT[outdoors.value] : PET_SPOT))
+const wxName = computed(() => weatherName(new Date(), props.weather))
 const night = computed(() => windowWeatherKey(new Date(), props.weather).includes('starry'))
 </script>
 
@@ -62,7 +64,9 @@ const night = computed(() => windowWeatherKey(new Date(), props.weather).include
     <!-- 1. outside the window -->
     <div class="win pixelated" :style="{ left: u(WINDOW.x), top: u(WINDOW.y), width: u(WINDOW.w), height: u(WINDOW.h),
         backgroundImage: weatherUrl ? `url(${weatherUrl})` : undefined,
-        backgroundSize: `${u(ROOM_SIZE * WINDOW_VIEW.scale)} ${u(ROOM_SIZE * WINDOW_VIEW.scale)}`, backgroundPosition: `${u(-WINDOW_VIEW.x)} ${u(-WINDOW_VIEW.y)}` }" />
+        backgroundSize: `${u(ROOM_SIZE * WINDOW_VIEW.scale)} ${u(ROOM_SIZE * WINDOW_VIEW.scale)}`, backgroundPosition: `${u(-WINDOW_VIEW.x)} ${u(-WINDOW_VIEW.y)}` }">
+        <WeatherFx :weather="wxName" :w="WINDOW.w" :h="WINDOW.h" />
+      </div>
     <!-- 2. the house -->
     <img draggable="false" class="layer pixelated" :src="room" alt="" />
       <!-- a floor tile the player chose covers the whole floor of the house art (rug included) -->
