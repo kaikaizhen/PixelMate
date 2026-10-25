@@ -40,10 +40,31 @@ public sealed class FakeClock(DateTimeOffset start) : TimeProvider
     public void Advance(TimeSpan by) => _now += by;
 }
 
+/// <summary>Stands in for Open-Meteo and the Central Weather Administration: records every call and answers what the test says.</summary>
+public sealed class FakeWeatherHandler : HttpMessageHandler
+{
+    public ConcurrentQueue<string> Calls { get; } = new();
+    public string OpenMeteoJson { get; set; } = "{\"current\":{\"temperature_2m\":22.5,\"weather_code\":0,\"wind_speed_10m\":5,\"precipitation\":0}}";
+    public string CwaJson { get; set; } = "{\"records\":{\"Station\":[]}}";
+    public bool OpenMeteoDown { get; set; }
+    public bool CwaDown { get; set; }
+
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage r, CancellationToken ct)
+    {
+        var host = r.RequestUri!.Host.Contains("open-meteo") ? "open-meteo" : "cwa";
+        Calls.Enqueue(host + " " + r.RequestUri.PathAndQuery);
+        var down = host == "open-meteo" ? OpenMeteoDown : CwaDown;
+        if (down) return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError));
+        return Task.FromResult(new HttpResponseMessage { Content = new StringContent(host == "open-meteo" ? OpenMeteoJson : CwaJson, System.Text.Encoding.UTF8, "application/json") });
+    }
+    public int Count(string host) => Calls.Count(c => c.StartsWith(host));
+}
+
 public sealed class AuthFactory(IDictionary<string, string?>? settings = null) : WebApplicationFactory<Program>
 {
     private readonly SqliteConnection _db = new("DataSource=:memory:");
     public FakeMailSender Mail { get; } = new();
+    public FakeWeatherHandler Weather { get; } = new();
     public FakeClock Clock { get; } = new(DateTimeOffset.UtcNow);
     public bool Seed { get; init; } = true;
 
@@ -68,6 +89,8 @@ public sealed class AuthFactory(IDictionary<string, string?>? settings = null) :
             services.AddDbContext<AppDbContext>(o => o.UseSqlite(_db).UseSnakeCaseNamingConvention());
             services.RemoveAll<IMailSender>();
             services.AddSingleton<IMailSender>(Mail);
+            services.AddHttpClient("openmeteo").ConfigurePrimaryHttpMessageHandler(() => Weather);   // never the real internet
+            services.AddHttpClient("cwa").ConfigurePrimaryHttpMessageHandler(() => Weather);
             services.RemoveAll<TimeProvider>();
             services.AddSingleton<TimeProvider>(Clock);
         });

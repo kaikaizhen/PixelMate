@@ -8,6 +8,7 @@ using PixelMate.Api.Pets;
 using PixelMate.Api.Realtime;
 using PixelMate.Api.Rooms;
 using PixelMate.Api.Social;
+using PixelMate.Api.Weather;
 
 namespace PixelMate.Api.Data;
 
@@ -28,6 +29,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<Letter> Letters => Set<Letter>();
     public DbSet<RoomState> RoomStates => Set<RoomState>();
     public DbSet<OutboxEvent> OutboxEvents => Set<OutboxEvent>();
+    public DbSet<UserLocation> UserLocations => Set<UserLocation>();
     public DbSet<RoomPlacement> RoomPlacements => Set<RoomPlacement>();
 
     protected override void OnModelCreating(ModelBuilder b)
@@ -181,6 +183,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             e.HasIndex(x => new { x.UserId, x.Seq });
             e.HasIndex(x => x.DispatchedAt);
             e.HasOne<AppUser>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+        });
+        b.Entity<UserLocation>(e =>
+        {
+            e.ToTable("user_locations", t => t.HasCheckConstraint("ck_user_locations_range", "latitude >= -90 AND latitude <= 90 AND longitude >= -180 AND longitude <= 180"));
+            e.HasKey(x => x.UserId);
+            e.Property(x => x.TimeZone).HasMaxLength(64).IsRequired();
+            e.Property(x => x.Label).HasMaxLength(40).IsRequired();
+            e.Property(x => x.Source).HasMaxLength(10).IsRequired();
+            e.HasOne<AppUser>().WithOne().HasForeignKey<UserLocation>(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

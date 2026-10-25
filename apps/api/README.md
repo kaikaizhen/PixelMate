@@ -74,3 +74,11 @@ scenes, effects and costume tails are not items. Rarity follows the art batch: B
   transaction; `pet_life.cursor_slot` is a concurrency token so the API and the worker can run at once. Max `Life:MaxFindsPerDay` (3) a UTC day.
 - `Life/LifeWorker.cs` – `BackgroundService` every `Life:WorkerIntervalSeconds` (300; 0 = off). `GET /pets/me` also catches up lazily.
 - `GET /pets/me` has `activity {key, startedAt, endsAt}`; `GET /pets/me/events` lists recent finds. Development: `POST /dev/pets/me/life/rewind?hours=N`.
+
+## Weather
+
+- `Weather/WeatherService.cs` – asks the Central Weather Administration (dataset O-A0003-001, Taiwan only, needs `Weather__CwaApiKey`) and Open-Meteo (everywhere, no key),
+  falling back to the pet world's simulated weather. Answers are cached per 0.1 degree cell for 6 hours (`Weather:CacheSeconds`) with HybridCache:
+  memory plus Redis when `ConnectionStrings__Redis` is set (`192.168.0.100:6379,user=kaikaizhen,...`). A failing source is left alone for 2 minutes.
+- Players save a place with `PUT /me/location` (rounded to 0.1 degree + time zone); until then the pet lives in Taipei. `pet.world` carries
+  `weather` (a condition word), `temperatureC`, `weatherSource`, `timeZone`; each device picks sunrise/day/sunset/night from its own clock.

@@ -40,10 +40,11 @@ public static class PetEndpoints
 
     private static Life.LifeOptions LifeOf(HttpContext ctx) => ctx.RequestServices.GetRequiredService<Microsoft.Extensions.Options.IOptions<Life.LifeOptions>>().Value;
 
-    private static PetWorld World(Guid petId, Life.ActivityInfo a, DateTime now, Life.LifeOptions o) =>
-        new("happy", Life.WorldRules.SceneAt(petId, a.Key, Life.LifeScheduler.SlotOf(now)), Life.WorldRules.WeatherAt(now, o.UtcOffsetHours));
+    private static PetWorld World(Guid petId, Life.ActivityInfo a, DateTime now, Life.LifeOptions o, Weather.WeatherSnapshot? w = null, string? tz = null) =>
+        new("happy", Life.WorldRules.SceneAt(petId, a.Key, Life.LifeScheduler.SlotOf(now)),
+            w?.Condition ?? Life.WorldRules.ConditionAt(now, o.UtcOffsetHours), w?.TemperatureC, w?.Source ?? Weather.Sources.Simulated, tz ?? "Asia/Taipei");
 
-    internal static PetSnapshot ToSnapshot(Pet p, DateTime? now = null, Life.LifeOptions? life = null)
+    internal static PetSnapshot ToSnapshot(Pet p, DateTime? now = null, Life.LifeOptions? life = null, Weather.WeatherSnapshot? weather = null, string? timeZone = null)
     {
         var skills = SkillKeys.All.ToDictionary(k => k, k => p.Skills.FirstOrDefault(s => s.SkillKey == k)?.Points ?? 0);
         var t = now ?? DateTime.UtcNow;
@@ -51,7 +52,7 @@ public static class PetEndpoints
         var remaining = Math.Max(0, PetRules.TotalSkillPoints(p.Level) - skills.Values.Sum());
         return new PetSnapshot(p.PetId, p.Name, p.BodyVariant, p.Level, p.Xp, p.Revision, skills, remaining,
             EquipmentOf(p),
-            World(p.PetId, activity, t, life ?? new Life.LifeOptions()), p.UpdatedAt, activity);
+            World(p.PetId, activity, t, life ?? new Life.LifeOptions(), weather, timeZone), p.UpdatedAt, activity);
     }
 
     private static async Task<IResult> Create(CreatePetRequest req, ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct)
@@ -76,7 +77,7 @@ public static class PetEndpoints
         {
             return conflict;                                // two tabs raced: the unique index on owner_id decides
         }
-        return Results.Created("/api/v1/pets/me", ToSnapshot(pet, null, LifeOf(ctx)));
+        return Results.Created("/api/v1/pets/me", ToSnapshot(pet, null, LifeOf(ctx), (await Weather.WeatherEndpoints.ForUser(owner, db, ctx.RequestServices.GetRequiredService<Weather.WeatherService>(), ct)).Weather));
     }
 
     /// <summary>Reading the pet also makes up any finished slots that the worker has not reached yet (lazy half of the hybrid).</summary>
@@ -87,7 +88,8 @@ public static class PetEndpoints
         var pet = await WithEquipment(db.Pets.AsNoTracking()).FirstOrDefaultAsync(p => p.OwnerId == owner, ct);
         if (pet is null) return NoPet(ctx);
         await life.CatchUpAsync(db, pet.PetId, owner, pet.CreatedAt, now, ct);
-        return Results.Ok(ToSnapshot(pet, now, lifeOptions.Value));
+        var (w, loc) = await Weather.WeatherEndpoints.ForUser(owner, db, ctx.RequestServices.GetRequiredService<Weather.WeatherService>(), ct);
+        return Results.Ok(ToSnapshot(pet, now, lifeOptions.Value, w, loc?.TimeZone));
     }
 
     /// <summary>The latest things the pet found, newest first.</summary>
@@ -175,7 +177,7 @@ public static class PetEndpoints
             pet.UpdatedAt = DateTime.UtcNow;
             outbox.Add(owner, Realtime.EventTypes.PetUpdated, new { reason = "level" }, pet.PetId, pet.Revision);
             await db.SaveChangesAsync(ct);
-            return Results.Ok(ToSnapshot(pet, null, LifeOf(ctx)));
+            return Results.Ok(ToSnapshot(pet, null, LifeOf(ctx), (await Weather.WeatherEndpoints.ForUser(owner, db, ctx.RequestServices.GetRequiredService<Weather.WeatherService>(), ct)).Weather));
         }).RequireAuthorization();
         // Moves the life cursor back so the next read makes those hours up again (deterministic: the same walks find the same items).
         api.MapPost("/dev/pets/me/life/rewind", async (int hours, ClaimsPrincipal principal, AppDbContext db, HttpContext ctx, CancellationToken ct) =>

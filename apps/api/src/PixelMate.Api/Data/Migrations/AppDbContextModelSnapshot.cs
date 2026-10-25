@@ -881,6 +881,51 @@ namespace PixelMate.Api.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PixelMate.Api.Weather.UserLocation", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("user_id");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("label");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("double")
+                        .HasColumnName("latitude");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("double")
+                        .HasColumnName("longitude");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)")
+                        .HasColumnName("source");
+
+                    b.Property<string>("TimeZone")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("time_zone");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("UserId")
+                        .HasName("pk_user_locations");
+
+                    b.ToTable("user_locations", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_user_locations_range", "latitude >= -90 AND latitude <= 90 AND longitude >= -180 AND longitude <= 180");
+                        });
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -1116,6 +1161,16 @@ namespace PixelMate.Api.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_relationships_users_user_low_id");
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Weather.UserLocation", b =>
+                {
+                    b.HasOne("PixelMate.Api.Data.AppUser", null)
+                        .WithOne()
+                        .HasForeignKey("PixelMate.Api.Weather.UserLocation", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_locations_users_user_id");
                 });
 
             modelBuilder.Entity("PixelMate.Api.Pets.Pet", b =>
