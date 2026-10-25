@@ -30,10 +30,10 @@ public static class PairingEndpoints
 
     internal static (Guid Low, Guid High) Ordered(Guid a, Guid b) => a.CompareTo(b) < 0 ? (a, b) : (b, a);
 
-    private static string Normalize(string code) => new string(code.Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
-    private static string Hash(string normalized) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(normalized)));
+    internal static string Normalize(string code) => new string(code.Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
+    internal static string Hash(string normalized) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(normalized)));
 
-    private static string NewCode()
+    internal static string NewCode()
     {
         var chars = new char[8];
         for (var i = 0; i < chars.Length; i++) chars[i] = Alphabet[RandomNumberGenerator.GetInt32(Alphabet.Length)];

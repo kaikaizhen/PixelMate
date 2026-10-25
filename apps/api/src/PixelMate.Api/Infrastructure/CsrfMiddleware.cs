@@ -19,6 +19,7 @@ public sealed class CsrfMiddleware(RequestDelegate next)
         var unsafeMethod = !HttpMethods.IsGet(ctx.Request.Method) && !HttpMethods.IsHead(ctx.Request.Method)
                            && !HttpMethods.IsOptions(ctx.Request.Method);
         if (unsafeMethod && ctx.Request.Path.StartsWithSegments("/api")
+            && !ctx.Request.Path.StartsWithSegments("/api/v1/device")        // devices send a Bearer credential, not a cookie: nothing for a cross-site page to ride on
             && !HasMarker(ctx))
         {
             return ErrorHandling.WriteAsync(ctx, StatusCodes.Status403Forbidden, ErrorCodes.CsrfRejected, "請求來源不被允許。");

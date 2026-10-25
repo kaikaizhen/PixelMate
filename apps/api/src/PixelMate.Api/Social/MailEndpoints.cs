@@ -101,7 +101,7 @@ public static class MailEndpoints
     }
 
     /// <summary>box=inbox (default; only letters whose postman has arrived) or box=sent. Newest first; cursor = DeliverAt ticks of the last row.</summary>
-    private static async Task<IResult> List(System.Security.Claims.ClaimsPrincipal principal, AppDbContext db, TimeProvider clock, string? box, bool? unreadOnly, int? limit, string? cursor, CancellationToken ct)
+    internal static async Task<IResult> List(System.Security.Claims.ClaimsPrincipal principal, AppDbContext db, TimeProvider clock, string? box, bool? unreadOnly, int? limit, string? cursor, CancellationToken ct)
     {
         var me = UserId(principal);
         var now = clock.GetUtcNow().UtcDateTime;
@@ -126,7 +126,7 @@ public static class MailEndpoints
     private static async Task<GiftDto?> GiftOf(AppDbContext db, string? itemId, CancellationToken ct) =>
         itemId is null ? null : await db.ItemDefinitions.AsNoTracking().Where(d => d.ItemId == itemId).Select(d => new GiftDto(d.ItemId, d.Name, d.AssetKey, d.Rarity)).FirstOrDefaultAsync(ct);
 
-    private static async Task<IResult> Get(Guid id, System.Security.Claims.ClaimsPrincipal principal, AppDbContext db, TimeProvider clock, HttpContext ctx, CancellationToken ct)
+    internal static async Task<IResult> Get(Guid id, System.Security.Claims.ClaimsPrincipal principal, AppDbContext db, TimeProvider clock, HttpContext ctx, CancellationToken ct)
     {
         var me = UserId(principal);
         var now = clock.GetUtcNow().UtcDateTime;
@@ -138,7 +138,7 @@ public static class MailEndpoints
     }
 
     /// <summary>Opening a letter marks it read and hands over its gift, exactly once however often it is called.</summary>
-    private static async Task<IResult> Read(Guid id, System.Security.Claims.ClaimsPrincipal principal, AppDbContext db, Realtime.EventOutbox outbox, TimeProvider clock, HttpContext ctx, CancellationToken ct)
+    internal static async Task<IResult> Read(Guid id, System.Security.Claims.ClaimsPrincipal principal, AppDbContext db, Realtime.EventOutbox outbox, TimeProvider clock, HttpContext ctx, CancellationToken ct)
     {
         var me = UserId(principal);
         var now = clock.GetUtcNow().UtcDateTime;

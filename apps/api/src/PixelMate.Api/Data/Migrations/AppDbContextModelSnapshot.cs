@@ -298,6 +298,124 @@ namespace PixelMate.Api.Data.Migrations
                     b.ToTable("users", (string)null);
                 });
 
+            modelBuilder.Entity("PixelMate.Api.Devices.Device", b =>
+                {
+                    b.Property<Guid>("DeviceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("device_id");
+
+                    b.Property<DateTime?>("ActivatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("activated_at");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("CredentialHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("credential_hash");
+
+                    b.Property<DateTime?>("LastSeenAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("last_seen_at");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("model");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("owner_id");
+
+                    b.Property<Guid>("PetId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("pet_id");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("revoked_at");
+
+                    b.HasKey("DeviceId")
+                        .HasName("pk_devices");
+
+                    b.HasIndex("OwnerId")
+                        .HasDatabaseName("ix_devices_owner_id");
+
+                    b.HasIndex("PetId")
+                        .HasDatabaseName("ix_devices_pet_id");
+
+                    b.ToTable("devices", (string)null);
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Devices.DevicePairing", b =>
+                {
+                    b.Property<Guid>("PairingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("pairing_id");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("approved_at");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("code_hash");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime?>("DeliveredAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("delivered_at");
+
+                    b.Property<Guid?>("DeviceId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("device_id");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("expires_at");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("model");
+
+                    b.Property<string>("PollTokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("poll_token_hash");
+
+                    b.HasKey("PairingId")
+                        .HasName("pk_device_pairings");
+
+                    b.HasIndex("CodeHash")
+                        .IsUnique()
+                        .HasDatabaseName("ix_device_pairings_code_hash");
+
+                    b.HasIndex("ExpiresAt")
+                        .HasDatabaseName("ix_device_pairings_expires_at");
+
+                    b.ToTable("device_pairings", (string)null);
+                });
+
             modelBuilder.Entity("PixelMate.Api.Items.InventoryEntry", b =>
                 {
                     b.Property<Guid>("InventoryId")
@@ -981,6 +1099,23 @@ namespace PixelMate.Api.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_tokens_users_user_id");
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Devices.Device", b =>
+                {
+                    b.HasOne("PixelMate.Api.Data.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_devices_users_owner_id");
+
+                    b.HasOne("PixelMate.Api.Pets.Pet", null)
+                        .WithMany()
+                        .HasForeignKey("PetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_devices_pets_pet_id");
                 });
 
             modelBuilder.Entity("PixelMate.Api.Items.InventoryEntry", b =>

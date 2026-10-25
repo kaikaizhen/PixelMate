@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using PixelMate.Api.Devices;
 using PixelMate.Api.Realtime;
 using PixelMate.Api.Rooms;
 using PixelMate.Api.Social;
@@ -81,7 +82,9 @@ builder.Services.ConfigureApplicationCookie(o =>
     o.Events.OnRedirectToLogin = ctx => ErrorHandling.WriteAsync(ctx.HttpContext, 401, ErrorCodes.AuthRequired, "請先登入。");
     o.Events.OnRedirectToAccessDenied = ctx => ErrorHandling.WriteAsync(ctx.HttpContext, 403, ErrorCodes.NotOwner, "沒有權限執行這個操作。");
 });
+builder.Services.AddAuthentication().AddScheme<Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, DeviceAuthHandler>(DeviceCredentials.Scheme, null);   // paired devices: Bearer credential
 builder.Services.AddAuthorization();
+builder.Services.Configure<DeviceOptions>(builder.Configuration.GetSection("Devices"));
 
 builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection("Auth"));
 builder.Services.Configure<MailOptions>(builder.Configuration.GetSection("Mail"));
@@ -141,6 +144,9 @@ builder.Services.AddRateLimiter(o =>
     o.AddPolicy("auth", ctx => RateLimitPartition.GetFixedWindowLimiter("auth:" + ClientIp(ctx),
         _ => new FixedWindowRateLimiterOptions { PermitLimit = authPermit, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     var pairingPermit = builder.Configuration.GetValue("RateLimit:PairingPerMinute", 10);   // guessing codes / sending letters
+    var pollPermit = builder.Configuration.GetValue("RateLimit:DevicePollPerMinute", 40);   // a device waiting for the owner polls every few seconds
+    o.AddPolicy("devicepoll", ctx => RateLimitPartition.GetFixedWindowLimiter("devicepoll:" + ClientIp(ctx),
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = pollPermit, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     o.AddPolicy("pairing", ctx => RateLimitPartition.GetFixedWindowLimiter("pairing:" + ClientIp(ctx),
         _ => new FixedWindowRateLimiterOptions { PermitLimit = pairingPermit, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     o.OnRejected = (rc, _) => new ValueTask(ErrorHandling.WriteAsync(rc.HttpContext, StatusCodes.Status429TooManyRequests,
@@ -186,6 +192,7 @@ api.MapPairing();
 api.MapRoom();
 api.MapEvents();
 api.MapWeather();
+api.MapDevices();
 api.MapMail();
 if (app.Environment.IsDevelopment())
 {

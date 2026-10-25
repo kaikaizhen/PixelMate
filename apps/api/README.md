@@ -82,3 +82,9 @@ scenes, effects and costume tails are not items. Rarity follows the art batch: B
   memory plus Redis when `ConnectionStrings__Redis` is set (`192.168.0.100:6379,user=kaikaizhen,...`). A failing source is left alone for 2 minutes.
 - Players save a place with `PUT /me/location` (rounded to 0.1 degree + time zone); until then the pet lives in Taipei. `pet.world` carries
   `weather` (a condition word), `temperatureC`, `weatherSource`, `timeZone`; each device picks sunrise/day/sunset/night from its own clock.
+
+## Devices (ESP32)
+
+- `Devices/` – pairing (`device_pairings`, device-initiated code, owner approves in the app, the device collects its credential once), `devices`, a `Device` bearer
+  authentication scheme (only the `/device/*` routes accept it; it carries the owner's user id so the read endpoints are shared), rotate / revoke.
+  Credentials are `{deviceId}.{random}`; only SHA-256 is stored. Try it without hardware: `apps/device-simulator`.

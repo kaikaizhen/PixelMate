@@ -15,7 +15,7 @@ public static class EventEndpoints
     }
 
     /// <summary>What happened to me after event number <c>after</c> (oldest first). A client that was away uses it to learn what to re-read.</summary>
-    private static async Task<IResult> Catchup(ClaimsPrincipal principal, AppDbContext db, long? after, int? limit, CancellationToken ct)
+    internal static async Task<IResult> Catchup(ClaimsPrincipal principal, AppDbContext db, long? after, int? limit, CancellationToken ct)
     {
         var me = Guid.Parse(principal.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var take = Math.Clamp(limit ?? 100, 1, 200);
