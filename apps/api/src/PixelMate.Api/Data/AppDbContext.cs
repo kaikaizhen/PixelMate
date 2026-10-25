@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using PixelMate.Api.Items;
 using PixelMate.Api.Life;
 using PixelMate.Api.Pets;
+using PixelMate.Api.Rooms;
 using PixelMate.Api.Social;
 
 namespace PixelMate.Api.Data;
@@ -24,6 +25,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<PairingInvite> PairingInvites => Set<PairingInvite>();
     public DbSet<Relationship> Relationships => Set<Relationship>();
     public DbSet<Letter> Letters => Set<Letter>();
+    public DbSet<RoomState> RoomStates => Set<RoomState>();
+    public DbSet<RoomPlacement> RoomPlacements => Set<RoomPlacement>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -147,6 +150,23 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             e.HasOne<AppUser>().WithMany().HasForeignKey(x => x.RecipientId).OnDelete(DeleteBehavior.Cascade);
             e.HasOne<ItemDefinition>().WithMany().HasForeignKey(x => x.GiftItemId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne<ItemDefinition>().WithMany().HasForeignKey(x => x.PaperItemId).OnDelete(DeleteBehavior.Restrict);
+        });
+        b.Entity<RoomState>(e =>
+        {
+            e.ToTable("room_states");
+            e.HasKey(x => x.OwnerId);
+            e.Property(x => x.FloorItemId).HasMaxLength(80);
+            e.HasOne<AppUser>().WithOne().HasForeignKey<RoomState>(x => x.OwnerId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<ItemDefinition>().WithMany().HasForeignKey(x => x.FloorItemId).OnDelete(DeleteBehavior.Restrict);
+        });
+        b.Entity<RoomPlacement>(e =>
+        {
+            e.ToTable("room_placements", t => t.HasCheckConstraint("ck_room_placements_xy", "x >= 0 AND x <= 240 AND y >= 0 AND y <= 240"));
+            e.HasKey(x => x.PlacementId);
+            e.Property(x => x.ItemId).HasMaxLength(80).IsRequired();
+            e.HasIndex(x => x.OwnerId);
+            e.HasOne<AppUser>().WithMany().HasForeignKey(x => x.OwnerId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<ItemDefinition>().WithMany().HasForeignKey(x => x.ItemId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

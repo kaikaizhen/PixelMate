@@ -572,6 +572,74 @@ namespace PixelMate.Api.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PixelMate.Api.Rooms.RoomPlacement", b =>
+                {
+                    b.Property<Guid>("PlacementId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("placement_id");
+
+                    b.Property<string>("ItemId")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("item_id");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("owner_id");
+
+                    b.Property<int>("X")
+                        .HasColumnType("int")
+                        .HasColumnName("x");
+
+                    b.Property<int>("Y")
+                        .HasColumnType("int")
+                        .HasColumnName("y");
+
+                    b.HasKey("PlacementId")
+                        .HasName("pk_room_placements");
+
+                    b.HasIndex("ItemId")
+                        .HasDatabaseName("ix_room_placements_item_id");
+
+                    b.HasIndex("OwnerId")
+                        .HasDatabaseName("ix_room_placements_owner_id");
+
+                    b.ToTable("room_placements", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_room_placements_xy", "x >= 0 AND x <= 240 AND y >= 0 AND y <= 240");
+                        });
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Rooms.RoomState", b =>
+                {
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("owner_id");
+
+                    b.Property<string>("FloorItemId")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("floor_item_id");
+
+                    b.Property<int>("Revision")
+                        .HasColumnType("int")
+                        .HasColumnName("revision");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("OwnerId")
+                        .HasName("pk_room_states");
+
+                    b.HasIndex("FloorItemId")
+                        .HasDatabaseName("ix_room_states_floor_item_id");
+
+                    b.ToTable("room_states", (string)null);
+                });
+
             modelBuilder.Entity("PixelMate.Api.Social.Letter", b =>
                 {
                     b.Property<Guid>("LetterId")
@@ -884,6 +952,39 @@ namespace PixelMate.Api.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_pet_skills_pets_pet_id");
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Rooms.RoomPlacement", b =>
+                {
+                    b.HasOne("PixelMate.Api.Items.ItemDefinition", null)
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_room_placements_item_definitions_item_id");
+
+                    b.HasOne("PixelMate.Api.Data.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_room_placements_users_owner_id");
+                });
+
+            modelBuilder.Entity("PixelMate.Api.Rooms.RoomState", b =>
+                {
+                    b.HasOne("PixelMate.Api.Items.ItemDefinition", null)
+                        .WithMany()
+                        .HasForeignKey("FloorItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_room_states_item_definitions_floor_item_id");
+
+                    b.HasOne("PixelMate.Api.Data.AppUser", null)
+                        .WithOne()
+                        .HasForeignKey("PixelMate.Api.Rooms.RoomState", "OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_room_states_users_owner_id");
                 });
 
             modelBuilder.Entity("PixelMate.Api.Social.Letter", b =>
